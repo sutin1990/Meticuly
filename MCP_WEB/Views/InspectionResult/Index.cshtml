@@ -249,7 +249,7 @@ console.log(arrdata);
                 $.ajax({
                     type: 'GET',
                     url: '@Url.Action("Get_RoutestageSUB", "GirdInspectionResult")',
-                    data: { "AbsEntry": result[0].U_AbsEntry,"Docentry":Entry_docnum },
+                    data: { "U_StgEntry": result[0].U_StgEntry,"Docentry":Entry_docnum },
                     dataType: 'json',
                     success: function (result_R) {
                         console.log(result_R["items"][0].status);
@@ -259,6 +259,8 @@ console.log(arrdata);
                             grid.refresh();
                             DevExpress.ui.notify("Edit data success.", "success", 1500);
                             arrdata = [];
+                            //console.log(arrdata);
+                            type = "transection";
                         }
                     }
                 });

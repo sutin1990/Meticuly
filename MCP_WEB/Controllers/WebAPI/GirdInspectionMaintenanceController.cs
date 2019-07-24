@@ -36,6 +36,7 @@ namespace MCP_WEB.Controllers.WebAPI
         {
             try
             {
+                var IR = _context.VW_MFC_M_INSPECT_RESULT.Select(s=>s.U_InspectEntry).ToList();
                 var RS = (from a in _context.VW_MFC_ROUTEINSPECT
                          join b in _context.VW_MFC_OSRN on a.U_AbsEntry equals b.AbsEntry
                          //orderby a.U_RouteCode,a.U_MethodDesc,a.U_RptOrder descending
@@ -44,6 +45,7 @@ namespace MCP_WEB.Controllers.WebAPI
                          select new
                          {
                              a.DocEntry,
+                             a.Code,
                              a.U_RouteCode,
                              b.Desc,
                              a.U_AbsEntry,                            
@@ -55,7 +57,8 @@ namespace MCP_WEB.Controllers.WebAPI
                              a.U_Lastupdateby,
                              a.U_Lastupdatedate,
                              a.U_RptOrder,
-                             U_ActiveFlag =  a.U_ActiveFlag == "Y" ? true:false
+                             U_ActiveFlag =  a.U_ActiveFlag == "Y" ? true:false,
+                             USE = IR.Contains(Convert.ToInt32(a.Code))
 
                          });                
                 var result = new
@@ -174,8 +177,8 @@ namespace MCP_WEB.Controllers.WebAPI
                     var U_Lastupdateby = userLogin.Value;
 
                     List<VW_MFC_ROUTEINSPECT> newList = _context.VW_MFC_ROUTEINSPECT.Where(m => 
-                    m.U_RouteCode == U_RouteCode.ToString() &&
-                    m.U_MethodDesc.ToString() == U_MethodDesc.ToString() &&
+                    m.U_RouteCode.ToString().ToUpper() == U_RouteCode.ToString().ToUpper() &&
+                    m.U_MethodDesc.ToString().ToUpper() == U_MethodDesc.ToString().ToUpper() &&
                     m.U_RptOrder == Convert.ToInt16(U_RptOrder)
                     ).ToList();
 
@@ -350,28 +353,43 @@ namespace MCP_WEB.Controllers.WebAPI
         }
 
         [HttpPost]
-        public IActionResult DeleteData(string values)
+        public IActionResult DeleteData(string values,int Code)
         {
             var identity = (ClaimsIdentity)User.Identity;
             IEnumerable<Claim> claims = identity.Claims;
             var userLogin = claims.FirstOrDefault();
-            DataTable dt_result = new DataTable();
+            DataTable dt_result = new DataTable();            
+            dt_result.Columns.Add("SqlStatus", typeof(System.String));
+            dt_result.Columns.Add("SqlErrtext", typeof(System.String));
+            dt_result.Columns.Add("statuscode", typeof(System.String));
+            dt_result.Columns.Add("statusmessage", typeof(System.String));
+            dt_result.Columns.Add("Code", typeof(System.Int32));
             var msg = "";
-            var DocEntry = 0;           
+            //var Code = 0;           
             try
             {
-                DataTable dt = (DataTable)JsonConvert.DeserializeObject(values, (typeof(DataTable)));                
-               
-                foreach (DataRow row in dt.Rows)
-                {                   
-                    DocEntry = Convert.ToInt32(row["DocEntry"]);                  
+                //DataTable dt = (DataTable)JsonConvert.DeserializeObject(values, (typeof(DataTable)));                
 
+                //foreach (DataRow row in dt.Rows)
+                //{                   
+                //Code = Convert.ToInt32(row["Code"]);       
+                var check_use = _context.VW_MFC_M_INSPECT_RESULT.Where(w => w.U_InspectEntry == Code).ToList();
+                if (check_use.Count > 0)
+                {
+                    DataRow dr_e = dt_result.NewRow();
+                    dr_e["SqlStatus"] = "E";
+                    dr_e["SqlErrtext"] = "There is an use of this Inspection Method";
+                    dr_e["Code"] = Code;
+                    dt_result.Rows.Add(dr_e);
+                }
+                else
+                {
                     using (var cmd = _context.Database.GetDbConnection().CreateCommand())
                     {
                         cmd.Parameters.Clear();
                         cmd.CommandText = "m_sp_MasterData_DeleteSelect";
                         cmd.CommandType = CommandType.StoredProcedure;
-                        cmd.Parameters.Add(new SqlParameter("@DocEntry", SqlDbType.Int) { Value = DocEntry });                        
+                        cmd.Parameters.Add(new SqlParameter("@Code", SqlDbType.Int) { Value = Code });
                         if (cmd.Connection.State != ConnectionState.Open)
                         {
                             cmd.Connection.Open();
@@ -379,17 +397,32 @@ namespace MCP_WEB.Controllers.WebAPI
 
                         DbDataReader DbReader = cmd.ExecuteReader();
                         if (DbReader.HasRows)
-                        {                            
-                            dt_result.Load(DbReader);                            
+                        {
+                            DataTable dt_sp = new DataTable();
+                            dt_sp.Load(DbReader);
+                            DataRow dr_s = dt_result.NewRow();
+                            dr_s["SqlStatus"] = "S";
+                            dr_s["SqlErrtext"] = "";
+                            dr_s["statuscode"] = dt_sp.Rows[0]["statuscode"];
+                            dr_s["statusmessage"] = dt_sp.Rows[0]["statusmessage"];
+                            dr_s["Code"] = dt_sp.Rows[0]["Code"];
+                            dt_result.Rows.Add(dr_s);
                         }
                         cmd.Connection.Close();
                     }
                 }
+                    
+                //}
 
             }
             catch (SqlException ex)
             {
-                msg = ex.Message;       
+                msg = ex.Message;
+                DataRow dr_e = dt_result.NewRow();
+                dr_e["SqlStatus"] = "E";
+                dr_e["SqlErrtext"] = msg;
+                dr_e["Code"] = Code;
+                dt_result.Rows.Add(dr_e);
             }
 
             return Json(dt_result);

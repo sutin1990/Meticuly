@@ -100,8 +100,7 @@ namespace MCP_WEB.Controllers.WebAPI
         [HttpGet]
         public IActionResult Get_RoutestageSUB(DataSourceLoadOptions loadOptions, int U_StgEntry, int Docentry)
         {
-            //DocEntry = "117";
-            //xxxxxxx
+            //DocEntry = "117";            
             try
             {
                 var VRS = _context.VW_MFC_M_INSPECT_RESULT.Where(w => w.U_StgEntry == U_StgEntry && w.U_DocEntry == Docentry).ToList();
@@ -186,17 +185,24 @@ namespace MCP_WEB.Controllers.WebAPI
             var identity = (ClaimsIdentity)User.Identity;
             IEnumerable<Claim> claims = identity.Claims;
             var userLogin = claims.FirstOrDefault();
-            DataTable dt_result = new DataTable();
+            DataTable dt_result = new DataTable();           
+            dt_result.Columns.Add("SqlStatus", typeof(System.String));
+            dt_result.Columns.Add("SqlErrtext", typeof(System.String));
+            dt_result.Columns.Add("statuscode", typeof(System.String));
+            dt_result.Columns.Add("statusmessage", typeof(System.String));            
+            dt_result.Columns.Add("Code", typeof(System.Int32));
+            dt_result.Columns.Add("CodeInsert", typeof(System.Int32));
+            dt_result.Columns.Add("U_StgEntry", typeof(System.String));
             var msgj = "";
+            var Code = 0;
             try
             {                
                 DataTable dt = (DataTable)JsonConvert.DeserializeObject(values, (typeof(DataTable)));
-                var count = dt.Rows.Count;
-                
+                var count = dt.Rows.Count;                
 
                 foreach (DataRow row in dt.Rows)
                 {
-                    var Code = Convert.ToInt32(row["Code"]);
+                     Code = Convert.ToInt32(row["Code"]);
                     var U_AbsEntry = row["U_StgEntry"];
                     var U_InspectEntry = row["U_InspectEntry"] ;
                     var U_InspectMethod = row["U_InspectMethod"] ;
@@ -239,55 +245,54 @@ namespace MCP_WEB.Controllers.WebAPI
                         {
                             cmd.Connection.Open();
                         }
-
-                        DbDataReader DbReader = cmd.ExecuteReader();
-                        if (DbReader.HasRows)
+                        try
                         {
-                            //dt_result.Columns.Add("SqlStatus", typeof(System.String));
-                            //dt_result.Columns.Add("SqlErrtext", typeof(System.String));
-                            //DataRow dr = dt_result.NewRow();
-                            //dr["SqlStatus"] = "Seccess";
-                            //dr["SqlErrtext"] = "";
-                            //dt.Rows.Add(dr);
-                            dt_result.Load(DbReader);
-
-                            //foreach (DataRow row in dt.Rows)
-                            //{
-                            //    row["SqlStatus"] = "Seccess";
-                            //    row["SqlErrtext"] = "";
-                            //    dt.Rows.Add(row);
-                            //}
+                            DbDataReader DbReader = cmd.ExecuteReader();
+                            if (DbReader.HasRows)
+                            {
+                                DataTable dt_sp = new DataTable();
+                                dt_sp.Load(DbReader);
+                                DataRow dr_s = dt_result.NewRow();
+                                dr_s["SqlStatus"] = "S";
+                                dr_s["SqlErrtext"] = "";
+                                dr_s["statuscode"] = dt_sp.Rows[0]["statuscode"];
+                                dr_s["statusmessage"] = dt_sp.Rows[0]["statusmessage"];
+                                dr_s["Code"] = dt_sp.Rows[0]["Code"];
+                                dr_s["CodeInsert"] = dt_sp.Rows[0]["CodeInsert"];
+                                dr_s["U_StgEntry"] = dt_sp.Rows[0]["U_StgEntry"];
+                                dt_result.Rows.Add(dr_s);
+                            }
                         }
+                        catch(Exception ex)
+                        {
+                            msgj = ex.Message;
+                            DataRow dr_e = dt_result.NewRow();
+                            dr_e["SqlStatus"] = "E";
+                            dr_e["SqlErrtext"] = msgj;
+                            dr_e["Code"] = Code;
+                            dt_result.Rows.Add(dr_e);
+                        }                        
+                       
                         cmd.Connection.Close();
                     }
-
                     //if (u_absentry != Convert.ToInt32(U_AbsEntry) || u_passqty != U_PassQty || u_rejectqty != U_RejectQty || u_rejectreason != U_RejectReason.ToString() || u_comment != U_Comment.ToString())
                     //{
 
                     //}
-
                 }
                 
             }
             catch (SqlException ex)
             {
                 msgj = ex.Message;
-                //dt.Columns.Add("SqlStatus", typeof(System.String));
-                //dt.Columns.Add("SqlErrtext", typeof(System.String));
-                //DataRow dr = dt.NewRow();
-                //dr["SqlStatus"] = "Error";
-                //dr["SqlErrtext"] = msgj;
-                //dt.Rows.Add(dr);
-                //foreach (DataRow row in dt.Rows)
-                //{
-                //    row["SqlStatus"] = "Error";
-                //    row["SqlErrtext"] = msgj;
-                //    dt.Rows.Add(row);
-                //}
-            }                  
-
+                msgj = ex.Message;
+                DataRow dr_e = dt_result.NewRow();
+                dr_e["SqlStatus"] = "E";
+                dr_e["SqlErrtext"] = msgj;
+                dr_e["Code"] = Code;
+                dt_result.Rows.Add(dr_e);
+            } 
                 return Json(dt_result);
-           
         }
 
         private string GetFullErrorMessage(ModelStateDictionary modelState)

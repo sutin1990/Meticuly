@@ -2,7 +2,7 @@
 <style>
 
     a {
-        text-decoration: none !important;
+        text-decoration: none !important;        
     }
 
     .dx-link-edit-4x {
@@ -11,6 +11,12 @@
         width: auto;
         height: auto;
     }
+    .dx-link-delete-4x {        
+        padding-left: 5px;
+        font-size: 1.3em;
+        width: 50px;
+        height: auto;       
+    }
 
     /*.dx-datagrid-revert-tooltip {
         display: none;
@@ -18,6 +24,10 @@
 
     .dx-datagrid-rowsview .dx-data-row .dx-cell-modified .dx-highlight-outline::after {
         border-color: transparent;
+    }
+
+    .redClass{
+        color: red;
     }
    
     /*.dx-checkbox-icon {
@@ -30,6 +40,77 @@
         font-weight: bold;
     }*/
 </style>
+<script>
+    function cellTemplate_btnDelete(element, cellInfo) {
+        //$('<a/>')
+        //    .addClass('dx-link dx-link-edit dx-icon-edit dx-link-edit-4x ')
+        //    .on('dxclick', function () {
+        //        //$('#EditPopup').dxPopup('instance').option('visible', true);
+        //        OpenEdit(cellInfo.data);
+        //    }).appendTo(element);
+        
+        var check = false;
+        if (!cellInfo.data.USE) {
+            $('<a/>')
+                .attr('color','red')
+                .addClass("dx-link dx-link-delete dx-icon-trash dx-link-delete-4x redClass")                
+                .on('dxclick', function () {
+                    deleteButtonClick(cellInfo.data);
+                })
+                .appendTo(element);
+            
+        }
+        //console.log(cellInfo.data.U_MethodDesc, element);
+
+       
+
+    }
+
+    function deleteButtonClick(data) {
+        var grid = $('#gridInspectionMaintenance').dxDataGrid('instance');
+        var result = ShowConfirmDialog('Are you sure you want to Delete this record ?', 'Delete Inspection Method.');
+        //console.log(data)
+        result.done(function (dialogResult) {
+            if (dialogResult) { // Yes: confirm close
+                $.ajax({
+                    type: 'POST',
+                    url: '@Url.Action("DeleteData", "GirdInspectionMaintenance", new { httproute = true })',
+                    data: { "Code": data.Code},
+                    async: false,
+                    beforeSend: function () {/*loading*/ },
+                    dataType: 'json',
+                    success: function (result) {
+                        if (result.length > 0) {
+                            if (result[0].SqlStatus == "S") {
+                                DevExpress.ui.notify("Delete success.", "success", 1000);
+                                grid.refresh();
+                            } else {
+                                DevExpress.ui.notify(result[0].SqlErrtext, "warning", 2000);
+                                grid.refresh();
+                            }
+
+                        } else {
+                                DevExpress.ui.notify("Parameter Code incorrect.", "warning", 2000);
+                                grid.refresh();
+                        }
+                    //location.reload();
+                },
+                error: function (ob, errStr) {
+                    ob.stopPropagation();
+                    DevExpress.ui.notify(errStr, "error", 2000);
+                    grid.refresh();
+
+                }
+        });
+
+
+            } else { // No: don't close popup
+                //closeConfirmed = false;
+            }
+        });
+
+    }
+</script>
 <div id="addscrollpop" class="scrollpop">
     <div class="addcontentpop">
 
@@ -48,7 +129,7 @@
                                                     .DataSource(ds => ds.Mvc()
                                                     .Controller("GirdInspectionMaintenance")
                                                     .LoadAction("Get")
-
+                                                    
                                                     //.LoadParams(new { DocEntry = "117" })
                                                     //.Key("U_AbsEntry")
                                                     )
@@ -98,10 +179,14 @@
                                                         //columns.Add().DataField("UserId").Caption("User Id").ShowInColumnChooser(false).Visible(false);
 
                                                         //columns.Add().DataField("U_AbsEntry").Caption("DocEntry IN");
+                                                        columns.Add().Caption("Delete").Alignment(HorizontalAlignment.Center)
+                                                        .CellTemplate(new JS("cellTemplate_btnDelete")).AllowExporting(false);
+                                                        columns.Add().DataField("USE").Visible(false);
+                                                        columns.Add().DataField("Code").Visible(false);
                                                         columns.Add().DataField("DocEntry").Visible(false);
                                                         columns.Add().DataField("U_RouteCode").Caption("Route Code").Width(350)//.AllowSorting(false)
-                                                                                                                    //.CellTemplate("cellTemplate")
-                                                                                                                    //.SetCellValue("setStateValue")
+                                                                                                                               //.CellTemplate("cellTemplate")
+                                                                                                                               //.SetCellValue("setStateValue")
 
                                                             .Lookup(lookup => lookup
                                                                .DataSource(d => d.Mvc().Controller("GirdInspectionMaintenance").LoadAction("Get_OSRN").Key("AbsEntry"))
@@ -183,11 +268,11 @@
                                                                                 .FocusStateEnabled(true)
                                                                                 .OnClick("SaveInspection"))
                             @*<div style="text-align:left;">*@
-                                @(Html.DevExtreme().Button().ID("deletebtnSave").Type(ButtonType.Danger)
+                                @*@(Html.DevExtreme().Button().ID("deletebtnSave").Type(ButtonType.Danger)
                                                                                 .Text("Delete")
                                                                                 .Disabled(true)
                                                                                 .FocusStateEnabled(true)
-                                                                                .OnClick("delete_selected"))
+                                                                                .OnClick("delete_selected"))*@
 
                             @*</div>*@
                         </div>
@@ -545,6 +630,8 @@
         //if (e.rowType === "data" && e.dataField == "U_ActiveFlag") {
 
         //}
+        console.log(e.component);
+        //e.cellElement.find(".dx-link-delete").remove();
         arr_add.push(e.data);
         //e.element.find(".dx-checkbox").dxCheckBox('instance').option("value", true);
         $("#addbtnSave").dxButton({
@@ -986,11 +1073,14 @@
                             });
                             customDialog.show().done(function (dialogResult) {
                                 grid.option("editing.allowUpdating", false);
-                                grid.refresh();
-                                stagenew = "";
-                                arrdata = [];
-                                arr_add = [];
-                                getdata_on_flag = [];
+                                $("#addbtnSave").dxButton({
+                                    disabled: true
+                                });
+                                //grid.refresh();
+                                //stagenew = "";
+                                //arrdata = [];
+                                //arr_add = [];
+                                //getdata_on_flag = [];
 
                             });
                         } else {
@@ -1001,7 +1091,7 @@
                             arrdata = [];
                             arr_add = [];
                             getdata_on_flag = [];
-                            setTimeout(function () { location.reload(); }, 1000);
+                            //setTimeout(function () { location.reload(); }, 1000);
                         }                       
                         //DevExpress.ui.notify("Can not add data Error[ " + result[0].SqlErrtext + " ]", "error", 2000);  
                     },
@@ -1197,11 +1287,16 @@
     function onCellPrepared(e) {
        
         if (e.rowType == "data") {
+            //$links = e.cellElement.find(".dx-link");
+            //$links.filter(".dx-link-delete-4x").addClass("redClass");
+
             if (currentStatus == "needRefresh" && e.row.isEditing) {
                 currentStatus = "Editing";
                 console.log(e.row.isEditing);
             }
-            
+            if (stagenew == "new") {
+                e.cellElement.find(".dx-link-delete").remove();
+            }
             //if (e.data.__KEY__ === undefined) {
             //    e.component.option('onContextMenuPreparing', false);
             //} else {
