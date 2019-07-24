@@ -1,0 +1,122 @@
+﻿
+
+    @(Html.DevExtreme().DataGrid<MCP_WEB.Models.s_ProcessLog>()
+                                                    .ID("grdError")
+                                                    .AllowColumnResizing(true)
+                                                    .ColumnAutoWidth(true)
+                                                    .RemoteOperations(true)
+                                                    .ShowColumnLines(true)
+                                                    .ShowRowLines(true)
+                                                    .RowAlternationEnabled(true)
+                                                    .ShowBorders(true)
+                                                    .Scrolling(x => x.ShowScrollbar(ShowScrollbarMode.Always))
+                                .HeaderFilter(h => h.Visible(true))
+                                .FilterRow(f => f.Visible(true))
+                                .SearchPanel(p => p.Visible(true))
+                                .Pager(p => p
+                                .AllowedPageSizes(new int[] { 10, 25, 50, 100 })
+                                .ShowInfo(true)
+                                .ShowNavigationButtons(true)
+                                .ShowPageSizeSelector(true)
+                                .Visible(true))
+                                .Paging(p => p.PageSize(10))
+                                .ColumnChooser(c => c
+                                    .Enabled(true)
+                                    .Mode(GridColumnChooserMode.DragAndDrop))
+                                .Export(e => e.Enabled(true).FileName("Import - " + DateTime.Now).AllowExportSelectedData(true))
+    )
+
+
+    <br />
+    <br />
+    <div class='form-row'>
+        <div class="col-lg-4 col-xs-4 form-group form-group-sm padding-top"></div>
+        <div class='col-lg-2 col-xs-2 form-group form-group-sm padding-top'>
+            <button class='form-control btn btn-primary submit-button btn-xs' type='button' name="btnConfirmYes" id="btnConfirmYes">Confirm selected item</button>
+        </div>
+        <div class='col-lg-2 col-xs-2 form-group form-group-sm padding-top'>
+            <button class='form-control btn btn-warning submit-button btn-xs' type='button' name="btnComfirmNo" id="btnComfirmNo">Cancle</button>
+        </div>
+        <div class="col-lg-4 col-xs-4 form-group form-group-sm padding-top"></div>
+    </div>
+
+<script>
+
+
+
+
+    //No
+    $('#btnComfirmNo').click(function () {
+        $('#LogPopup').dxPopup('instance').option('visible', false);
+    });
+
+    //Yes
+    $('#btnConfirmYes').click(function () {
+        console.log('Confirm Yes');
+
+        var arr = [];
+        let grid = $("#grdError").dxDataGrid('instance');
+        //let rows = grid.getVisibleRows();
+        //getSelectedRowsData();
+        grid.getSelectedRowsData().done(function (rowData) {
+            for (var i = 0; i < rowData.length; i++) {
+                console.log(i);
+                console.log(rowData[i].FCode);
+
+                arr.push({
+                    id: rowData[i].id,
+                    fcode: rowData[i].FCode,
+                    itemcode: rowData[i].ItemCode,
+                    qtyorderall: rowData[i].QtyOrderAll,
+                    serieslot: rowData[i].SeriesLot,
+                    errorkey: rowData[i].ErrorKey
+                    //,confirm: row.data.Confirm
+                });
+            };
+
+            for (i = 0; i <= arr.length - 1; i++) {
+                console.log(arr[i]);
+            };
+
+            console.log("arr length");
+            console.log(arr.length);
+
+            if (arr.length == 0) {
+                DevExpress.ui.dialog.alert("Please select item.");
+                return;
+            }
+
+            var myArr = JSON.stringify(arr);
+
+            $.ajax({
+                url: 'FileUpload/WeeklyPlanConfirm',
+                data: { item: myArr },
+                dataType: "json",
+                type: "GET",
+                contentType: "application/json; charset=utf-8",
+                success: function (result) {
+
+                    if (result.status === "success") {
+                        console.log(result.status);
+                        $('#LogPopup').dxPopup('instance').option('visible', false);
+                        DevExpress.ui.dialog.alert("Import finish");
+                    }
+                    else {
+                        console.log(result.status);
+                        DevExpress.ui.dialog.alert(result.message);
+                    }
+                },
+                error: function (xhr, status, error) {
+                    console.log(xhr.responseText);
+                    console.log(status);
+                    DevExpress.ui.dialog.alert(error);
+                }
+            });
+
+
+        });
+        //end;
+
+    });
+    
+</script>

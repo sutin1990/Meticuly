@@ -1,0 +1,164 @@
+﻿
+@{
+    ViewData["Title"] = "Index";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+@(Html.DevExtreme().DataGrid<MCP_WEB.Models.m_Shift>()
+                    .ID("dgMain")
+                    .Selection(s => s.Mode(SelectionMode.Multiple)
+                                        .SelectAllMode(SelectAllMode.Page))
+                    .ShowBorders(true)
+                    .DataSource(ds => ds.Mvc()
+                        .Controller("m_Shift")
+                        .LoadAction("Get")
+                        .InsertAction("Post")
+                        .UpdateAction("Put")
+                        .DeleteAction("Delete")
+                        .Key("ShiftID")
+                    )
+                    .RemoteOperations(true)
+                    .ShowColumnLines(true)
+                    .ShowRowLines(true)
+                    .RowAlternationEnabled(true)
+                    .ShowBorders(true)
+                    .HeaderFilter(h => h.Visible(true))
+                    .FilterRow(f => f.Visible(true))
+                    .SearchPanel(p => p.Visible(true))
+                    .Pager(p => p
+                    .AllowedPageSizes(new int[] { 10, 25, 50, 100 })
+                    .ShowInfo(true)
+                    .ShowNavigationButtons(true)
+                    .ShowPageSizeSelector(true)
+                    .Visible(true))
+                    .Paging(p => p.PageSize(10))
+                    .ColumnChooser(c => c
+                        .Enabled(true)
+                        .Mode(GridColumnChooserMode.DragAndDrop))
+                    .AllowColumnResizing(true)
+                    .ColumnMinWidth(100)
+                    .ColumnAutoWidth(true)
+                    .ColumnHidingEnabled(true)
+                    .Export(e => e.Enabled(true).FileName("BP - " + DateTime.Now).AllowExportSelectedData(true))
+                    .Columns(columns =>
+                    {
+
+            //columns.AddFor(m => m.ShiftID)
+            //    .Caption("Shift ID.")
+            //    .DataType(GridColumnDataType.String)
+            //    .Alignment(HorizontalAlignment.Left)
+            //    .Visible(false);
+
+            columns.AddFor(m => m.ShiftType)
+                                        .Caption("Shift Type")
+                                        .DataType(GridColumnDataType.String)
+                                        .Alignment(HorizontalAlignment.Left)
+                                        .SortOrder(SortOrder.Asc);
+
+                        columns.AddFor(m => m.ShiftDesc)
+                            .Caption("Shift Desc.")
+                            .DataType(GridColumnDataType.String)
+                            .Alignment(HorizontalAlignment.Left);
+
+                        columns.AddFor(m => m.StartTime)
+                            .Caption("Start")
+                            .DataType(GridColumnDataType.DateTime)
+                            .Format(Format.ShortTime)
+                            .Alignment(HorizontalAlignment.Left);
+
+                        columns.AddFor(m => m.EndTime)
+                            .Caption("End")
+                            .DataType(GridColumnDataType.DateTime)
+                            .Format(Format.ShortTime)
+                            .Alignment(HorizontalAlignment.Left);
+
+                        columns.AddFor(m => m.TransDate)
+                            .Caption("Trans Date")
+                            .DataType(GridColumnDataType.DateTime)
+                            .Alignment(HorizontalAlignment.Left)
+                            .AllowEditing(false)
+                            .Visible(false)
+                            .Format(ViewBag.GlobalDtFormat)
+                            ;
+
+                        columns.AddFor(m => m.CreateDate)
+                            .Caption("Create Date")
+                            .DataType(GridColumnDataType.DateTime)
+                            .Alignment(HorizontalAlignment.Left)
+                            .AllowEditing(false)
+                            .Visible(false)
+                            .Format(ViewBag.GlobalDtFormat)
+                            ;
+
+                        columns.AddFor(m => m.ModifyBy)
+                            .Caption("Modify By")
+                            .DataType(GridColumnDataType.String)
+                            .Alignment(HorizontalAlignment.Left)
+                            .AllowEditing(false)
+                            .Visible(false);
+                    })
+                    .Editing(e => e
+                        .Mode(GridEditMode.Popup)
+                        .AllowAdding(true)
+                        .AllowUpdating(true)
+                        .AllowDeleting(true)
+                        .UseIcons(true)
+                        .Popup(p => p
+                            .Title("Info")
+                            .ShowTitle(true)
+                            .MaxWidth(700)
+                            .MaxHeight(345)
+                            .Position(pos => pos
+                            .My(HorizontalAlignment.Center, VerticalAlignment.Bottom)
+                            .At(HorizontalAlignment.Center, VerticalAlignment.Center)
+                            .Of(new JS("window"))
+                                    )
+                                )
+                        )
+
+                    .OnContentReady(@<text>
+                        function(e)
+                        {
+                        moveEditColumnToLeft(e.component);
+                        }
+                    </text>)
+
+                    .OnEditingStart(@<text> function(e) {
+                        e.component.columnOption("ShiftID", "allowEditing", false);
+                        e.component.columnOption("CreateDate", "allowEditing", false);
+                        e.component.columnOption("ModifyBy", "allowEditing", false);
+                        } </text>)
+
+                    .OnInitNewRow(@<text>function(e) {
+                        e.component.columnOption("ShiftID", "allowEditing", true);
+                        InitNewRow(e)
+                        }</text>)
+
+                    @*.OnEditorPreparing(@<text> function(e) {
+                        if (e.dataField == 'TransDate') {
+                            e.editorOptions.disabled = true;
+                            }
+                        if (e.dataField == 'CreateDate') {
+                            e.editorOptions.disabled = true;
+                            }
+                        if (e.dataField == 'ModifyBy') {
+                            e.editorOptions.disabled = true;
+                            }
+                        }</text>)*@
+)
+
+<script>
+    function moveEditColumnToLeft(dataGrid) {
+        dataGrid.columnOption("command:edit", {
+            visibleIndex: -1
+        });
+    }
+
+    function InitNewRow(e) {
+        e.data.TransDate = new Date();
+        e.data.CreateDate = new Date();
+        var u = "@(ViewBag.UserName)";
+        e.data.ModifyBy = u;
+    }
+
+</script>

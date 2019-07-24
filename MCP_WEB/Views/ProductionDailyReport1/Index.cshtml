@@ -1,0 +1,936 @@
+﻿<meta http-equiv='cache-control' content='no-cache'>
+<meta http-equiv='expires' content='0'>
+<meta http-equiv='pragma' content='no-cache'>
+@{
+    ViewData["Title"] = "Index";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+<style>
+    div.relative {
+        position: relative;
+        width: 100%;
+        border: 1px solid lightgray;
+        height: 120px;
+    }
+
+    div.absolute1 {
+        position: absolute;
+        top: 4.5%;
+        left: 2%;
+        width: 15%;
+        /*height: 100px;*/
+        /*border: 1px solid #73AD21;*/
+    }
+
+    div.absolute2 {
+        position: absolute;
+        /*top: 10px;*/
+        top: 4.5%;
+        left: 30%;
+        width: 20%;
+        /*height: 100px;*/
+        /*border: 1px solid #73AD21;*/
+    }
+
+    div.absolute3 {
+        position: absolute;
+        top: 8%;
+        left: 55%;
+        /*height: 100px;*/
+    }
+
+    div.absolute4 {
+        position: absolute;
+        top: 70px;
+        left: 2%;
+        /*height: 100px;*/
+    }
+</style>
+<form>
+    <br /><div class="relative">
+        <div class="absolute1"><label style="padding-top:10px">Date From:</label><div id="startdateBox" style="width:100%; left:55%; bottom:30px;"></div></div>
+        <div class="absolute2"><label style="padding-top:10px">Date To:</label><div id="enddateBox" style="left:34%; bottom:30px;"></div></div>
+        <div class="absolute4"><label>M/C Line:</label><div id="select_MachineMaste" style="left:46%; bottom:30px;"></div></div>
+        <div class="absolute3">
+            @(Html.DevExtreme().Button()
+                            .ID("btnOK")
+                            .Text("Ok")
+                            .Type(ButtonType.Success)
+                            .OnClick("filter")
+            )
+        </div>
+    </div>
+
+    <br />
+    <div id="gridContainer"></div>
+    <script>
+
+        const format = num => {
+            const n = String(num),
+                p = n.indexOf('.')
+            return n.replace(
+                /\d(?=(?:\d{3})+(?:\.|$))/g,
+                (m, i) => p < 0 || i < p ? `${m},` : m
+            )
+        }
+        var sumCUTOFFBAR = [];
+        var sumFRICTION = [];
+        var sumFORGING = [];
+        var sumSTELLITE_TIP = [];
+        var sumSTELLITE_SEAT = [];
+        var sumSTRAIGHTENING = [];
+        var sumSTEM_ROUGH = [];
+        var sumSTEM_FINISH = [];
+        var sumISONITE = [];
+        var sumSEAT_FINISH = [];
+        var sumQC = [];
+        var sumTotal = [];
+        var totalCUTOFFBAR = 0;
+    var Source_Grid = DevExpress.data.AspNet.createStore({
+        //"key": "ID",
+        "loadUrl": "@Url.Action("Get", "ProductionDailyReport1", new { httproute = true })",
+    });
+         $("#gridContainer").dxDataGrid({
+            dataSource: Source_Grid,
+            columnAutoWidth: true,
+            allowColumnReordering: true,
+            allowColumnResizing: true,
+             showRowLines: true,
+             columnChooser: {
+                 enabled: true,
+                 mode: "dragAndDrop" // or "select"
+             },
+            //remoteOperations:true,
+            "export": {
+                enabled: true,
+                fileName: "ProductionDailyReport1-" + Date(),
+                allowExportSelectedData: true,
+                customizeExcelCell: options => {
+                    var gridCell = options.gridCell;
+                    if (gridCell) {
+                        if (gridCell.rowType === 'data') {                         
+                            
+                               
+                                if (gridCell.column.dataField === 'FCode') {
+                                    options.backgroundColor = '#FFBB00';
+                                    options.font.color = '#000';
+                                }
+                            
+                        } 
+                    }
+                }
+            },
+            //onExporting: function (e) {
+            //    //console.log(e);
+            //    e.component.beginUpdate();
+            //    e.component.columnOption("customColumn", "visible", false);
+            //},
+            //onExported: function (e) {
+            //    e.component.columnOption("customColumn", "visible", false);
+            //    e.component.endUpdate();
+            //},
+            //customizeExportData: function (cols, rows) {
+            //    rows.forEach(function (row) {
+            //        //console.log(row);
+            //        if (row.rowType == "totalFooter") {
+            //            var rowValues = row.values;
+            //            //console.log(rowValues);
+            //            for (i = 0; i < rowValues.length; i++) {
+                            
+            //                if (typeof (rowValues[i]) === 'object') {
+            //                    //console.log(rowValues[i].column);
+            //                    if (rowValues[i].column === 'CUTOFFBAR') {
+            //                        //rowValues[i].value = 4000;
+            //                        //console.log(rowValues[i].value);
+            //                    }
+            //                    //if (rowValues[i][0].valueFormat && rowValues[i][0].valueFormat.type && rowValues[i][0].valueFormat.type == "fixedpoint" && rowValues[i][0].valueFormat.precision > 0) {
+            //                    //    rowValues[i][0].value = rowValues[i][0].value.toFixed(rowValues[i][0].valueFormat.precision);
+            //                    //}
+            //                }
+            //            }
+            //        }
+            //    });
+            //},
+
+            searchPanel: {
+                visible: true,
+                width: 240,
+                placeholder: "Search...",
+            },
+            headerFilter: {
+                visible: true,
+            },
+            filterRow: {
+                visible: true,
+                applyFilter: "auto",
+            },
+            rowAlternationEnabled: true,
+            showBorders: true,
+            paging: {
+                //enabled: false,
+                pageSize: 10,
+            },
+            pager: {
+                showPageSizeSelector: true,
+                allowedPageSizes: [10, 25, 50, 100],
+                showInfo: true,
+                showNavigationButtons: true,
+                showPageSizeSelector: true,
+                visible: true,
+            },
+            selection: {
+                mode: "multiple",
+                showCheckBoxesMode: "always",
+                selectAllMode: "page",
+            },
+            columns: [
+               
+                            {
+                                dataField: "FCode",                                
+                                showInColumnChooser: true
+                            }, 
+                            
+                            {
+                                dataField: "Model",                                
+                                showInColumnChooser: true
+                            },
+                                                       
+                            {
+                                dataField: "CUTOFFBAR",
+                                caption: "CUTOFFBAR",
+                                format: "#,##0",
+                                showInColumnChooser: true
+                            },
+                            {
+                                dataField: "FRICTION",
+                                caption: "FRICTION",
+                                format: "#,##0",
+                                showInColumnChooser: true
+                            },
+                            {
+                                dataField: "FORGING",
+                                caption: "FORGING",
+                                format: "#,##0",
+                                showInColumnChooser: true
+                            },
+                            {
+                                dataField: "STELLITETIP",
+                                caption: "STELLITE TIP",
+                                format: "#,##0",
+                                showInColumnChooser: true
+                            },
+                            {
+                                dataField: "STELLITESEAT",
+                                caption: "STELLITE SEAT", 
+                                format: "#,##0",
+                                showInColumnChooser: true
+                            },
+                            {
+                                dataField: "STRAIGHTENING",
+                                caption: "STRAIGHTENING",
+                                format: "#,##0",
+                                showInColumnChooser: true
+                            },
+                            {
+                                dataField: "STEMROUGH",
+                                caption: "STEM ROUGH",
+                                format: "#,##0",
+                                showInColumnChooser: true
+                            },
+                            {
+                                dataField: "STEMFINISH",
+                                caption: "STEM FINISH",
+                                format: "#,##0",
+                                showInColumnChooser: true
+                            },
+                            {
+                                dataField: "ISONITE",
+                                caption: "ISONITE",
+                                format: "#,##0",
+                                showInColumnChooser: true
+                            },
+                            {
+                                dataField: "SEATFINISH",
+                                caption: "SEAT FINISH",
+                                format: "#,##0",
+                                showInColumnChooser: true
+                            },
+                            {
+                                dataField: "QCVISUAL",
+                                caption: "QC",
+                                format: "#,##0",
+                                showInColumnChooser: true
+                            },
+                            {
+                                dataField: "Total",
+                                caption: "Total",
+                                format: "#,##0",
+                                showInColumnChooser: true
+                            },
+                            
+                                                       
+                        ],
+                        onCellPrepared: function (e) {
+                            if (e.rowType === "data" && e.column.dataField === "CUTOFFBAR" && e.rowIndex != undefined) {
+                                sumCUTOFFBAR.push(e.data.CUTOFFBAR);                               
+                            }
+                            if (e.rowType === "data" && e.column.dataField === "FRICTION" && e.rowIndex != undefined) {
+                                sumFRICTION.push(e.data.FRICTION);
+                            }
+                            if (e.rowType === "data" && e.column.dataField === "FORGING" && e.rowIndex != undefined) {
+                                sumFORGING.push(e.data.FORGING);
+                            }
+
+                            if (e.rowType === "data" && e.column.dataField === "STELLITETIP" && e.rowIndex != undefined) {
+                                sumSTELLITE_TIP.push(e.data.STELLITETIP);
+                            }
+
+                            if (e.rowType === "data" && e.column.dataField === "STELLITESEAT" && e.rowIndex != undefined) {
+                                sumSTELLITE_SEAT.push(e.data.STELLITESEAT);
+                            }
+
+                            if (e.rowType === "data" && e.column.dataField === "STRAIGHTENING" && e.rowIndex != undefined) {
+                                sumSTRAIGHTENING.push(e.data.STRAIGHTENING);
+                            }
+
+                            if (e.rowType === "data" && e.column.dataField === "STEMROUGH" && e.rowIndex != undefined) {
+                                sumSTEM_ROUGH.push(e.data.STEMROUGH);
+                            }
+
+                            if (e.rowType === "data" && e.column.dataField === "STEMFINISH" && e.rowIndex != undefined) {
+                                sumSTEM_FINISH.push(e.data.STEMFINISH);
+                            }
+
+                            if (e.rowType === "data" && e.column.dataField === "ISONITE" && e.rowIndex != undefined) {
+                                sumISONITE.push(e.data.ISONITE);
+                            }
+
+                            if (e.rowType === "data" && e.column.dataField === "SEATFINISH" && e.rowIndex != undefined) {
+                                sumSEAT_FINISH.push(e.data.SEATFINISH);
+                            }
+
+                            if (e.rowType === "data" && e.column.dataField === "QCVISUAL" && e.rowIndex != undefined) {
+                                sumQC.push(e.data.QCVISUAL);
+                            }
+
+                            if (e.rowType === "data" && e.column.dataField === "Total" && e.rowIndex != undefined) {
+                                sumTotal.push(e.data.Total);
+                            }
+
+                            if (e.rowType === "header" && e.column.dataField === "CUTOFFBAR") {
+                                                              
+                                //setTimeout(function () {
+                                //    e.cellElement.find(".dx-header-filter").unbind().on("dxclick", function (event) {                                        
+
+                                //        event.stopPropagation();
+                                //    });
+                                //});
+                            }
+                           
+             },
+             onOptionChanged: function (e) {
+                 //if (e.fullName.indexOf("visibleIndex") != -1)
+                     //console.log(e.fullName.indexOf("visibleIndex"));
+                     //alert("Column was moved");
+             },
+             onRowPrepared: function (e) {
+                 //if (e.rowType == 'data') {
+                 //    var currentFirstName = e.component.cellValue(e.rowIndex, "CUTOFFBAR");
+                 //    //console.log(e);
+                 //}
+                 
+             },             
+             onContentReady: function (e) {
+                 
+                //e.element.find(".dx-datagrid-total-footer")
+                //    .css("border-top", 0)
+                //    .css("border-bottom", "1px solid #d3d3d3")
+                //    .insertBefore(e.element.find(".dx-datagrid-rowsview"))
+
+               // $("#summary").text("Total SaleAmount: " + e.component.getTotalSummaryValue("CUTOFFBAR"));
+                //console.log(e.component.exportToExcel("CUTOFFBAR"));
+                //console.log(sumQtyMove.join(''));
+                //var sum = sumDigits(sumQtyMove.join(''));
+                //totalCUTOFFBAR = sumCUTOFFBAR.reduce((a, b) => parseFloat(a) + parseFloat(b), 0);
+                //$('#gridContainer .dx-datagrid-summary-item ').replaceWith(function () {
+                //    return e.element.find('.dx-datagrid-summary-item').text(" User Amount: "); // this.outerHTML.replace('|||', '<br/>');
+                //});
+                //var gridItems = $("#gridContainer").dxDataGrid('instance')._controllers.data._items;
+                //console.log(gridItems);
+                var gridItems = $("#gridContainer").dxDataGrid('instance');
+                
+                var total1 = sumCUTOFFBAR.reduce((a, b) => parseFloat(a) + parseFloat(b), 0);
+                sumCUTOFFBAR = [];
+                var total2 = sumFRICTION.reduce((a, b) => parseFloat(a) + parseFloat(b), 0);
+                sumFRICTION = [];
+                var total3 = sumFORGING.reduce((a, b) => parseFloat(a) + parseFloat(b), 0);
+                sumFORGING = [];
+                var total4 = sumSTELLITE_TIP.reduce((a, b) => parseFloat(a) + parseFloat(b), 0);
+                sumSTELLITE_TIP = [];
+                var total5 = sumSTELLITE_SEAT.reduce((a, b) => parseFloat(a) + parseFloat(b), 0);
+                sumSTELLITE_SEAT = [];
+                var total6 = sumSTRAIGHTENING.reduce((a, b) => parseFloat(a) + parseFloat(b), 0);
+                sumSTRAIGHTENING = [];
+                var total7 = sumSTEM_ROUGH.reduce((a, b) => parseFloat(a) + parseFloat(b), 0);
+                sumSTEM_ROUGH = [];
+                var total8 = sumSTEM_FINISH.reduce((a, b) => parseFloat(a) + parseFloat(b), 0);                
+                sumSTEM_FINISH = [];
+                var total9 = sumISONITE.reduce((a, b) => parseFloat(a) + parseFloat(b), 0);
+                sumISONITE = [];
+                var total10 = sumSEAT_FINISH.reduce((a, b) => parseFloat(a) + parseFloat(b), 0);
+                sumSEAT_FINISH = [];
+                var total11 = sumQC.reduce((a, b) => parseFloat(a) + parseFloat(b), 0);
+                sumQC = [];                
+                var total12 = sumTotal.reduce((a, b) => parseFloat(a) + parseFloat(b), 0);
+                 sumTotal = [];
+
+                 var summaryCells = e.component.getController('data').footerItems()[0].summaryCells;
+                 $.each(summaryCells, function (item, value) {
+                     if (value.length > 0) {
+                         //console.log(item + "=>" + value[0].name);
+                         var name = value[0].name;
+                         if (name == "CUTOFFBAR") {
+                             gridItems.getController('data').footerItems()[0].summaryCells[item][0].value = total1;
+                         }
+                         if (name == "FRICTION") {
+                             gridItems.getController('data').footerItems()[0].summaryCells[item][0].value = total2;
+                         }
+                         if (name == "FORGING") {
+                             gridItems.getController('data').footerItems()[0].summaryCells[item][0].value = total3;
+                         }
+                         if (name == "STELLITETIP") {
+                             gridItems.getController('data').footerItems()[0].summaryCells[item][0].value = total4;
+                         }
+                         if (name == "STELLITESEAT") {
+                             gridItems.getController('data').footerItems()[0].summaryCells[item][0].value = total5;
+                         }
+                         if (name == "STRAIGHTENING") {
+                             gridItems.getController('data').footerItems()[0].summaryCells[item][0].value = total6;
+                         }
+                         if (name == "STEMROUGH") {
+                             gridItems.getController('data').footerItems()[0].summaryCells[item][0].value = total7;
+                         }
+                         if (name == "STEMFINISH") {
+                             gridItems.getController('data').footerItems()[0].summaryCells[item][0].value = total8;
+                         }
+                         if (name == "ISONITE") {
+                             gridItems.getController('data').footerItems()[0].summaryCells[item][0].value = total9;
+                         }
+                         if (name == "SEATFINISH") {
+                             gridItems.getController('data').footerItems()[0].summaryCells[item][0].value = total10;
+                         }
+                         if (name == "QCVISUAL") {
+                             gridItems.getController('data').footerItems()[0].summaryCells[item][0].value = total11;
+                         }
+                         if (name == "Total") {
+                             gridItems.getController('data').footerItems()[0].summaryCells[item][0].value = total12;
+                         }
+                         gridItems.getView('footerView').render();
+                     }
+                 });
+                 NotSelection(gridItems);
+                 //var colCount = e.component.columnCount();
+                 //for (var i = 0; i < colCount; i++) {
+                 //    var position = e.component.columnOption(i, "visibleIndex") + "=>" + e.component.columnOption(i, "dataField");
+                 //    console.log(position);
+                 //    var column = e.component.columnOption(i, "dataField");
+                 //    var index = e.component.columnOption(i, "visibleIndex")+1;
+                 //    if (column == "CUTOFFBAR") {                         
+                 //        gridItems.getController('data').footerItems()[0].summaryCells[index][0].value = total1;                          
+                 //    }
+                 //    if (column == "FRICTION") {                         
+                 //        gridItems.getController('data').footerItems()[0].summaryCells[index][0].value = total2;                         
+                 //    }
+                 //    if (column == "FORGING") {
+                 //        gridItems.getController('data').footerItems()[0].summaryCells[index][0].value = total3;
+                 //    }
+                 //    if (column == "STELLITETIP") {
+                 //        gridItems.getController('data').footerItems()[0].summaryCells[index][0].value = total4;
+                 //    }
+                 //    if (column == "STELLITESEAT") {
+                 //        gridItems.getController('data').footerItems()[0].summaryCells[index][0].value = total5;
+                 //    }
+                 //    if (column == "STRAIGHTENING") {
+                 //        gridItems.getController('data').footerItems()[0].summaryCells[index][0].value = total6;
+                 //    }
+                 //    if (column == "STEMROUGH") {
+                 //        gridItems.getController('data').footerItems()[0].summaryCells[index][0].value = total7;
+                 //    }
+                 //    if (column == "STEMFINISH") {
+                 //        gridItems.getController('data').footerItems()[0].summaryCells[index][0].value = total8;
+                 //    }
+                 //    if (column == "ISONITE") {
+                 //        gridItems.getController('data').footerItems()[0].summaryCells[index][0].value = total9;
+                 //    }
+                 //    if (column == "SEATFINISH") {
+                 //        gridItems.getController('data').footerItems()[0].summaryCells[index][0].value = total10;
+                 //    }
+                 //    if (column == "QCVISUAL") {
+                 //        gridItems.getController('data').footerItems()[0].summaryCells[index][0].value = total11;
+                 //    }
+                 //    if (column == "Total") {
+                 //        gridItems.getController('data').footerItems()[0].summaryCells[index][0].value = total12;
+                 //    }
+                 //    gridItems.getView('footerView').render(); 
+                 //}
+                    
+                        },
+                        summary: {
+                            calculateCustomSummary: function (options) {                                   
+                                if (options.name == "CUTOFFBAR") { 
+                                    if (options.summaryProcess == "start") {                                       
+                                        options.totalValue = 0;
+                                    }
+                                    if (options.summaryProcess == "calculate") {                                        
+                                        if (options.value) {                                           
+                                            options.totalValue += options.value["CUTOFFBAR"];
+                                        }
+                                    }
+                                }
+
+                                if (options.name == "FRICTION") {
+                                    if (options.summaryProcess == "start") {
+                                        options.totalValue = 0;
+                                    }
+                                    if (options.summaryProcess == "calculate") {
+                                        if (options.value) {
+                                            options.totalValue += options.value["FRICTION"];
+                                        }
+                                    }
+                                }
+                                if (options.name == "FORGING") {
+                                    if (options.summaryProcess == "start") {
+                                        options.totalValue = 0;
+                                    }
+                                    if (options.summaryProcess == "calculate") {
+                                        if (options.value) {
+                                            options.totalValue += options.value["FORGING"];
+                                        }
+                                    }
+                                }
+                                if (options.name == "STELLITETIP") {
+                                    if (options.summaryProcess == "start") {
+                                        options.totalValue = 0;
+                                    }
+                                    if (options.summaryProcess == "calculate") {
+                                        if (options.value) {
+                                            options.totalValue += options.value["STELLITETIP"];
+                                        }
+                                    }
+                                }
+                                if (options.name == "STELLITESEAT") {
+                                    if (options.summaryProcess == "start") {
+                                        options.totalValue = 0;
+                                    }
+                                    if (options.summaryProcess == "calculate") {
+                                        if (options.value) {
+                                            options.totalValue += options.value["STELLITESEAT"];
+                                        }
+                                    }
+                                }
+                                if (options.name == "STRAIGHTENING") {
+                                    if (options.summaryProcess == "start") {
+                                        options.totalValue = 0;
+                                    }
+                                    if (options.summaryProcess == "calculate") {
+                                        if (options.value) {
+                                            options.totalValue += options.value["STRAIGHTENING"];
+                                        }
+                                    }
+                                }
+                                if (options.name == "STEMROUGH") {
+                                    if (options.summaryProcess == "start") {
+                                        options.totalValue = 0;
+                                    }
+                                    if (options.summaryProcess == "calculate") {
+                                        if (options.value) {
+                                            options.totalValue += options.value["STEMROUGH"];
+                                        }
+                                    }
+                                }
+                                if (options.name == "STEMFINISH") {
+                                    if (options.summaryProcess == "start") {
+                                        options.totalValue = 0;
+                                    }
+                                    if (options.summaryProcess == "calculate") {
+                                        if (options.value) {
+                                            options.totalValue += options.value["STEMFINISH"];
+                                        }
+                                    }
+                                }
+                                if (options.name == "ISONITE") {
+                                    if (options.summaryProcess == "start") {
+                                        options.totalValue = 0;
+                                    }
+                                    if (options.summaryProcess == "calculate") {
+                                        if (options.value) {
+                                            options.totalValue += options.value["ISONITE"];
+                                        }
+                                    }
+                                }
+                                if (options.name == "SEATFINISH") {
+                                    if (options.summaryProcess == "start") {
+                                        options.totalValue = 0;
+                                    }
+                                    if (options.summaryProcess == "calculate") {
+                                        if (options.value) {
+                                            options.totalValue += options.value["SEATFINISH"];
+                                        }
+                                    }
+                                }
+                                if (options.name == "QCVISUAL") {
+                                    if (options.summaryProcess == "start") {
+                                        options.totalValue = 0;
+                                    }
+                                    if (options.summaryProcess == "calculate") {
+                                        if (options.value) {
+                                            options.totalValue += options.value["QCVISUAL"];
+                                        }
+                                    }
+                                }
+                                if (options.name == "Total") {
+                                    if (options.summaryProcess == "start") {
+                                        options.totalValue = 0;
+                                    }
+                                    if (options.summaryProcess == "calculate") {
+                                        if (options.value) {
+                                            options.totalValue += options.value["Total"];
+                                        }
+                                    }
+                                }
+                            },
+                            totalItems: [{
+                                column: "Model",
+                                alignment: "right",
+                                customizeText: function (data) {
+                                    return "Total:";
+                                }
+                            },{                               
+                                    showInColumn:"CUTOFFBAR",
+                                    summaryType: "custom",
+                                    alignment: "right",
+                                    valueFormat: "#,##0",
+                                    name:"CUTOFFBAR",                              
+                                },{
+                                    showInColumn:"FRICTION",                                    
+                                    summaryType: "custom",
+                                    alignment: "right",
+                                    valueFormat: "#,##0",
+                                    name: "FRICTION",
+                                },{
+                                    showInColumn: "FORGING",
+                                    summaryType: "custom",
+                                    alignment: "right",
+                                    valueFormat: "#,##0",
+                                    name: "FORGING",
+                                },{
+                                    showInColumn: "STELLITETIP",
+                                    summaryType: "custom",
+                                    alignment: "right",
+                                    valueFormat: "#,##0",
+                                    name: "STELLITETIP",
+                                }, {
+                                    showInColumn: "STELLITESEAT",
+                                    summaryType: "custom",
+                                    alignment: "right",
+                                    valueFormat: "#,##0",
+                                    name: "STELLITESEAT",
+                                }, {
+                                    showInColumn: "STRAIGHTENING",
+                                    summaryType: "custom",
+                                    alignment: "right",
+                                    valueFormat: "#,##0",
+                                    name: "STRAIGHTENING",
+                                }, {
+                                    showInColumn: "STEMROUGH",
+                                    summaryType: "custom",
+                                    alignment: "right",
+                                    valueFormat: "#,##0",
+                                    name: "STEMROUGH",
+                                }, {
+                                    showInColumn: "STEMFINISH",
+                                    summaryType: "custom",
+                                    alignment: "right",
+                                    valueFormat: "#,##0",
+                                    name: "STEMFINISH",
+                                },{
+                                    showInColumn: "ISONITE",
+                                    summaryType: "custom",
+                                    alignment: "right",
+                                    valueFormat: "#,##0",
+                                    name: "ISONITE",
+                                },{
+                                    showInColumn: "SEATFINISH",
+                                    summaryType: "custom",
+                                    alignment: "right",
+                                    valueFormat: "#,##0",
+                                    name: "SEATFINISH",
+                                },{
+                                    showInColumn: "QCVISUAL",
+                                    summaryType: "custom",
+                                    alignment: "right",
+                                    valueFormat: "#,##0",
+                                    name: "QCVISUAL",
+                                }, {
+                                    showInColumn: "Total",
+                                    summaryType: "custom",
+                                    alignment: "right",
+                                    valueFormat: "#,##0",
+                                    name: "Total",
+                                },                                 
+                                //    column: "Total",
+                                //    summaryType: "sum",
+                                //    alignment: "right",
+                                //    valueFormat: "#,##0",
+                                //    displayFormat: "#,##0",
+                                //    customizeText: function (data) {
+                                //        //console.log(sumQtyMove.join(''));
+                                //        //var sum = sumDigits(sumQtyMove.join(''));
+                                //        var sum = sumTotal.reduce((a, b) => parseFloat(a) + parseFloat(b), 0);
+                                //        var total = sum.toLocaleString(
+                                //            undefined, // leave undefined to use the browser's locale,
+                                //            // or use a string like 'en-US' to override it.
+                                //            { minimumFractionDigits: 0 }
+                                //        );
+                                //        return format(sum);
+                                //    }
+                                //}
+                        ]
+                        }
+        });
+       
+
+    </script>
+
+    <br />
+
+    @(Html.DevExtreme().Button()
+                        .ID("btnPrintPreviewT1")
+                        .Text("Print")
+                        .Type(ButtonType.Default)
+                        //.UseSubmitBehavior(true)
+                        .OnClick("PrintPreview")
+    )
+
+    <script>
+
+
+    var source_m_MachineMaster = DevExpress.data.AspNet.createStore({
+                //"key": "ID",
+                "loadUrl": "@Url.Action("Get_m_MachineMaster", "ProductionDailyReport1", new { httproute = true })",
+    });
+    var display = "";
+    var machinemaste = 0;
+    $("#select_MachineMaste").dxSelectBox({
+        dataSource: source_m_MachineMaster,
+        displayExpr: function (e) {
+            if (e) {
+                display = e.MachineCode + " - " + e.MachineName;
+            }
+            return display;
+        },
+        //displayExpr: "DepDesc",
+        valueExpr: 'MachineCode',
+        searchEnabled: true,
+        searchExpr: ["MachineCode", "MachineName"],
+
+        itemTemplate: function (itemData) {
+            return $("<div />").append(
+                $("<p />").text(itemData.MachineCode + " - " + itemData.MachineName)
+                    .css("display", "inline-block")
+            );
+        },
+        onValueChanged: function (e) {
+            machinemaste = e.value;
+        },
+    });
+
+    var startdateBox = new Date();
+    startdateBox = startdateBox.getFullYear() + "-" + (startdateBox.getMonth() + 1) + "-" + startdateBox.getDate();
+    var enddateBox = new Date();
+    enddateBox = enddateBox.getFullYear() + "-" + (enddateBox.getMonth() + 1) + "-" + enddateBox.getDate();
+
+    $("#startdateBox").dxDateBox({
+        min: new Date(2000, 0, 1),
+        max: new Date(2029, 11, 31),
+        value: new Date(),
+        displayFormat: "dd/MM/yyyy",
+        formatString: 'shortdate',
+        onValueChanged: function (e) {
+            var ed = $("#enddateBox").dxDateBox('instance').option('value');
+            if (e.value.getTime() >= ed.getTime()) {
+                $("#enddateBox").dxDateBox("instance").option("isValid", true);//clear validate dateBox
+            }
+            startdateBox = e.value;
+            startdateBox = startdateBox.getFullYear() + "-" + (startdateBox.getMonth() + 1) + "-" + startdateBox.getDate();
+
+        },
+
+    }).dxValidator({
+        validationRules: [{
+            type: "required",
+            message: "From Date is required."
+        },
+        {
+            type: "custom",
+            message: "please select again From Date Must not be over To Date.",
+            validationCallback: function (e) {
+                var ed = $("#enddateBox").dxDateBox('instance').option('value');
+                var sd = e.value;
+                return sd && ed && sd.getTime() <= ed.getTime();
+            }
+        }
+        ]
+    });
+
+    $("#enddateBox").dxDateBox({
+        min: new Date(2000, 0, 1),
+        max: new Date(2029, 11, 31),
+        value: new Date(),
+        displayFormat: "dd/MM/yyyy",
+        formatString: 'dd MMM yyyy',
+        onValueChanged: function (e) {
+            var sd = $("#startdateBox").dxDateBox('instance').option('value');
+            if (e.value.getTime() >= sd.getTime()) {
+                $("#startdateBox").dxDateBox("instance").option("isValid", true);
+            }
+            enddateBox = e.value;
+            enddateBox = enddateBox.getFullYear() + "-" + (enddateBox.getMonth() + 1) + "-" + enddateBox.getDate();
+
+        }
+
+    }).dxValidator({
+        validationRules: [{
+            type: "required",
+            message: "To Date is required."
+        },
+        {
+            type: "custom",
+            message: "please select again To date Must not be less than From Date.",
+            validationCallback: function (e) {
+                var sd = $("#startdateBox").dxDateBox('instance').option('value');
+                var ed = e.value;
+                return ed && sd && ed.getTime() >= sd.getTime();
+            }
+        }
+        ]
+    });
+
+        var view = true;
+        function filter() {
+            view = false;
+        var check_enddate = $("#enddateBox").dxDateBox("instance").option('isValid');
+        var check_startdate = $("#startdateBox").dxDateBox("instance").option('isValid');
+
+        if (check_enddate == true && check_startdate == true) {
+
+            //console.log("start:", startdateBox);
+            //console.log("end:", enddateBox);
+            $.ajax({
+                type: 'POST',
+                url: "api/ProductionDailyReport1/Filter",
+                data: { "fromdate": startdateBox, "todate": enddateBox, "machinemaste": machinemaste },
+                async: false,
+                dataType: 'json',
+                success: function (result) {
+                    //console.log(result);
+                    $.each(result, function (item, value) {
+
+                        source = value;
+                    });
+
+                    $("#gridContainer").dxDataGrid({
+                        dataSource: result,
+                        
+                    });
+                    $("#gridContainer").dxDataGrid("instance").refresh();
+
+                },
+                error: function (ob, errStr) {
+                    DevExpress.ui.notify(errStr, "This MachineCode OR Rang TransDate is not available in the database", 2000);
+                }
+            });
+        }
+
+    }
+    </script>
+
+    <script>
+        function PrintPreview(data) {           
+        var grid = $('#gridContainer').dxDataGrid('instance');
+        var keys = grid.getSelectedRowKeys();
+        var text = "";
+        var s;
+        var comma = 0;
+        var checkslectDN = false;
+        if (keys.length > 0) {
+            for (s in keys) {
+                comma = parseInt(s) + 1;
+                if (comma == keys.length) {
+                    text += keys[s].RowNumber;
+                }
+                else {
+                    text += keys[s].RowNumber + ",";
+                }
+            }
+            if (startdateBox == null) {
+                startdateBox = "";
+            }
+            if (enddateBox == null) {
+                enddateBox = "";
+            }
+
+            //console.log("date:",startdateBox +'->'+ enddateBox)
+            //data.preventDefault();
+            //var element = this;
+            //window.open('api/ProductionDailyReport1_Print/PrintProductionDailyReport1?FCode=' + text);
+            $.ajax({
+                type: 'POST',
+                url: "api/ProductionDailyReport1_Print/PrintProductionDailyReport1",
+                data: { "RowNumber": text, "fromdate": startdateBox, "todate": enddateBox},
+                //contentType: "application/json; charset=utf-8",
+                //dataType: "html",
+                //async: false,
+                //dataType: 'json',
+                success: function (e) {
+                    //alert("xxx");
+                    //$(element).closest("form").submit();
+                    if (e) {
+                        if (view) {
+                            window.open('@Url.Action("Index", "PrintProduction1")', '_blank').focus();
+                        } else {
+                            window.open('@Url.Action("Index", "PrintProduction1")?fromdate=' + startdateBox + '&todate=' + enddateBox, '_blank').focus();
+                        }
+                        
+                    }
+                        //console.log(e);
+                    //alert("success");
+                    @*if (e) {
+                        window.open('@Url.Action("PrintProductionDailyReport1", "ProductionDailyReport1_Print")', '_blank').focus();
+                    }*@
+                }
+            });
+            //window.open('api/ProductionDailyReport1/PrintProductionDailyReport1','_blank');
+            @*window.open('@Url.Action("Index", "PrintProduction1")', '_blank').focus();*@
+           
+        } else {
+            var errorcustomDialog = DevExpress.ui.dialog.custom({
+                title: 'print Production Daily Report 1 incorrect ! ',
+                message: 'Please select Fcode.',
+                toolbarItems: [
+                    { text: "Close", onClick: function () { return "Ok" } },
+                    //{ text: "Not Ok", onClick: function () { return "Not Ok" } }
+                ],
+                width: "500px"
+
+            });
+            errorcustomDialog.show().done(function (dialogResult) {
+                //focus something
+            });
+        }
+             @*window.open('@Url.Action("Index", "PrintProduction1")', '_blank').focus();*@
+
+    }
+    </script>
+    @*@Html.ActionLink("cccc", "PrintProductionDailyReport1", "ProductionDailyReport1_Print", null, new { target = "_blank" })*@
+</form>

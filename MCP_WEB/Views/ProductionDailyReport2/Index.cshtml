@@ -1,0 +1,1296 @@
+﻿<style>
+    div.relative {
+        position: relative;
+        width: 100%;
+        border: 1px solid lightgray;
+        height: 120px;
+        margin-top: 10px;
+        margin-bottom: 10px;
+    }
+
+    div.absolute1 {
+        position: absolute;
+        top: 4.5%;
+        left: 2%;
+        width: 15%;
+        /*height: 100px;*/
+        /*border: 1px solid #73AD21;*/
+    }
+
+    div.absolute2 {
+        position: absolute;
+        /*top: 10px;*/
+        top: 4.5%;
+        left: 30%;
+        width: 20%;
+        /*height: 100px;*/
+        /*border: 1px solid #73AD21;*/
+    }
+
+    div.absolute3 {
+        position: absolute;
+        top: 8%;
+        left: 55%;
+        /*height: 100px;*/
+    }
+
+    div.absolute4 {
+        position: absolute;
+        top: 70px;
+        left: 2%;
+        width:30%;
+        /*height: 100px;*/
+    }
+</style>
+<div class="relative">
+    <div class="absolute1"><label style="padding-top:10px">Date From:</label><div id="startdateBox" style="width:100%; left:70%; bottom:30px;"></div></div>
+    <div class="absolute2"><label style="padding-top:10px">Date To:</label><div id="enddateBox" style="left:34%; bottom:30px;"></div></div>
+    <div class="absolute4"><label>ProcessCode:</label><div id="ProcessCode" style="left:35%; bottom:30px;"></div></div>
+    <div class="absolute3">
+        @(Html.DevExtreme().Button()
+                        .ID("Ok")
+                        .Text("Ok")
+                        .Type(ButtonType.Success)
+                        .OnClick("filter")
+        )
+
+ 
+    </div>
+
+</div>
+<script>
+        var startdateBox = new Date();
+        startdateBox = startdateBox.getFullYear() + "-" + (startdateBox.getMonth() + 1) + "-" + startdateBox.getDate();
+        var enddateBox = new Date();
+        enddateBox = enddateBox.getFullYear() + "-" + (enddateBox.getMonth() + 1) + "-" + enddateBox.getDate();
+    var maxItems = 3;
+    var suspendValueChagned;
+    var itemprocess = null;
+    //let qty = [];
+
+        $("#startdateBox").dxDateBox({
+            min: new Date(2000, 0, 1),
+            max: new Date(2029, 11, 31),
+            value: new Date(),
+            displayFormat: "dd/MM/yyyy",
+            formatString: 'shortdate',
+            onValueChanged: function (e) {
+                var ed = $("#enddateBox").dxDateBox('instance').option('value');
+                if (e.value.getTime() >= ed.getTime()) {
+                    $("#enddateBox").dxDateBox("instance").option("isValid", true);//clear validate dateBox
+                }
+                startdateBox = e.value;
+                startdateBox = startdateBox.getFullYear() + "-" + (startdateBox.getMonth() + 1) + "-" + startdateBox.getDate();
+
+            },
+
+        }).dxValidator({
+            validationRules: [{
+                type: "required",
+                message: "From Date is required."
+            },
+            {
+                type: "custom",
+                message: "please select again From Date Must not be over To Date.",
+                validationCallback: function (e) {
+                    var ed = $("#enddateBox").dxDateBox('instance').option('value');
+                    var sd = e.value;
+                    return sd && ed && sd.getTime() <= ed.getTime();
+                }
+            }
+            ]
+        });
+
+        $("#enddateBox").dxDateBox({
+            min: new Date(2000, 0, 1),
+            max: new Date(2029, 11, 31),
+            value: new Date(),
+            displayFormat: "dd/MM/yyyy",
+            formatString: 'dd MMM yyyy',
+            onValueChanged: function (e) {
+                var sd = $("#startdateBox").dxDateBox('instance').option('value');
+                if (e.value.getTime() >= sd.getTime()) {
+                    $("#startdateBox").dxDateBox("instance").option("isValid", true);
+                }
+                enddateBox = e.value;
+                enddateBox = enddateBox.getFullYear() + "-" + (enddateBox.getMonth() + 1) + "-" + enddateBox.getDate();
+
+            }
+
+        }).dxValidator({
+            validationRules: [{
+                type: "required",
+                message: "To Date is required."
+            },
+            {
+                type: "custom",
+                message: "please select again To date Must not be less than From Date.",
+                validationCallback: function (e) {
+                    var sd = $("#startdateBox").dxDateBox('instance').option('value');
+                    var ed = e.value;
+                    return ed && sd && ed.getTime() >= sd.getTime();
+                }
+            }
+            ]
+        });
+
+    $("#ProcessCode").dxTagBox({
+        dataSource: "@Url.Action("GetProcess", "GridProductionDailyReport2")",
+        //value: [1, 2, 3, 4],
+        displayExpr: "ProcessName",
+        valueExpr: "ProcessCode",
+        showSelectionControls: true,
+        maxDisplayedTags: 3,
+        showMultiTagOnly: false,
+        onValueChanged: function (e) {
+            //if (suspendValueChagned) {
+            //    suspendValueChagned = false;
+            //    return;
+            //}
+            //if (e.value.length > maxItems) {
+            //    suspendValueChagned = true;
+            //    e.component.option('value', e.previousValue);
+            //}
+            itemprocess = e.value;
+
+        }
+    }).dxValidator({
+        validationRules: [
+           // {
+        //    type: "required",
+        //    message: "ProcessCode is required."
+        //},
+            {
+                type: "custom",
+                message: "please Select ProcessCode.",
+                validationCallback: function (e) {
+
+                    return e.value!="" || e.value != null;
+                }
+            }
+        ]
+    });
+
+
+</script>
+
+@(Html.DevExtreme().DataGrid<MCP_WEB.Models.VW_MFC_ProductionDailyReport2>()
+                            .ID("gridContainer")
+                            .ShowBorders(true)
+                            .Export(e => e.Enabled(true).FileName("ProductionDailyReport2-" + DateTime.Now).AllowExportSelectedData(true))
+                            //.ColumnChooser(c => c.Enabled(true))
+                            .AllowColumnResizing(true)
+                            .AllowColumnReordering(true)
+                            .RemoteOperations(true)
+                            .ShowRowLines(true)
+                            .Selection(s => s.Mode(SelectionMode.Multiple)
+                                .ShowCheckBoxesMode(GridSelectionShowCheckBoxesMode.Always)
+                                .SelectAllMode(SelectAllMode.Page)
+                                )
+
+                            .HoverStateEnabled(true)
+                            .RowAlternationEnabled(true)
+                            .Paging(paging => paging.PageSize(10))
+                            .Pager(pager =>
+                            {
+                                pager.ShowPageSizeSelector(true);
+                                pager.AllowedPageSizes(new List<int> { 10, 25, 50, 100 });
+                                pager.ShowInfo(true);
+                                pager.Visible(true);
+                            })
+
+                            //.DataSource(d => d.Mvc().Controller("ProductionDailyReport1").LoadAction("Get"))
+
+                            //.FilterPanel(f => f.Visible(true))
+                            .HeaderFilter(h => h.Visible(true))
+                            .FilterRow(filterRow => filterRow
+                                    .Visible(true)
+                                    .ApplyFilter(GridApplyFilterMode.Auto))
+                            .SearchPanel(searchPanel => searchPanel
+                                .Visible(true)
+                                .Width(240)
+                                .Placeholder("Search..."))
+
+)
+
+@(Html.DevExtreme().Button()
+                    .ID("btnPrintPreviewT1")
+                    .Text("Print")
+                    .Type(ButtonType.Default)
+                    //.UseSubmitBehavior(true)
+                    .OnClick("PrintPreview")
+)
+
+@*<div id="gridContainer"></div>*@
+
+
+
+
+
+<script type="text/javascript">
+    const format = num => {
+        const n = String(num),
+            p = n.indexOf('.')
+        return n.replace(
+            /\d(?=(?:\d{3})+(?:\.|$))/g,
+            (m, i) => p < 0 || i < p ? `${m},` : m
+        )
+    }
+    var dt;
+    var MC = [];
+
+    //var jsonarray = [];
+    var uniq = [];
+
+    var MC_type = [];
+    function filter() {
+        var fcode = [];
+        var unique_Fcode;
+        var jsonarray = [];
+            var check_enddate = $("#enddateBox").dxDateBox("instance").option('isValid');
+            var check_startdate = $("#startdateBox").dxDateBox("instance").option('isValid');
+        var check_processcode = $("#ProcessCode").dxTagBox("instance").option('isValid');
+        //console.log(itemprocess);
+        if (itemprocess) {
+
+            if (check_enddate == true && check_startdate == true) {
+                $.ajax({
+                    type: "POST",
+                    url: "@Url.Action("Get", "GridProductionDailyReport2")",
+                    data: { "fromdate": startdateBox, "todate": enddateBox, "itemprocess": itemprocess },
+                    async: false,
+                    dataType: "json",
+                    success: function (result) {
+                        dt = result;
+                        var columnsIn = result[0];
+                        //console.log(result[0]);
+                        $.each(result, function (item, value) {
+                            fcode.push(value.FCode);
+
+                            jsonarray.push({ "FCode": value.FCode, "Model": value.Model });
+
+                            for (k in value) {//เลือกเอาเฉพาะKeyของข้อมูลมาก่อน
+                                MC.push(k);
+                            }
+                        });
+
+                    }
+                });
+                //console.log(jsonarray);
+                const startsWithMC = MC.filter((country) => country.startsWith("MC"));//กรองเอาเฉพาะitemที่ขึ้นต้นด้วย MC
+                const startsWithF = MC.filter((country) => country.startsWith("F"));//กรองเอาเฉพาะitemที่ขึ้นต้นด้วย MC
+
+
+                function onlyUnique(value, index, self) {//ตัดตัวซํ้า
+                    return self.indexOf(value) === index;
+                }
+
+
+                function compare(a, b) {//เรียงลำดับข้อมูลจากน้อยไปมาก
+                    if (parseInt(a.substring(2), 10) < parseInt(b.substring(2), 10))
+                        return -1;
+                    if (parseInt(a.substring(2), 10) > parseInt(b.substring(2), 10))
+                        return 1;
+                    return 0;
+                }
+
+                //for (var i = 0; i < jsonarray.length; i++) {//ตัดซํ้า
+                //    if (uniq.indexOf(jsonarray[i].FCode) === -1) {
+                //        uniq.push({ "FCode": jsonarray[i].FCode, "Model": jsonarray[i].Model });
+                //    }
+                //}
+                const result = [];
+                const map = new Map();
+                for (const item of jsonarray) { // เลือกเอาเฉพาะ Fcode และ โมเดลที่ไม่ ซํ้ากัน เอาไปแสดงในgrid ก่อน
+                    if (!map.has(item.FCode)) {
+                        map.set(item.FCode, true);    // set any value to Map
+                        result.push({
+                            "FCode": item.FCode,
+                            "Model": item.Model
+                        });
+                    }
+                }
+                //console.log(result);
+                //console.log(uniq.length);
+                //console.log(jsonarray.length);
+
+                var unique = startsWithMC.filter(onlyUnique);
+                fcode = fcode.filter(onlyUnique);
+                //var unique_jsonarray = jsonarray.filter(onlyUnique);
+
+                //console.log(unique);
+                var reMC = unique.sort(compare);
+                //console.log(startsWithMC);
+
+                //for (var x = 0; x < itemprocess.length; x++) {
+
+                //}
+                var json_opr = [];
+                var jsonSummary = [];
+                var jsonMC1 = [];
+                var summ = [];
+                var FORGING = [];
+                var summary_01 = [];
+                var summary_02 = [];
+                var summary_03 = [];
+                var summary_04 = [];
+                var summary_05 = [];
+                var summary_06 = [];
+                var summary_07 = [];
+                var summary_08 = [];
+                var summary_09 = [];
+                var summary_10 = [];
+                var summary_11 = [];
+
+                summary_01[0] = 0;
+                summary_02[0] = 0;
+
+                jsonSummary.push(
+                    {
+                        column: "Model",
+                        alignment: "right",
+                        customizeText: function (data) {
+                            return "Total:";
+                        }
+                    },
+                    //, { column: "MC01_1", summaryType: "sum", alignment: "right", displayFormat: "{0}", customizeText: function (data) { return summary_01[1]; } }
+                );
+                //alert(summary_01.length);
+                for (var a = 1; a <= 20; a++) {
+                    jsonSummary.push(
+                    { showInColumn: "MC01_" + a, name: "MC01_" + a, summaryType: "custom", valueFormat: "#,##0", alignment: "right" },
+                    { showInColumn: "MC02_" + a, name: "MC02_" + a, summaryType: "custom", valueFormat: "#,##0", alignment: "right" },
+                    { showInColumn: "MC03_" + a, name: "MC03_" + a, summaryType: "custom", valueFormat: "#,##0", alignment: "right" },
+                    { showInColumn: "MC04_" + a, name: "MC04_" + a, summaryType: "custom", valueFormat: "#,##0", alignment: "right" },
+                    { showInColumn: "MC05_" + a, name: "MC05_" + a, summaryType: "custom", valueFormat: "#,##0", alignment: "right" },
+                    { showInColumn: "MC06_" + a, name: "MC06_" + a, summaryType: "custom", valueFormat: "#,##0", alignment: "right" },
+                    { showInColumn: "MC07_" + a, name: "MC07_" + a, summaryType: "custom", valueFormat: "#,##0", alignment: "right" },
+                    { showInColumn: "MC08_" + a, name: "MC08_" + a, summaryType: "custom", valueFormat: "#,##0", alignment: "right" },
+                    { showInColumn: "MC09_" + a, name: "MC09_" + a, summaryType: "custom", valueFormat: "#,##0", alignment: "right" },
+                    { showInColumn: "MC10_" + a, name: "MC10_" + a, summaryType: "custom", valueFormat: "#,##0", alignment: "right" },
+                    { showInColumn: "MC11_" + a, name: "MC11_" + a, summaryType: "custom", valueFormat: "#,##0", alignment: "right" }
+                    );
+                }
+                function xxx() {
+                    //    jsonSummary.push(
+                    //        { column: "MC01_1", showInColumn: "MC01_1", summaryType: "sum", alignment: "right", valueFormat: "#,##0", customizeText: function (data) { if (typeof summary_01[1] === 'undefined') { return "0"; } else { return format(summary_01[1]); } } },
+                    //        { column: "MC01_2", showInColumn: "MC01_2", summaryType: "sum", alignment: "right", valueFormat: "#,##0", customizeText: function (data) { if (typeof summary_01[1] === 'undefined') { return "0"; } else { return format(summary_01[2]); } } } ,
+                    //        { column: "MC01_3", showInColumn: "MC01_3", summaryType: "sum", alignment: "right", valueFormat: "#,##0", customizeText: function (data) { if (typeof summary_01[1] === 'undefined') { return "0"; } else { return format(summary_01[3]); } } } ,
+                    //        //{ column: "MC01_1", summaryType: "sum", alignment: "right", displayFormat: "{0}", value: summary_01[1] },
+                    //        //{ column: "MC01_2", summaryType: "sum", alignment: "right", displayFormat: "{0}", value: summary_01[2] },                    
+                    //        //{ column: "MC01_3", summaryType: "sum", alignment: "right", displayFormat: "{0}", value: summary_01[3] },
+                    //        { column: "MC01_4", summaryType: "sum", alignment: "right", displayFormat: "{0}", customizeText: function (data) { if (typeof summary_01[1] === 'undefined') { return "0"; } else { return format(summary_01[4]); } } } ,
+                    //        { column: "MC01_5", summaryType: "sum", alignment: "right", displayFormat: "{0}", customizeText: function (data) { if (typeof summary_01[1] === 'undefined') { return "0"; } else { return format(summary_01[5]); } } } ,
+                    //        { column: "MC01_6", summaryType: "sum", alignment: "right", displayFormat: "{0}", customizeText: function (data) { if (typeof summary_01[1] === 'undefined') { return "0"; } else { return format(summary_01[6]); } } } ,
+                    //        { column: "MC01_7", summaryType: "sum", alignment: "right", displayFormat: "{0}", customizeText: function (data) { if (typeof summary_01[1] === 'undefined') { return "0"; } else { return format(summary_01[7]); } } } ,
+                    //        { column: "MC01_8", summaryType: "sum", alignment: "right", displayFormat: "{0}", customizeText: function (data) { if (typeof summary_01[1] === 'undefined') { return "0"; } else { return format(summary_01[8]); } } } ,
+                    //        { column: "MC01_9", summaryType: "sum", alignment: "right", displayFormat: "{0}", customizeText: function (data) { if (typeof summary_01[1] === 'undefined') { return "0"; } else { return format(summary_01[9]); } } } ,
+                    //        { column: "MC01_10", summaryType: "sum", alignment: "right", displayFormat: "{0}", customizeText: function (data) { if (typeof summary_01[1] === 'undefined') { return "0"; } else { return format(summary_01[10]); } } } ,
+                    //        { column: "MC01_11", summaryType: "sum", alignment: "right", displayFormat: "{0}", customizeText: function (data) { if (typeof summary_01[1] === 'undefined') { return "0"; } else { return format(summary_01[11]); } } } ,
+                    //        { column: "MC01_12", summaryType: "sum", alignment: "right", displayFormat: "{0}", customizeText: function (data) { if (typeof summary_01[1] === 'undefined') { return "0"; } else { return format(summary_01[12]); } } } ,
+                    //        { column: "MC01_13", summaryType: "sum", alignment: "right", displayFormat: "{0}", customizeText: function (data) { if (typeof summary_01[1] === 'undefined') { return "0"; } else { return format(summary_01[13]); } } } ,
+                    //        { column: "MC01_14", summaryType: "sum", alignment: "right", displayFormat: "{0}", customizeText: function (data) { if (typeof summary_01[1] === 'undefined') { return "0"; } else { return format(summary_01[14]); } } } ,
+                    //        { column: "MC01_15", summaryType: "sum", alignment: "right", displayFormat: "{0}", customizeText: function (data) { if (typeof summary_01[1] === 'undefined') { return "0"; } else { return format(summary_01[15]); } } } ,
+                    //        { column: "MC01_16", summaryType: "sum", alignment: "right", displayFormat: "{0}", customizeText: function (data) { if (typeof summary_01[1] === 'undefined') { return "0"; } else { return format(summary_01[16]); } } } ,
+                    //        { column: "MC01_17", summaryType: "sum", alignment: "right", displayFormat: "{0}", customizeText: function (data) { if (typeof summary_01[1] === 'undefined') { return "0"; } else { return format(summary_01[17]); } } } ,
+                    //        { column: "MC01_18", summaryType: "sum", alignment: "right", displayFormat: "{0}", customizeText: function (data) { if (typeof summary_01[1] === 'undefined') { return "0"; } else { return format(summary_01[18]); } } } ,
+                    //        { column: "MC01_19", summaryType: "sum", alignment: "right", displayFormat: "{0}", customizeText: function (data) { if (typeof summary_01[1] === 'undefined') { return "0"; } else { return format(summary_01[19]); } } } ,
+                    //        { column: "MC01_20", summaryType: "sum", alignment: "right", displayFormat: "{0}", customizeText: function (data) { if (typeof summary_01[1] === 'undefined') { return "0"; } else { return format(summary_01[20]); } } } ,
+
+                    //    );
+
+                    //jsonSummary.push(
+                    //    { column: "MC02_1", summaryType: "sum", alignment: "right", displayFormat: "{0}", customizeText: function (data) { if (typeof summary_02[1] === 'undefined') { return "0"; } else { return format(summary_02[1]); } } },
+                    //        { column: "MC02_2", summaryType: "sum", alignment: "right", displayFormat: "{0}", customizeText: function (data) { if (typeof summary_02[1] === 'undefined') { return "0"; } else { return format(summary_02[2]); } } } ,
+                    //        { column: "MC02_3", summaryType: "sum", alignment: "right", displayFormat: "{0}", customizeText: function (data) { if (typeof summary_02[1] === 'undefined') { return "0"; } else { return format(summary_02[3]); } } } ,
+                    //        { column: "MC02_4", summaryType: "sum", alignment: "right", displayFormat: "{0}", customizeText: function (data) { if (typeof summary_02[1] === 'undefined') { return "0"; } else { return format(summary_02[4]); } } } ,
+                    //        { column: "MC02_5", summaryType: "sum", alignment: "right", displayFormat: "{0}", customizeText: function (data) { if (typeof summary_02[1] === 'undefined') { return "0"; } else { return format(summary_02[5]); } } } ,
+                    //        { column: "MC02_6", summaryType: "sum", alignment: "right", displayFormat: "{0}", customizeText: function (data) { if (typeof summary_02[1] === 'undefined') { return "0"; } else { return format(summary_02[6]); } } } ,
+                    //        { column: "MC02_7", summaryType: "sum", alignment: "right", displayFormat: "{0}", customizeText: function (data) { if (typeof summary_02[1] === 'undefined') { return "0"; } else { return format(summary_02[7]); } } } ,
+                    //        { column: "MC02_8", summaryType: "sum", alignment: "right", displayFormat: "{0}", customizeText: function (data) { if (typeof summary_02[1] === 'undefined') { return "0"; } else { return format(summary_02[8]); } } } ,
+                    //        { column: "MC02_9", summaryType: "sum", alignment: "right", displayFormat: "{0}", customizeText: function (data) { if (typeof summary_02[1] === 'undefined') { return "0"; } else { return format(summary_02[9]); } } } ,
+                    //        { column: "MC02_10", summaryType: "sum", alignment: "right", displayFormat: "{0}", customizeText: function (data) { if (typeof summary_02[1] === 'undefined') { return "0"; } else { return format(summary_02[10]); } } } ,
+                    //        { column: "MC02_11", summaryType: "sum", alignment: "right", displayFormat: "{0}", customizeText: function (data) { if (typeof summary_02[1] === 'undefined') { return "0"; } else { return format(summary_02[11]); } } } ,
+                    //        { column: "MC02_12", summaryType: "sum", alignment: "right", displayFormat: "{0}", customizeText: function (data) { if (typeof summary_02[1] === 'undefined') { return "0"; } else { return format(summary_02[12]); } } } ,
+                    //        { column: "MC02_13", summaryType: "sum", alignment: "right", displayFormat: "{0}", customizeText: function (data) { if (typeof summary_02[1] === 'undefined') { return "0"; } else { return format(summary_02[13]); } } } ,
+                    //        { column: "MC02_14", summaryType: "sum", alignment: "right", displayFormat: "{0}", customizeText: function (data) { if (typeof summary_02[1] === 'undefined') { return "0"; } else { return format(summary_02[14]); } } } ,
+                    //        { column: "MC02_15", summaryType: "sum", alignment: "right", displayFormat: "{0}", customizeText: function (data) { if (typeof summary_02[1] === 'undefined') { return "0"; } else { return format(summary_02[15]); } } } ,
+                    //        { column: "MC02_16", summaryType: "sum", alignment: "right", displayFormat: "{0}", customizeText: function (data) { if (typeof summary_02[1] === 'undefined') { return "0"; } else { return format(summary_02[16]); } } } ,
+                    //        { column: "MC02_17", summaryType: "sum", alignment: "right", displayFormat: "{0}", customizeText: function (data) { if (typeof summary_02[1] === 'undefined') { return "0"; } else { return format(summary_02[17]); } } } ,
+                    //        { column: "MC02_18", summaryType: "sum", alignment: "right", displayFormat: "{0}", customizeText: function (data) { if (typeof summary_02[1] === 'undefined') { return "0"; } else { return format(summary_02[18]); } } } ,
+                    //        { column: "MC02_19", summaryType: "sum", alignment: "right", displayFormat: "{0}", customizeText: function (data) { if (typeof summary_02[1] === 'undefined') { return "0"; } else { return format(summary_02[19]); } } } ,
+                    //        { column: "MC02_20", summaryType: "sum", alignment: "right", displayFormat: "{0}", customizeText: function (data) { if (typeof summary_02[1] === 'undefined') { return "0"; } else { return format(summary_02[20]); } } } ,
+                    //);
+
+
+                    //jsonSummary.push(
+                    //    { column: "MC03_1", summaryType: "sum", alignment: "right", displayFormat: "{0}", customizeText: function (data) { if (typeof summary_03[1] === 'undefined') { return "0"; } else { return format(summary_03[1]); } } },
+                    //    { column: "MC03_2", summaryType: "sum", alignment: "right", displayFormat: "{0}", customizeText: function (data) { if (typeof summary_03[1] === 'undefined') { return "0"; } else { return format(summary_03[2]); } } },
+                    //    { column: "MC03_3", summaryType: "sum", alignment: "right", displayFormat: "{0}", customizeText: function (data) { if (typeof summary_03[1] === 'undefined') { return "0"; } else { return format(summary_03[3]); } } },
+                    //    { column: "MC03_4", summaryType: "sum", alignment: "right", displayFormat: "{0}", customizeText: function (data) { if (typeof summary_03[1] === 'undefined') { return "0"; } else { return format(summary_03[4]); } } },
+                    //    { column: "MC03_5", summaryType: "sum", alignment: "right", displayFormat: "{0}", customizeText: function (data) { if (typeof summary_03[1] === 'undefined') { return "0"; } else { return format(summary_03[5]); } } },
+                    //    { column: "MC03_6", summaryType: "sum", alignment: "right", displayFormat: "{0}", customizeText: function (data) { if (typeof summary_03[1] === 'undefined') { return "0"; } else { return format(summary_03[6]); } } },
+                    //    { column: "MC03_7", summaryType: "sum", alignment: "right", displayFormat: "{0}", customizeText: function (data) { if (typeof summary_03[1] === 'undefined') { return "0"; } else { return format(summary_03[7]); } } },
+                    //    { column: "MC03_8", summaryType: "sum", alignment: "right", displayFormat: "{0}", customizeText: function (data) { if (typeof summary_03[1] === 'undefined') { return "0"; } else { return format(summary_03[8]); } } },
+                    //    { column: "MC03_9", summaryType: "sum", alignment: "right", displayFormat: "{0}", customizeText: function (data) { if (typeof summary_03[1] === 'undefined') { return "0"; } else { return format(summary_03[9]); } } },
+                    //    { column: "MC03_10", summaryType: "sum", alignment: "right", displayFormat: "{0}", customizeText: function (data) { if (typeof summary_03[1] === 'undefined') { return "0"; } else { return format(summary_03[10]); } } },
+                    //    { column: "MC03_11", summaryType: "sum", alignment: "right", displayFormat: "{0}", customizeText: function (data) { if (typeof summary_03[1] === 'undefined') { return "0"; } else { return format(summary_03[11]); } } },
+                    //    { column: "MC03_12", summaryType: "sum", alignment: "right", displayFormat: "{0}", customizeText: function (data) { if (typeof summary_03[1] === 'undefined') { return "0"; } else { return format(summary_03[12]); } } },
+                    //    { column: "MC03_13", summaryType: "sum", alignment: "right", displayFormat: "{0}", customizeText: function (data) { if (typeof summary_03[1] === 'undefined') { return "0"; } else { return format(summary_03[13]); } } },
+                    //    { column: "MC03_14", summaryType: "sum", alignment: "right", displayFormat: "{0}", customizeText: function (data) { if (typeof summary_03[1] === 'undefined') { return "0"; } else { return format(summary_03[14]); } } },
+                    //    { column: "MC03_15", summaryType: "sum", alignment: "right", displayFormat: "{0}", customizeText: function (data) { if (typeof summary_03[1] === 'undefined') { return "0"; } else { return format(summary_03[15]); } } },
+                    //    { column: "MC03_16", summaryType: "sum", alignment: "right", displayFormat: "{0}", customizeText: function (data) { if (typeof summary_03[1] === 'undefined') { return "0"; } else { return format(summary_03[16]); } } },
+                    //    { column: "MC03_17", summaryType: "sum", alignment: "right", displayFormat: "{0}", customizeText: function (data) { if (typeof summary_03[1] === 'undefined') { return "0"; } else { return format(summary_03[17]); } } },
+                    //    { column: "MC03_18", summaryType: "sum", alignment: "right", displayFormat: "{0}", customizeText: function (data) { if (typeof summary_03[1] === 'undefined') { return "0"; } else { return format(summary_03[18]); } } },
+                    //    { column: "MC03_19", summaryType: "sum", alignment: "right", displayFormat: "{0}", customizeText: function (data) { if (typeof summary_03[1] === 'undefined') { return "0"; } else { return format(summary_03[19]); } } },
+                    //    { column: "MC03_20", summaryType: "sum", alignment: "right", displayFormat: "{0}", customizeText: function (data) { if (typeof summary_03[1] === 'undefined') { return "0"; } else { return format(summary_03[20]); } } } ,
+                    //);
+
+
+                    //jsonSummary.push(
+                    //    { column: "MC04_1", summaryType: "sum", alignment: "right", displayFormat: "{0}", customizeText: function (data) { if (typeof summary_04[1] === 'undefined') { return "0"; } else { return format(summary_04[1]); } } },
+                    //    { column: "MC04_2", summaryType: "sum", alignment: "right", displayFormat: "{0}", customizeText: function (data) { if (typeof summary_04[1] === 'undefined') { return "0"; } else { return format(summary_04[2]); } } },
+                    //    { column: "MC04_3", summaryType: "sum", alignment: "right", displayFormat: "{0}", customizeText: function (data) { if (typeof summary_04[1] === 'undefined') { return "0"; } else { return format(summary_04[3]); } } },
+                    //    { column: "MC04_4", summaryType: "sum", alignment: "right", displayFormat: "{0}", customizeText: function (data) { if (typeof summary_04[1] === 'undefined') { return "0"; } else { return format(summary_04[4]); } } },
+                    //    { column: "MC04_5", summaryType: "sum", alignment: "right", displayFormat: "{0}", customizeText: function (data) { if (typeof summary_04[1] === 'undefined') { return "0"; } else { return format(summary_04[5]); } } },
+                    //    { column: "MC04_6", summaryType: "sum", alignment: "right", displayFormat: "{0}", customizeText: function (data) { if (typeof summary_04[1] === 'undefined') { return "0"; } else { return format(summary_04[6]); } } },
+                    //    { column: "MC04_7", summaryType: "sum", alignment: "right", displayFormat: "{0}", customizeText: function (data) { if (typeof summary_04[1] === 'undefined') { return "0"; } else { return format(summary_04[7]); } } },
+                    //    { column: "MC04_8", summaryType: "sum", alignment: "right", displayFormat: "{0}", customizeText: function (data) { if (typeof summary_04[1] === 'undefined') { return "0"; } else { return format(summary_04[8]); } } },
+                    //    { column: "MC04_9", summaryType: "sum", alignment: "right", displayFormat: "{0}", customizeText: function (data) { if (typeof summary_04[1] === 'undefined') { return "0"; } else { return format(summary_04[9]); } } },
+                    //    { column: "MC04_10", summaryType: "sum", alignment: "right", displayFormat: "{0}", customizeText: function (data) { if (typeof summary_04[1] === 'undefined') { return "0"; } else { return format(summary_04[10]); } } },
+                    //    { column: "MC04_11", summaryType: "sum", alignment: "right", displayFormat: "{0}", customizeText: function (data) { if (typeof summary_04[1] === 'undefined') { return "0"; } else { return format(summary_04[11]); } } },
+                    //    { column: "MC04_12", summaryType: "sum", alignment: "right", displayFormat: "{0}", customizeText: function (data) { if (typeof summary_04[1] === 'undefined') { return "0"; } else { return format(summary_04[12]); } } },
+                    //    { column: "MC04_13", summaryType: "sum", alignment: "right", displayFormat: "{0}", customizeText: function (data) { if (typeof summary_04[1] === 'undefined') { return "0"; } else { return format(summary_04[13]); } } },
+                    //    { column: "MC04_14", summaryType: "sum", alignment: "right", displayFormat: "{0}", customizeText: function (data) { if (typeof summary_04[1] === 'undefined') { return "0"; } else { return format(summary_04[14]); } } },
+                    //    { column: "MC04_15", summaryType: "sum", alignment: "right", displayFormat: "{0}", customizeText: function (data) { if (typeof summary_04[1] === 'undefined') { return "0"; } else { return format(summary_04[15]); } } },
+                    //    { column: "MC04_16", summaryType: "sum", alignment: "right", displayFormat: "{0}", customizeText: function (data) { if (typeof summary_04[1] === 'undefined') { return "0"; } else { return format(summary_04[16]); } } },
+                    //    { column: "MC04_17", summaryType: "sum", alignment: "right", displayFormat: "{0}", customizeText: function (data) { if (typeof summary_04[1] === 'undefined') { return "0"; } else { return format(summary_04[17]); } } },
+                    //    { column: "MC04_18", summaryType: "sum", alignment: "right", displayFormat: "{0}", customizeText: function (data) { if (typeof summary_04[1] === 'undefined') { return "0"; } else { return format(summary_04[18]); } } },
+                    //    { column: "MC04_19", summaryType: "sum", alignment: "right", displayFormat: "{0}", customizeText: function (data) { if (typeof summary_04[1] === 'undefined') { return "0"; } else { return format(summary_04[19]); } } },
+                    //    { column: "MC04_20", summaryType: "sum", alignment: "right", displayFormat: "{0}", customizeText: function (data) { if (typeof summary_04[1] === 'undefined') { return "0"; } else { return format(summary_04[20]); } } } ,
+                    //);
+
+
+                    //jsonSummary.push(
+                    //    { column: "MC05_1", summaryType: "sum", alignment: "right", displayFormat: "{0}", customizeText: function (data) { if (typeof summary_05[1] === 'undefined') { return "0"; } else { return format(summary_05[1]); } } },
+                    //    { column: "MC05_2", summaryType: "sum", alignment: "right", displayFormat: "{0}", customizeText: function (data) { if (typeof summary_05[1] === 'undefined') { return "0"; } else { return format(summary_05[2]); } } },
+                    //    { column: "MC05_3", summaryType: "sum", alignment: "right", displayFormat: "{0}", customizeText: function (data) { if (typeof summary_05[1] === 'undefined') { return "0"; } else { return format(summary_05[3]); } } },
+                    //    { column: "MC05_4", summaryType: "sum", alignment: "right", displayFormat: "{0}", customizeText: function (data) { if (typeof summary_05[1] === 'undefined') { return "0"; } else { return format(summary_05[4]); } } },
+                    //    { column: "MC05_5", summaryType: "sum", alignment: "right", displayFormat: "{0}", customizeText: function (data) { if (typeof summary_05[1] === 'undefined') { return "0"; } else { return format(summary_05[5]); } } },
+                    //    { column: "MC05_6", summaryType: "sum", alignment: "right", displayFormat: "{0}", customizeText: function (data) { if (typeof summary_05[1] === 'undefined') { return "0"; } else { return format(summary_05[6]); } } },
+                    //    { column: "MC05_7", summaryType: "sum", alignment: "right", displayFormat: "{0}", customizeText: function (data) { if (typeof summary_05[1] === 'undefined') { return "0"; } else { return format(summary_05[7]); } } },
+                    //    { column: "MC05_8", summaryType: "sum", alignment: "right", displayFormat: "{0}", customizeText: function (data) { if (typeof summary_05[1] === 'undefined') { return "0"; } else { return format(summary_05[8]); } } },
+                    //    { column: "MC05_9", summaryType: "sum", alignment: "right", displayFormat: "{0}", customizeText: function (data) { if (typeof summary_05[1] === 'undefined') { return "0"; } else { return format(summary_05[9]); } } },
+                    //    { column: "MC05_10", summaryType: "sum", alignment: "right", displayFormat: "{0}", customizeText: function (data) { if (typeof summary_05[1] === 'undefined') { return "0"; } else { return format(summary_05[10]); } } },
+                    //    { column: "MC05_11", summaryType: "sum", alignment: "right", displayFormat: "{0}", customizeText: function (data) { if (typeof summary_05[1] === 'undefined') { return "0"; } else { return format(summary_05[11]); } } },
+                    //    { column: "MC05_12", summaryType: "sum", alignment: "right", displayFormat: "{0}", customizeText: function (data) { if (typeof summary_05[1] === 'undefined') { return "0"; } else { return format(summary_05[12]); } } },
+                    //    { column: "MC05_13", summaryType: "sum", alignment: "right", displayFormat: "{0}", customizeText: function (data) { if (typeof summary_05[1] === 'undefined') { return "0"; } else { return format(summary_05[13]); } } },
+                    //    { column: "MC05_14", summaryType: "sum", alignment: "right", displayFormat: "{0}", customizeText: function (data) { if (typeof summary_05[1] === 'undefined') { return "0"; } else { return format(summary_05[14]); } } },
+                    //    { column: "MC05_15", summaryType: "sum", alignment: "right", displayFormat: "{0}", customizeText: function (data) { if (typeof summary_05[1] === 'undefined') { return "0"; } else { return format(summary_05[15]); } } },
+                    //    { column: "MC05_16", summaryType: "sum", alignment: "right", displayFormat: "{0}", customizeText: function (data) { if (typeof summary_05[1] === 'undefined') { return "0"; } else { return format(summary_05[16]); } } },
+                    //    { column: "MC05_17", summaryType: "sum", alignment: "right", displayFormat: "{0}", customizeText: function (data) { if (typeof summary_05[1] === 'undefined') { return "0"; } else { return format(summary_05[17]); } } },
+                    //    { column: "MC05_18", summaryType: "sum", alignment: "right", displayFormat: "{0}", customizeText: function (data) { if (typeof summary_05[1] === 'undefined') { return "0"; } else { return format(summary_05[18]); } } },
+                    //    { column: "MC05_19", summaryType: "sum", alignment: "right", displayFormat: "{0}", customizeText: function (data) { if (typeof summary_05[1] === 'undefined') { return "0"; } else { return format(summary_05[19]); } } },
+                    //    { column: "MC05_20", summaryType: "sum", alignment: "right", displayFormat: "{0}", customizeText: function (data) { if (typeof summary_05[1] === 'undefined') { return "0"; } else { return format(summary_05[20]); } } } ,
+                    //);
+
+
+                    //jsonSummary.push(
+                    //    { column: "MC06_1", summaryType: "sum", alignment: "right", displayFormat: "{0}", customizeText: function (data) { if (typeof summary_06[1] === 'undefined') { return "0"; } else { return format(summary_06[1]); } } },
+                    //    { column: "MC06_2", summaryType: "sum", alignment: "right", displayFormat: "{0}", customizeText: function (data) { if (typeof summary_06[1] === 'undefined') { return "0"; } else { return format(summary_06[2]); } } },
+                    //    { column: "MC06_3", summaryType: "sum", alignment: "right", displayFormat: "{0}", customizeText: function (data) { if (typeof summary_06[1] === 'undefined') { return "0"; } else { return format(summary_06[3]); } } },
+                    //    { column: "MC06_4", summaryType: "sum", alignment: "right", displayFormat: "{0}", customizeText: function (data) { if (typeof summary_06[1] === 'undefined') { return "0"; } else { return format(summary_06[4]); } } },
+                    //    { column: "MC06_5", summaryType: "sum", alignment: "right", displayFormat: "{0}", customizeText: function (data) { if (typeof summary_06[1] === 'undefined') { return "0"; } else { return format(summary_06[5]); } } },
+                    //    { column: "MC06_6", summaryType: "sum", alignment: "right", displayFormat: "{0}", customizeText: function (data) { if (typeof summary_06[1] === 'undefined') { return "0"; } else { return format(summary_06[6]); } } },
+                    //    { column: "MC06_7", summaryType: "sum", alignment: "right", displayFormat: "{0}", customizeText: function (data) { if (typeof summary_06[1] === 'undefined') { return "0"; } else { return format(summary_06[7]); } } },
+                    //    { column: "MC06_8", summaryType: "sum", alignment: "right", displayFormat: "{0}", customizeText: function (data) { if (typeof summary_06[1] === 'undefined') { return "0"; } else { return format(summary_06[8]); } } },
+                    //    { column: "MC06_9", summaryType: "sum", alignment: "right", displayFormat: "{0}", customizeText: function (data) { if (typeof summary_06[1] === 'undefined') { return "0"; } else { return format(summary_06[9]); } } },
+                    //    { column: "MC06_10", summaryType: "sum", alignment: "right", displayFormat: "{0}", customizeText: function (data) { if (typeof summary_06[1] === 'undefined') { return "0"; } else { return format(summary_06[10]); } } },
+                    //    { column: "MC06_11", summaryType: "sum", alignment: "right", displayFormat: "{0}", customizeText: function (data) { if (typeof summary_06[1] === 'undefined') { return "0"; } else { return format(summary_06[11]); } } },
+                    //    { column: "MC06_12", summaryType: "sum", alignment: "right", displayFormat: "{0}", customizeText: function (data) { if (typeof summary_06[1] === 'undefined') { return "0"; } else { return format(summary_06[12]); } } },
+                    //    { column: "MC06_13", summaryType: "sum", alignment: "right", displayFormat: "{0}", customizeText: function (data) { if (typeof summary_06[1] === 'undefined') { return "0"; } else { return format(summary_06[13]); } } },
+                    //    { column: "MC06_14", summaryType: "sum", alignment: "right", displayFormat: "{0}", customizeText: function (data) { if (typeof summary_06[1] === 'undefined') { return "0"; } else { return format(summary_06[14]); } } },
+                    //    { column: "MC06_15", summaryType: "sum", alignment: "right", displayFormat: "{0}", customizeText: function (data) { if (typeof summary_06[1] === 'undefined') { return "0"; } else { return format(summary_06[15]); } } },
+                    //    { column: "MC06_16", summaryType: "sum", alignment: "right", displayFormat: "{0}", customizeText: function (data) { if (typeof summary_06[1] === 'undefined') { return "0"; } else { return format(summary_06[16]); } } },
+                    //    { column: "MC06_17", summaryType: "sum", alignment: "right", displayFormat: "{0}", customizeText: function (data) { if (typeof summary_06[1] === 'undefined') { return "0"; } else { return format(summary_06[17]); } } },
+                    //    { column: "MC06_18", summaryType: "sum", alignment: "right", displayFormat: "{0}", customizeText: function (data) { if (typeof summary_06[1] === 'undefined') { return "0"; } else { return format(summary_06[18]); } } },
+                    //    { column: "MC06_19", summaryType: "sum", alignment: "right", displayFormat: "{0}", customizeText: function (data) { if (typeof summary_06[1] === 'undefined') { return "0"; } else { return format(summary_06[19]); } } },
+                    //    { column: "MC06_20", summaryType: "sum", alignment: "right", displayFormat: "{0}", customizeText: function (data) { if (typeof summary_06[1] === 'undefined') { return "0"; } else { return format(summary_06[20]); } } } ,
+                    //);
+
+
+                    //jsonSummary.push(
+                    //    { column: "MC07_1", summaryType: "sum", alignment: "right", displayFormat: "{0}", customizeText: function (data) { if (typeof summary_07[1] === 'undefined') { return "0"; } else { return format(summary_07[1]); } } },
+                    //    { column: "MC07_2", summaryType: "sum", alignment: "right", displayFormat: "{0}", customizeText: function (data) { if (typeof summary_07[1] === 'undefined') { return "0"; } else { return format(summary_07[2]); } } },
+                    //    { column: "MC07_3", summaryType: "sum", alignment: "right", displayFormat: "{0}", customizeText: function (data) { if (typeof summary_07[1] === 'undefined') { return "0"; } else { return format(summary_07[3]); } } },
+                    //    { column: "MC07_4", summaryType: "sum", alignment: "right", displayFormat: "{0}", customizeText: function (data) { if (typeof summary_07[1] === 'undefined') { return "0"; } else { return format(summary_07[4]); } } },
+                    //    { column: "MC07_5", summaryType: "sum", alignment: "right", displayFormat: "{0}", customizeText: function (data) { if (typeof summary_07[1] === 'undefined') { return "0"; } else { return format(summary_07[5]); } } },
+                    //    { column: "MC07_6", summaryType: "sum", alignment: "right", displayFormat: "{0}", customizeText: function (data) { if (typeof summary_07[1] === 'undefined') { return "0"; } else { return format(summary_07[6]); } } },
+                    //    { column: "MC07_7", summaryType: "sum", alignment: "right", displayFormat: "{0}", customizeText: function (data) { if (typeof summary_07[1] === 'undefined') { return "0"; } else { return format(summary_07[7]); } } },
+                    //    { column: "MC07_8", summaryType: "sum", alignment: "right", displayFormat: "{0}", customizeText: function (data) { if (typeof summary_07[1] === 'undefined') { return "0"; } else { return format(summary_07[8]); } } },
+                    //    { column: "MC07_9", summaryType: "sum", alignment: "right", displayFormat: "{0}", customizeText: function (data) { if (typeof summary_07[1] === 'undefined') { return "0"; } else { return format(summary_07[9]); } } },
+                    //    { column: "MC07_10", summaryType: "sum", alignment: "right", displayFormat: "{0}", customizeText: function (data) { if (typeof summary_07[1] === 'undefined') { return "0"; } else { return format(summary_07[10]); } } },
+                    //    { column: "MC07_11", summaryType: "sum", alignment: "right", displayFormat: "{0}", customizeText: function (data) { if (typeof summary_07[1] === 'undefined') { return "0"; } else { return format(summary_07[11]); } } },
+                    //    { column: "MC07_12", summaryType: "sum", alignment: "right", displayFormat: "{0}", customizeText: function (data) { if (typeof summary_07[1] === 'undefined') { return "0"; } else { return format(summary_07[12]); } } },
+                    //    { column: "MC07_13", summaryType: "sum", alignment: "right", displayFormat: "{0}", customizeText: function (data) { if (typeof summary_07[1] === 'undefined') { return "0"; } else { return format(summary_07[13]); } } },
+                    //    { column: "MC07_14", summaryType: "sum", alignment: "right", displayFormat: "{0}", customizeText: function (data) { if (typeof summary_07[1] === 'undefined') { return "0"; } else { return format(summary_07[14]); } } },
+                    //    { column: "MC07_15", summaryType: "sum", alignment: "right", displayFormat: "{0}", customizeText: function (data) { if (typeof summary_07[1] === 'undefined') { return "0"; } else { return format(summary_07[15]); } } },
+                    //    { column: "MC07_16", summaryType: "sum", alignment: "right", displayFormat: "{0}", customizeText: function (data) { if (typeof summary_07[1] === 'undefined') { return "0"; } else { return format(summary_07[16]); } } },
+                    //    { column: "MC07_17", summaryType: "sum", alignment: "right", displayFormat: "{0}", customizeText: function (data) { if (typeof summary_07[1] === 'undefined') { return "0"; } else { return format(summary_07[17]); } } },
+                    //    { column: "MC07_18", summaryType: "sum", alignment: "right", displayFormat: "{0}", customizeText: function (data) { if (typeof summary_07[1] === 'undefined') { return "0"; } else { return format(summary_07[18]); } } },
+                    //    { column: "MC07_19", summaryType: "sum", alignment: "right", displayFormat: "{0}", customizeText: function (data) { if (typeof summary_07[1] === 'undefined') { return "0"; } else { return format(summary_07[19]); } } },
+                    //    { column: "MC07_20", summaryType: "sum", alignment: "right", displayFormat: "{0}", customizeText: function (data) { if (typeof summary_07[1] === 'undefined') { return "0"; } else { return format(summary_07[20]); } } } ,
+                    //);
+
+
+                    //jsonSummary.push(
+                    //    { column: "MC08_1", summaryType: "sum", alignment: "right", displayFormat: "{0}", customizeText: function (data) { if (typeof summary_08[1] === 'undefined') { return "0"; } else { return format(summary_08[1]); } } },
+                    //    { column: "MC08_2", summaryType: "sum", alignment: "right", displayFormat: "{0}", customizeText: function (data) { if (typeof summary_08[1] === 'undefined') { return "0"; } else { return format(summary_08[2]); } } },
+                    //    { column: "MC08_3", summaryType: "sum", alignment: "right", displayFormat: "{0}", customizeText: function (data) { if (typeof summary_08[1] === 'undefined') { return "0"; } else { return format(summary_08[3]); } } },
+                    //    { column: "MC08_4", summaryType: "sum", alignment: "right", displayFormat: "{0}", customizeText: function (data) { if (typeof summary_08[1] === 'undefined') { return "0"; } else { return format(summary_08[4]); } } },
+                    //    { column: "MC08_5", summaryType: "sum", alignment: "right", displayFormat: "{0}", customizeText: function (data) { if (typeof summary_08[1] === 'undefined') { return "0"; } else { return format(summary_08[5]); } } },
+                    //    { column: "MC08_6", summaryType: "sum", alignment: "right", displayFormat: "{0}", customizeText: function (data) { if (typeof summary_08[1] === 'undefined') { return "0"; } else { return format(summary_08[6]); } } },
+                    //    { column: "MC08_7", summaryType: "sum", alignment: "right", displayFormat: "{0}", customizeText: function (data) { if (typeof summary_08[1] === 'undefined') { return "0"; } else { return format(summary_08[7]); } } },
+                    //    { column: "MC08_8", summaryType: "sum", alignment: "right", displayFormat: "{0}", customizeText: function (data) { if (typeof summary_08[1] === 'undefined') { return "0"; } else { return format(summary_08[8]); } } },
+                    //    { column: "MC08_9", summaryType: "sum", alignment: "right", displayFormat: "{0}", customizeText: function (data) { if (typeof summary_08[1] === 'undefined') { return "0"; } else { return format(summary_08[9]); } } },
+                    //    { column: "MC08_10", summaryType: "sum", alignment: "right", displayFormat: "{0}", customizeText: function (data) { if (typeof summary_08[1] === 'undefined') { return "0"; } else { return format(summary_08[10]); } } },
+                    //    { column: "MC08_11", summaryType: "sum", alignment: "right", displayFormat: "{0}", customizeText: function (data) { if (typeof summary_08[1] === 'undefined') { return "0"; } else { return format(summary_08[11]); } } },
+                    //    { column: "MC08_12", summaryType: "sum", alignment: "right", displayFormat: "{0}", customizeText: function (data) { if (typeof summary_08[1] === 'undefined') { return "0"; } else { return format(summary_08[12]); } } },
+                    //    { column: "MC08_13", summaryType: "sum", alignment: "right", displayFormat: "{0}", customizeText: function (data) { if (typeof summary_08[1] === 'undefined') { return "0"; } else { return format(summary_08[13]); } } },
+                    //    { column: "MC08_14", summaryType: "sum", alignment: "right", displayFormat: "{0}", customizeText: function (data) { if (typeof summary_08[1] === 'undefined') { return "0"; } else { return format(summary_08[14]); } } },
+                    //    { column: "MC08_15", summaryType: "sum", alignment: "right", displayFormat: "{0}", customizeText: function (data) { if (typeof summary_08[1] === 'undefined') { return "0"; } else { return format(summary_08[15]); } } },
+                    //    { column: "MC08_16", summaryType: "sum", alignment: "right", displayFormat: "{0}", customizeText: function (data) { if (typeof summary_08[1] === 'undefined') { return "0"; } else { return format(summary_08[16]); } } },
+                    //    { column: "MC08_17", summaryType: "sum", alignment: "right", displayFormat: "{0}", customizeText: function (data) { if (typeof summary_08[1] === 'undefined') { return "0"; } else { return format(summary_08[17]); } } },
+                    //    { column: "MC08_18", summaryType: "sum", alignment: "right", displayFormat: "{0}", customizeText: function (data) { if (typeof summary_08[1] === 'undefined') { return "0"; } else { return format(summary_08[18]); } } },
+                    //    { column: "MC08_19", summaryType: "sum", alignment: "right", displayFormat: "{0}", customizeText: function (data) { if (typeof summary_08[1] === 'undefined') { return "0"; } else { return format(summary_08[19]); } } },
+                    //    { column: "MC08_20", summaryType: "sum", alignment: "right", displayFormat: "{0}", customizeText: function (data) { if (typeof summary_08[1] === 'undefined') { return "0"; } else { return format(summary_08[20]); } } } ,
+                    //);
+
+
+                    //jsonSummary.push(
+                    //    { column: "MC09_1", summaryType: "sum", alignment: "right", displayFormat: "{0}", customizeText: function (data) { if (typeof summary_09[1] === 'undefined') { return "0"; } else { return format(summary_09[1]); } } },
+                    //    { column: "MC09_2", summaryType: "sum", alignment: "right", displayFormat: "{0}", customizeText: function (data) { if (typeof summary_09[1] === 'undefined') { return "0"; } else { return format(summary_09[2]); } } },
+                    //    { column: "MC09_3", summaryType: "sum", alignment: "right", displayFormat: "{0}", customizeText: function (data) { if (typeof summary_09[1] === 'undefined') { return "0"; } else { return format(summary_09[3]); } } },
+                    //    { column: "MC09_4", summaryType: "sum", alignment: "right", displayFormat: "{0}", customizeText: function (data) { if (typeof summary_09[1] === 'undefined') { return "0"; } else { return format(summary_09[4]); } } },
+                    //    { column: "MC09_5", summaryType: "sum", alignment: "right", displayFormat: "{0}", customizeText: function (data) { if (typeof summary_09[1] === 'undefined') { return "0"; } else { return format(summary_09[5]); } } },
+                    //    { column: "MC09_6", summaryType: "sum", alignment: "right", displayFormat: "{0}", customizeText: function (data) { if (typeof summary_09[1] === 'undefined') { return "0"; } else { return format(summary_09[6]); } } },
+                    //    { column: "MC09_7", summaryType: "sum", alignment: "right", displayFormat: "{0}", customizeText: function (data) { if (typeof summary_09[1] === 'undefined') { return "0"; } else { return format(summary_09[7]); } } },
+                    //    { column: "MC09_8", summaryType: "sum", alignment: "right", displayFormat: "{0}", customizeText: function (data) { if (typeof summary_09[1] === 'undefined') { return "0"; } else { return format(summary_09[8]); } } },
+                    //    { column: "MC09_9", summaryType: "sum", alignment: "right", displayFormat: "{0}", customizeText: function (data) { if (typeof summary_09[1] === 'undefined') { return "0"; } else { return format(summary_09[9]); } } },
+                    //    { column: "MC09_10", summaryType: "sum", alignment: "right", displayFormat: "{0}", customizeText: function (data) { if (typeof summary_09[1] === 'undefined') { return "0"; } else { return format(summary_09[10]); } } },
+                    //    { column: "MC09_11", summaryType: "sum", alignment: "right", displayFormat: "{0}", customizeText: function (data) { if (typeof summary_09[1] === 'undefined') { return "0"; } else { return format(summary_09[11]); } } },
+                    //    { column: "MC09_12", summaryType: "sum", alignment: "right", displayFormat: "{0}", customizeText: function (data) { if (typeof summary_09[1] === 'undefined') { return "0"; } else { return format(summary_09[12]); } } },
+                    //    { column: "MC09_13", summaryType: "sum", alignment: "right", displayFormat: "{0}", customizeText: function (data) { if (typeof summary_09[1] === 'undefined') { return "0"; } else { return format(summary_09[13]); } } },
+                    //    { column: "MC09_14", summaryType: "sum", alignment: "right", displayFormat: "{0}", customizeText: function (data) { if (typeof summary_09[1] === 'undefined') { return "0"; } else { return format(summary_09[14]); } } },
+                    //    { column: "MC09_15", summaryType: "sum", alignment: "right", displayFormat: "{0}", customizeText: function (data) { if (typeof summary_09[1] === 'undefined') { return "0"; } else { return format(summary_09[15]); } } },
+                    //    { column: "MC09_16", summaryType: "sum", alignment: "right", displayFormat: "{0}", customizeText: function (data) { if (typeof summary_09[1] === 'undefined') { return "0"; } else { return format(summary_09[16]); } } },
+                    //    { column: "MC09_17", summaryType: "sum", alignment: "right", displayFormat: "{0}", customizeText: function (data) { if (typeof summary_09[1] === 'undefined') { return "0"; } else { return format(summary_09[17]); } } },
+                    //    { column: "MC09_18", summaryType: "sum", alignment: "right", displayFormat: "{0}", customizeText: function (data) { if (typeof summary_09[1] === 'undefined') { return "0"; } else { return format(summary_09[18]); } } },
+                    //    { column: "MC09_19", summaryType: "sum", alignment: "right", displayFormat: "{0}", customizeText: function (data) { if (typeof summary_09[1] === 'undefined') { return "0"; } else { return format(summary_09[19]); } } },
+                    //    { column: "MC09_20", summaryType: "sum", alignment: "right", displayFormat: "{0}", customizeText: function (data) { if (typeof summary_09[1] === 'undefined') { return "0"; } else { return format(summary_09[20]); } } } ,
+                    //);
+
+
+                    //jsonSummary.push(
+                    //    { column: "MC10_1", summaryType: "sum", alignment: "right", displayFormat: "{0}", customizeText: function (data) { if (typeof summary_10[1] === 'undefined') { return "0"; } else { return format(summary_10[1]); } } },
+                    //    { column: "MC10_2", summaryType: "sum", alignment: "right", displayFormat: "{0}", customizeText: function (data) { if (typeof summary_10[1] === 'undefined') { return "0"; } else { return format(summary_10[2]); } } },
+                    //    { column: "MC10_3", summaryType: "sum", alignment: "right", displayFormat: "{0}", customizeText: function (data) { if (typeof summary_10[1] === 'undefined') { return "0"; } else { return format(summary_10[3]); } } },
+                    //    { column: "MC10_4", summaryType: "sum", alignment: "right", displayFormat: "{0}", customizeText: function (data) { if (typeof summary_10[1] === 'undefined') { return "0"; } else { return format(summary_10[4]); } } },
+                    //    { column: "MC10_5", summaryType: "sum", alignment: "right", displayFormat: "{0}", customizeText: function (data) { if (typeof summary_10[1] === 'undefined') { return "0"; } else { return format(summary_10[5]); } } },
+                    //    { column: "MC10_6", summaryType: "sum", alignment: "right", displayFormat: "{0}", customizeText: function (data) { if (typeof summary_10[1] === 'undefined') { return "0"; } else { return format(summary_10[6]); } } },
+                    //    { column: "MC10_7", summaryType: "sum", alignment: "right", displayFormat: "{0}", customizeText: function (data) { if (typeof summary_10[1] === 'undefined') { return "0"; } else { return format(summary_10[7]); } } },
+                    //    { column: "MC10_8", summaryType: "sum", alignment: "right", displayFormat: "{0}", customizeText: function (data) { if (typeof summary_10[1] === 'undefined') { return "0"; } else { return format(summary_10[8]); } } },
+                    //    { column: "MC10_9", summaryType: "sum", alignment: "right", displayFormat: "{0}", customizeText: function (data) { if (typeof summary_10[1] === 'undefined') { return "0"; } else { return format(summary_10[9]); } } },
+                    //    { column: "MC10_10", summaryType: "sum", alignment: "right", displayFormat: "{0}", customizeText: function (data) { if (typeof summary_10[1] === 'undefined') { return "0"; } else { return format(summary_10[10]); } } },
+                    //    { column: "MC10_11", summaryType: "sum", alignment: "right", displayFormat: "{0}", customizeText: function (data) { if (typeof summary_10[1] === 'undefined') { return "0"; } else { return format(summary_10[11]); } } },
+                    //    { column: "MC10_12", summaryType: "sum", alignment: "right", displayFormat: "{0}", customizeText: function (data) { if (typeof summary_10[1] === 'undefined') { return "0"; } else { return format(summary_10[12]); } } },
+                    //    { column: "MC10_13", summaryType: "sum", alignment: "right", displayFormat: "{0}", customizeText: function (data) { if (typeof summary_10[1] === 'undefined') { return "0"; } else { return format(summary_10[13]); } } },
+                    //    { column: "MC10_14", summaryType: "sum", alignment: "right", displayFormat: "{0}", customizeText: function (data) { if (typeof summary_10[1] === 'undefined') { return "0"; } else { return format(summary_10[14]); } } },
+                    //    { column: "MC10_15", summaryType: "sum", alignment: "right", displayFormat: "{0}", customizeText: function (data) { if (typeof summary_10[1] === 'undefined') { return "0"; } else { return format(summary_10[15]); } } },
+                    //    { column: "MC10_16", summaryType: "sum", alignment: "right", displayFormat: "{0}", customizeText: function (data) { if (typeof summary_10[1] === 'undefined') { return "0"; } else { return format(summary_10[16]); } } },
+                    //    { column: "MC10_17", summaryType: "sum", alignment: "right", displayFormat: "{0}", customizeText: function (data) { if (typeof summary_10[1] === 'undefined') { return "0"; } else { return format(summary_10[17]); } } },
+                    //    { column: "MC10_18", summaryType: "sum", alignment: "right", displayFormat: "{0}", customizeText: function (data) { if (typeof summary_10[1] === 'undefined') { return "0"; } else { return format(summary_10[18]); } } },
+                    //    { column: "MC10_19", summaryType: "sum", alignment: "right", displayFormat: "{0}", customizeText: function (data) { if (typeof summary_10[1] === 'undefined') { return "0"; } else { return format(summary_10[19]); } } },
+                    //    { column: "MC10_20", summaryType: "sum", alignment: "right", displayFormat: "{0}", customizeText: function (data) { if (typeof summary_10[1] === 'undefined') { return "0"; } else { return format(summary_10[20]); } } } ,
+                    //);
+
+
+                    //jsonSummary.push(
+                    //    { column: "MC11_1", summaryType: "sum", alignment: "right", displayFormat: "{0}", customizeText: function (data) { if (typeof summary_11[1] === 'undefined') { return "0"; } else { return format(summary_11[1]); } } },
+                    //    { column: "MC11_2", summaryType: "sum", alignment: "right", displayFormat: "{0}", customizeText: function (data) { if (typeof summary_11[1] === 'undefined') { return "0"; } else { return format(summary_11[2]); } } },
+                    //    { column: "MC11_3", summaryType: "sum", alignment: "right", displayFormat: "{0}", customizeText: function (data) { if (typeof summary_11[1] === 'undefined') { return "0"; } else { return format(summary_11[3]); } } },
+                    //    { column: "MC11_4", summaryType: "sum", alignment: "right", displayFormat: "{0}", customizeText: function (data) { if (typeof summary_11[1] === 'undefined') { return "0"; } else { return format(summary_11[4]); } } },
+                    //    { column: "MC11_5", summaryType: "sum", alignment: "right", displayFormat: "{0}", customizeText: function (data) { if (typeof summary_11[1] === 'undefined') { return "0"; } else { return format(summary_11[5]); } } },
+                    //    { column: "MC11_6", summaryType: "sum", alignment: "right", displayFormat: "{0}", customizeText: function (data) { if (typeof summary_11[1] === 'undefined') { return "0"; } else { return format(summary_11[6]); } } },
+                    //    { column: "MC11_7", summaryType: "sum", alignment: "right", displayFormat: "{0}", customizeText: function (data) { if (typeof summary_11[1] === 'undefined') { return "0"; } else { return format(summary_11[7]); } } },
+                    //    { column: "MC11_8", summaryType: "sum", alignment: "right", displayFormat: "{0}", customizeText: function (data) { if (typeof summary_11[1] === 'undefined') { return "0"; } else { return format(summary_11[8]); } } },
+                    //    { column: "MC11_9", summaryType: "sum", alignment: "right", displayFormat: "{0}", customizeText: function (data) { if (typeof summary_11[1] === 'undefined') { return "0"; } else { return format(summary_11[9]); } } },
+                    //    { column: "MC11_10", summaryType: "sum", alignment: "right", displayFormat: "{0}", customizeText: function (data) { if (typeof summary_11[1] === 'undefined') { return "0"; } else { return format(summary_11[10]); } } },
+                    //    { column: "MC11_11", summaryType: "sum", alignment: "right", displayFormat: "{0}", customizeText: function (data) { if (typeof summary_11[1] === 'undefined') { return "0"; } else { return format(summary_11[11]); } } },
+                    //    { column: "MC11_12", summaryType: "sum", alignment: "right", displayFormat: "{0}", customizeText: function (data) { if (typeof summary_11[1] === 'undefined') { return "0"; } else { return format(summary_11[12]); } } },
+                    //    { column: "MC11_13", summaryType: "sum", alignment: "right", displayFormat: "{0}", customizeText: function (data) { if (typeof summary_11[1] === 'undefined') { return "0"; } else { return format(summary_11[13]); } } },
+                    //    { column: "MC11_14", summaryType: "sum", alignment: "right", displayFormat: "{0}", customizeText: function (data) { if (typeof summary_11[1] === 'undefined') { return "0"; } else { return format(summary_11[14]); } } },
+                    //    { column: "MC11_15", summaryType: "sum", alignment: "right", displayFormat: "{0}", customizeText: function (data) { if (typeof summary_11[1] === 'undefined') { return "0"; } else { return format(summary_11[15]); } } },
+                    //    { column: "MC11_16", summaryType: "sum", alignment: "right", displayFormat: "{0}", customizeText: function (data) { if (typeof summary_11[1] === 'undefined') { return "0"; } else { return format(summary_11[16]); } } },
+                    //    { column: "MC11_17", summaryType: "sum", alignment: "right", displayFormat: "{0}", customizeText: function (data) { if (typeof summary_11[1] === 'undefined') { return "0"; } else { return format(summary_11[17]); } } },
+                    //    { column: "MC11_18", summaryType: "sum", alignment: "right", displayFormat: "{0}", customizeText: function (data) { if (typeof summary_11[1] === 'undefined') { return "0"; } else { return format(summary_11[18]); } } },
+                    //    { column: "MC11_19", summaryType: "sum", alignment: "right", displayFormat: "{0}", customizeText: function (data) { if (typeof summary_11[1] === 'undefined') { return "0"; } else { return format(summary_11[19]); } } },
+                    //    { column: "MC11_20", summaryType: "sum", alignment: "right", displayFormat: "{0}", customizeText: function (data) { if (typeof summary_11[1] === 'undefined') { return "0"; } else { return format(summary_11[20]); } } } ,
+                    //);
+
+                    //}
+                    //alert("forexit");
+                }
+
+                var grid = $("#gridContainer").dxDataGrid({
+                    dataSource: dt,
+                    columnAutoWidth: true,
+                    allowColumnReordering: true,
+                    showBorders: true,
+                   
+                    onCellPrepared: function (e) {
+                        //console.log(e.column.caption);
+                        //for (var a = 1; a <= 20; a++) {
+                        var dataField = String(e.column.dataField); 
+                        var substr_Field = dataField.substr(0, 4);
+                        for (var a = 1; a <= 20; a++) {
+                            if (e.rowType == "data" && e.column.dataField == "MC01_"+a && e.rowIndex != undefined) {
+                                if (summary_01[a]) {
+                                    summary_01[a] += 0;
+                                } else { summary_01[a] = 0; }
+                                summary_01[a] = parseFloat(summary_01[a] + e.data["MC01_"+a]);                                
+                            }
+
+                            if (e.rowType == "data" && e.column.dataField == "MC02_" + a && e.rowIndex != undefined) {
+                                if (summary_02[a]) {
+                                    summary_02[a] += 0;
+                                } else { summary_02[a] = 0; }
+                                summary_02[a] = parseFloat(summary_02[a] + e.data["MC02_" + a]);
+                            }
+
+                            if (e.rowType == "data" && e.column.dataField == "MC03_" + a && e.rowIndex != undefined) {
+                                if (summary_03[a]) {
+                                    summary_03[a] += 0;
+                                } else { summary_03[a] = 0; }
+                                summary_03[a] = parseFloat(summary_03[a] + e.data["MC03_" + a]);
+                            }
+
+                            if (e.rowType == "data" && e.column.dataField == "MC04_" + a && e.rowIndex != undefined) {
+                                if (summary_04[a]) {
+                                    summary_04[a] += 0;
+                                } else { summary_04[a] = 0; }
+                                summary_04[a] = parseFloat(summary_04[a] + e.data["MC04_" + a]);
+                            }
+
+                            if (e.rowType == "data" && e.column.dataField == "MC05_" + a && e.rowIndex != undefined) {
+                                if (summary_05[a]) {
+                                    summary_05[a] += 0;
+                                } else { summary_05[a] = 0; }
+                                summary_05[a] = parseFloat(summary_05[a] + e.data["MC05_" + a]);
+                            }
+
+                            if (e.rowType == "data" && e.column.dataField == "MC06_" + a && e.rowIndex != undefined) {
+                                if (summary_06[a]) {
+                                    summary_06[a] += 0;
+                                } else { summary_06[a] = 0; }
+                                summary_06[a] = parseFloat(summary_06[a] + e.data["MC06_" + a]);
+                            }
+
+                            if (e.rowType == "data" && e.column.dataField == "MC07_" + a && e.rowIndex != undefined) {
+                                if (summary_07[a]) {
+                                    summary_07[a] += 0;
+                                } else { summary_07[a] = 0; }
+                                summary_07[a] = parseFloat(summary_07[a] + e.data["MC07_" + a]);
+                            }
+
+                            if (e.rowType == "data" && e.column.dataField == "MC08_" + a && e.rowIndex != undefined) {
+                                if (summary_08[a]) {
+                                    summary_08[a] += 0;
+                                } else { summary_08[a] = 0; }
+                                summary_08[a] = parseFloat(summary_08[a] + e.data["MC08_" + a]);
+                            }
+
+                            if (e.rowType == "data" && e.column.dataField == "MC09_" + a && e.rowIndex != undefined) {
+                                if (summary_09[a]) {
+                                    summary_09[a] += 0;
+                                } else { summary_09[a] = 0; }
+                                summary_09[a] = parseFloat(summary_09[a] + e.data["MC09_" + a]);
+                            }
+
+                            if (e.rowType == "data" && e.column.dataField == "MC10_" + a && e.rowIndex != undefined) {
+                                if (summary_10[a]) {
+                                    summary_10[a] += 0;
+                                } else { summary_10[a] = 0; }
+                                summary_10[a] = parseFloat(summary_10[a] + e.data["MC10_" + a]);
+                            }
+
+                            if (e.rowType == "data" && e.column.dataField == "MC11_" + a && e.rowIndex != undefined) {
+                                if (summary_11[a]) {
+                                    summary_11[a] += 0;
+                                } else { summary_11[a] = 0; }
+                                summary_11[a] = parseFloat(summary_11[a] + e.data["MC11_" + a]);
+                            }
+                        }
+                        //if (e.rowType == "data" && dataField.length>4 && e.rowIndex != undefined) {
+                           
+                            //console.log(dataField.substr(0,4))
+                            //for (var a = 1; a <= 20; a++) {
+                            //    var value = "MC1_" + a;
+                            //    //console.log(value);
+                            //    //if (e.rowType == "data" && e.column.dataField == value && e.rowIndex != undefined) {
+                            //    //    console.log(e.data[value]);
+                            //    //}
+                            //}
+                        //}
+
+                        //if (e.column.caption == "CUTOFFBAR")
+                        //{
+
+                            
+                        //}
+                        //if (e.column.caption == "FORGING")
+                        //{
+                        //    console.log(e.column.caption);
+                        //}
+                        //}
+
+                        //if (e.rowType == "data" && e.column.dataField == "FORGINGMC1" && e.rowIndex != undefined) {     
+                        //    console.log(e.column);
+                        //    //console.log(e.data["FCode"])
+                        //    var found;
+                        //    found = dt.filter(function (item) {//เช็คว่า fcode และ process ใน row นั้นๆ มี อยู่ใน dt ไหม (dt ซึ่งได้มาจากการดึงข้อมูลใน store m_sp_ProductionDailyReport2 โดย where ตาม ProcessCode ที่เลือกไป)
+                        //        //for (var key in filter) {
+                        //        if (item.FCode === undefined || item.FCode != e.data["FCode"] || item.ProcessCode === undefined || item.ProcessCode != "FORGING")
+                        //            return false;
+
+                        //        return true;
+
+                        //    });
+
+                        //    if (found.length > 0) {//จากน้นก็มาเช็คว่า ที่เราไป where ข้อมูลมา มีชุดข้อมูลหรือไม่
+                        //        if (typeof found[0].MC1 !== "undefined") {//กรณีมีชุดข้อมูลแต่ แต่ไม่มี column นั้นๆ
+                        //            var ssumm = 0;
+
+                        //            //if (FORGING.length > 0) {
+                        //            //    FORGING = [];
+                        //            //}
+                        //            //json_opr.push({ "CUTOFFBAR": { "MC1": found[0].MC1 } });
+                        //            FORGING.push(found[0].MC1)
+                        //            // return found[0].MC1;
+                        //        } else { FORGING = []; }
+                        //    } else { FORGING = []; }
+                        //}
+                       // if (e.rowType == 'totalFooter') {
+                       //     var summaryItem = e.cellElement.find('.dx-datagrid-summary-item');
+                            
+                       //     if (summaryItem.length > 0) {
+                       //         $.each(summaryItem, function (_, item) {
+                       //             $(item).html($(item).text() + "</br> Your text")
+                       //         });
+                       //     }
+                       // }
+                       // console.log("column=",e.column.dataField);
+                       //if (e.rowType !== "data" || e.column.dataField !== "ParentName") {
+                       //     return;
+                       //     }
+                       //console.log(FORGING);
+
+                        },
+                    groupPanel: {
+                        visible: true
+                    },
+                    onContentReady: function (e) {
+                        //alert(summary_01.length);
+                        var gridItems = $("#gridContainer").dxDataGrid('instance');
+                        //for (var i = 1; i < summary_01.length; i++) {
+                        //    //console.log(summary_01[i])
+                        //    //gridItems.getController('data').footerItems()[0].summaryCells[3][0].value = 2000;
+                        //    //gridItems.getView('footerView').render();
+                        //}
+                        var summaryCells = e.component.getController('data').footerItems()[0].summaryCells;
+                        $.each(summaryCells, function (item, value) {
+                            if (value.length > 0) {
+                                //console.log(item + "=>" + value[0].name);
+                                var name = value[0].name;
+                                for (var a = 1; a <= 20; a++) {
+                                    if (name == "MC01_"+a) {
+                                        gridItems.getController('data').footerItems()[0].summaryCells[item][0].value = summary_01[a];
+                                    }
+                                    if (name == "MC02_" + a) {
+                                        gridItems.getController('data').footerItems()[0].summaryCells[item][0].value = summary_02[a];
+                                    }
+                                    if (name == "MC03_" + a) {
+                                        gridItems.getController('data').footerItems()[0].summaryCells[item][0].value = summary_03[a];
+                                    }
+                                    if (name == "MC04_" + a) {
+                                        gridItems.getController('data').footerItems()[0].summaryCells[item][0].value = summary_04[a];
+                                    }
+                                    if (name == "MC05_" + a) {
+                                        gridItems.getController('data').footerItems()[0].summaryCells[item][0].value = summary_05[a];
+                                    }
+                                    if (name == "MC06_" + a) {
+                                        gridItems.getController('data').footerItems()[0].summaryCells[item][0].value = summary_06[a];
+                                    }
+                                    if (name == "MC07_" + a) {
+                                        gridItems.getController('data').footerItems()[0].summaryCells[item][0].value = summary_07[a];
+                                    }
+                                    if (name == "MC08_" + a) {
+                                        gridItems.getController('data').footerItems()[0].summaryCells[item][0].value = summary_08[a];
+                                    }
+                                    if (name == "MC09_" + a) {
+                                        gridItems.getController('data').footerItems()[0].summaryCells[item][0].value = summary_09[a];
+                                    }
+                                    if (name == "MC10_" + a) {
+                                        gridItems.getController('data').footerItems()[0].summaryCells[item][0].value = summary_10[a];
+                                    }
+                                    if (name == "MC11_" + a) {
+                                        gridItems.getController('data').footerItems()[0].summaryCells[item][0].value = summary_11[a];
+                                    }
+                                    
+                                }
+                                gridItems.getView('footerView').render();
+                            }
+                        });
+                        
+                        
+                        //console.log(gridItems.getController('data').footerItems()[0]);
+                        //console.log(jsonSummary);
+                        var itemsx = [];                       
+                        var items = [];
+                       
+                        var sumcus = [];
+                    
+                        //if (!e.component.__summaryIsNotAdded) {
+                        //for (var x = 1; x <= 20; x++) {                            
+                        //    itemsx.push({ column: "MC01_" + x, summaryType: "sum", alignment: "right", displayFormat: "{0}", customizeText: function (data) { return format(summary_01[x]); } });
+                                
+                        //    }
+                        //    //console.log(summary_02[x]);
+
+                        //    e.component.option("summary.totalItems", itemsx);
+                        //    e.component.__summaryIsNotAdded = true;
+                        //}
+
+                        
+                        //if (!e.component.__summaryIsNotAdded) {
+                        //    e.component.option("summary.totalItems", "");
+                            //console.log(summary_01[1]);
+                            //console.log(summary_02[1]);
+
+                            //console.log(itemsx);
+                            
+                            //for (var x = 1; x <= 20; x++) {
+                                //console.log(summary_01[x]);
+                                //console.log(summary_02[x]);
+                                //alert("forcontent");                          
+
+         
+                            //}
+                            //console.log(e.component.columnCount());
+                            //for (var i = 0; i < e.component.columnCount(); i++) {
+                            //    //console.log(e.component.columnOption(i, "dataField"));
+                            //    //if (e.component.columnOption(i, "caption") == "CUTOFFBAR") {
+                            //    if (e.component.columnOption(i, "dataField") == "FORGINGMC1") {
+                            //        //console.log(e.component.option("summary"));
+                                   
+                            //        var FORGINGMC1 = sumcus.reduce((a, b) => parseFloat(a) + parseFloat(b), 0)
+                            //        //console.log(FORGINGMC1);
+                                   
+                            //        //for (x = 1; x <= 40; x++) { 
+                            //        var sum = FORGING.reduce((a, b) => parseFloat(a) + parseFloat(b), 0);
+                            //        //console.log(sum);
+                            //            items.push({
+                            //                column: "FORGINGMC1",
+                            //                summaryType: "sum",
+                            //                customizeText: function (data) {                                                
+                            //                    return "Total:" + FORGINGMC1;
+                            //                }
+
+                            //            });
+                            //        //}
+                                    
+                            //        break;
+                            //    }
+
+                            //}
+                           //console.log(jsonSummary);
+
+                            //e.component.option("summary.totalItems", jsonSummary);
+                            //e.component.__summaryIsNotAdded = true;
+                            
+
+                            
+                            //e.component.__summaryIsNotAdded = false;
+                            //items = [];
+                        //}
+                        summary_01 = [];
+                        summary_02 = [];
+                        summary_03 = [];
+                        summary_04 = [];
+                        summary_05 = [];
+                        summary_06 = [];
+                        summary_07 = [];
+                        summary_08 = [];
+                        summary_09 = [];
+                        summary_10 = [];
+                        summary_11 = [];
+                        NotSelection(gridItems);
+                    },
+                    //summary: {
+                    //    totalItems: [{
+                    //        name: "SelectedRowsSummary",
+                    //        showInColumn: "Model",
+                    //        displayFormat: "Sum: {0}",
+                    //        //valueFormat: "currency",
+                    //        summaryType: "custom"
+                    //    }],
+                    //    calculateCustomSummary: function (options) {
+                           
+                    //        if (options.name === "SelectedRowsSummary") {
+                    //            if (options.summaryProcess === "start") {
+                    //                options.totalValue = 0;
+                    //            }
+                    //            if (options.summaryProcess === "calculate") {
+                    //                //if (options.component.isRowSelected(options.value.ID)) {
+                    //                    options.totalValue = options.totalValue + options.value.MC01_1;
+                    //                //}
+                    //            }
+                    //        }
+                    //        alert(options);
+                    //    }
+                    //},
+                    
+                    summary: {
+                        calculateCustomSummary: function (options) {
+                            //console.log(options);
+                            for (var a = 1; a <= 20; a++) {
+                                var name1 = "MC01_" + a;
+                                var name2 = "MC02_" + a;
+                                var name3 = "MC03_" + a;
+                                var name4 = "MC04_" + a;
+                                var name5 = "MC05_" + a;
+                                var name6 = "MC06_" + a;
+                                var name7 = "MC07_" + a;
+                                var name8 = "MC08_" + a;
+                                var name9 = "MC09_" + a;
+                                var name10 = "MC10_" + a;
+                                var name11 = "MC11_" + a;
+                                if (options.name == name1) {
+                                    if (options.summaryProcess == "start") {
+                                        options.totalValue = 0;
+                                    }
+                                    if (options.summaryProcess == "calculate") {
+                                        if (options.value) {
+                                            //console.log(options.value["MC01_"+a]);
+                                            options.totalValue += options.value["MC01_"+a];
+                                        }
+                                    }
+                                }
+                                if (options.name == name2) {
+                                    if (options.summaryProcess == "start") {
+                                        options.totalValue = 0;
+                                    }
+                                    if (options.summaryProcess == "calculate") {
+                                        if (options.value) {
+                                            //console.log("MC02_" + a+"=>"+options.value["MC02_" + a]);
+                                            options.totalValue += options.value["MC02_" + a];
+                                        }
+                                    }
+                                }
+                                if (options.name == name3) {
+                                    if (options.summaryProcess == "start") {
+                                        options.totalValue = 0;
+                                    }
+                                    if (options.summaryProcess == "calculate") {
+                                        if (options.value) {
+                                            //console.log(options.value["MC03_" + a]);
+                                            options.totalValue += options.value["MC03_" + a];
+                                        }
+                                    }
+                                }
+                                if (options.name == name4) {
+                                    if (options.summaryProcess == "start") {
+                                        options.totalValue = 0;
+                                    }
+                                    if (options.summaryProcess == "calculate") {
+                                        if (options.value) {
+                                            //console.log(options.value["MC04_" + a]);
+                                            options.totalValue += options.value["MC04_" + a];
+                                        }
+                                    }
+                                }
+                                if (options.name == name5) {
+                                    if (options.summaryProcess == "start") {
+                                        options.totalValue = 0;
+                                    }
+                                    if (options.summaryProcess == "calculate") {
+                                        if (options.value) {
+                                            //console.log(options.value["MC05_" + a]);
+                                            options.totalValue += options.value["MC05_" + a];
+                                        }
+                                    }
+                                }
+                                if (options.name == name6) {
+                                    if (options.summaryProcess == "start") {
+                                        options.totalValue = 0;
+                                    }
+                                    if (options.summaryProcess == "calculate") {
+                                        if (options.value) {
+                                            //console.log(options.value["MC06_" + a]);
+                                            options.totalValue += options.value["MC06_" + a];
+                                        }
+                                    }
+                                }
+                                if (options.name == name7) {
+                                    if (options.summaryProcess == "start") {
+                                        options.totalValue = 0;
+                                    }
+                                    if (options.summaryProcess == "calculate") {
+                                        if (options.value) {
+                                            //console.log(options.value["MC07_" + a]);
+                                            options.totalValue += options.value["MC07_" + a];
+                                        }
+                                    }
+                                }
+                                if (options.name == name8) {
+                                    if (options.summaryProcess == "start") {
+                                        options.totalValue = 0;
+                                    }
+                                    if (options.summaryProcess == "calculate") {
+                                        if (options.value) {
+                                            //console.log(options.value["MC08_" + a]);
+                                            options.totalValue += options.value["MC08_" + a];
+                                        }
+                                    }
+                                }
+                                if (options.name == name9) {
+                                    if (options.summaryProcess == "start") {
+                                        options.totalValue = 0;
+                                    }
+                                    if (options.summaryProcess == "calculate") {
+                                        if (options.value) {
+                                            //console.log(options.value["MC09_" + a]);
+                                            options.totalValue += options.value["MC09_" + a];
+                                        }
+                                    }
+                                }
+                                if (options.name == name10) {
+                                    if (options.summaryProcess == "start") {
+                                        options.totalValue = 0;
+                                    }
+                                    if (options.summaryProcess == "calculate") {
+                                        if (options.value) {
+                                            //console.log(options.value["MC10_" + a]);
+                                            options.totalValue += options.value["MC10_" + a];
+                                        }
+                                    }
+                                }
+                                if (options.name == name11) {
+                                    if (options.summaryProcess == "start") {
+                                        options.totalValue = 0;
+                                    }
+                                    if (options.summaryProcess == "calculate") {
+                                        if (options.value) {
+                                            //console.log(options.value["MC11_" + a]);
+                                            options.totalValue += options.value["MC11_" + a];
+                                        }
+                                    }
+                                }
+                            }
+                        },
+                        //totalItems: [{
+                        //    column: "Model",
+                        //    alignment: "right",
+                        //    customizeText: function (data) {
+                        //        return "Total:";
+                        //    }
+                        //},
+                        //    { showInColumn: "MC01_1", name: "MC01_1", summaryType: "custom", valueFormat: "#,##0", alignment: "right" }]
+                        totalItems: jsonSummary
+                    },
+                    columns: ["FCode",
+                        {
+                            headerCellTemplate: function (container) {
+                                container.append($("<div>Model</div>"));
+                            },
+                            dataField: "Model"
+                        }
+                    ],
+                    
+                    customizeColumns: function (columns) {
+                        //console.log(columns);
+                            //console.log(unique_Fcode[f]);
+                            //columns.push({
+                            //    caption: "FCodex",
+                            //    calculateDisplayValue: function (e) {
+                            //        for (var f = 0; f < unique_Fcode.length; f++) {
+                            //            return unique_Fcode[f];
+                            //        }
+                            //    }
+
+                            //})
+                        var qty2 = [];
+                        
+                        for (var z = 0; z < itemprocess.length; z++) {
+                            var jsoncol = [];                            
+
+                                    for (var a = 0; a < 20; a++) {//loop MC
+                                       // var getqty = qty;
+                                        var po = itemprocess[z];
+                                        var numberprocess = "";
+                                        if (po == "CUTOFFBAR") {
+                                            numberprocess = "MC01_" + (a + 1);
+                                        }
+                                        if (po == "FORGING") {
+                                            numberprocess = "MC02_" + (a + 1);
+                                        }
+                                        if (po == "FRICTION") {
+                                            numberprocess = "MC03_" + (a + 1);
+                                        }
+                                        if (po == "ISONITE") {
+                                            numberprocess = "MC04_" + (a + 1);
+                                        }
+                                        if (po == "QCVISUAL") {
+                                            numberprocess = "MC05_" + (a + 1);
+                                        }
+                                        if (po == "SEATFINISH") {
+                                            numberprocess = "MC06_" + (a + 1);
+                                        }
+                                        if (po == "STELLITESEAT") {
+                                            numberprocess = "MC07_" + (a + 1);
+                                        }
+                                        if (po == "STELLITETIP") {
+                                            numberprocess = "MC08_" + (a + 1);
+                                        }
+                                        if (po == "STEMFINISH") {
+                                            numberprocess = "MC09_" + (a + 1);
+                                        }
+                                        if (po == "STEMROUGH") {
+                                            numberprocess = "MC10_" + (a + 1);
+                                        }
+                                        if (po == "STRAIGHTENING") {
+                                            numberprocess = "MC11_" + (a + 1);
+                                        }
+                                        var MC_no = "MC" + (a + 1);                                    
+                                        //if (unique[a] == MC_no) {
+                                            jsoncol.push({
+                                                "dataField": numberprocess, "caption": "MC" + (a + 1), format: "#,##0"
+                                            });
+                                        //}
+                                        //console.log(jsoncol);
+                                        
+
+                                    } 
+
+                            columns.push({
+                                caption: itemprocess[z],
+                                
+                                columns: jsoncol
+                                
+                            });
+
+                        }
+
+                    },
+
+
+            }).dxDataGrid("instance");           
+
+            }
+        } else {
+            var errorcustomDialog = DevExpress.ui.dialog.custom({
+                title: 'Can not View Data  ! ',
+                message: 'Please select ProcessCode.',
+                toolbarItems: [
+                    { text: "Close", onClick: function () { return "Ok" } },
+                    //{ text: "Not Ok", onClick: function () { return "Not Ok" } }
+                ],
+                width: "500px"
+
+            });
+            errorcustomDialog.show().done(function (dialogResult) {
+                //focus something
+            });
+        }
+
+    }
+
+    function PrintPreview(data) {
+        var grid = $('#gridContainer').dxDataGrid('instance');
+        var keys = grid.getSelectedRowKeys();
+
+        var check_enddate = $("#enddateBox").dxDateBox("instance").option('isValid');
+        var check_startdate = $("#startdateBox").dxDateBox("instance").option('isValid');
+        // console.log(itemprocess);
+        if (keys.length > 0) {
+            if (check_enddate == true && check_startdate == true) {
+                //var keys = itemprocess;
+                var text = "";
+                var text_fcode = "";
+                var s;
+                var FCode = "";
+                var comma = 0;
+                for (var i = 0; i < itemprocess.length; i++) {
+                    if (text != "") {
+                        text += "&";
+                    }
+                    text += 'itemprocess=' + itemprocess[i];
+                }
+
+                for (var s = 0; s < keys.length; s++) {
+                    comma = parseInt(s) + 1;
+                    if (text_fcode != "") {
+                        text_fcode += "&";
+                    }
+                    text_fcode += 'FCode=' + keys[s].FCode;
+                    //console.log(keys[s].FCode);
+
+                    if (comma == keys.length) {
+                        FCode += keys[s].FCode;
+                    }
+                    else {
+                        FCode += keys[s].FCode + ",";
+                    }
+                }
+
+                $.ajax({
+                    type: 'POST',
+                    url: "api/GridProductionDailyReport2/Print",
+                    data: { "FCode": FCode },
+                    //contentType: "application/json; charset=utf-8",
+                    //dataType: "html",
+                    //async: false,
+                    //dataType: 'json',
+                    success: function (e) {
+
+                        if (e) {
+                            window.open('@Url.Action("Index", "PrintProductionDailyReport2")?' + text + '&fromdate=' + startdateBox + '&todate=' + enddateBox, '_blank').focus();
+                            //window.open('PrintWipMovement/Index?fromdate=' + startdateBox + '&todate=' + enddateBox + '&process=' + Process + '&FCode=' + FCode + '&ItemCode=' + ItemCode + '&Model=' + Model);
+                        }
+
+                    }
+                });
+
+                //window.open('PDR2/Index?' + text + '&' + text_fcode + '&fromdate=' + startdateBox + '&todate=' + enddateBox, '_blank');
+
+            }
+
+        } else {
+            var errorcustomDialog = DevExpress.ui.dialog.custom({
+                title: 'print Production Daily Report 2 incorrect ! ',
+                message: 'Please select Fcode.',
+                toolbarItems: [
+                    { text: "Close", onClick: function () { return "Ok" } },
+                    //{ text: "Not Ok", onClick: function () { return "Not Ok" } }
+                ],
+                width: "500px"
+
+            });
+            errorcustomDialog.show().done(function (dialogResult) {
+                //focus something
+            });
+        }
+    }
+
+</script>
+

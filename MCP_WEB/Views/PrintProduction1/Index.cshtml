@@ -1,0 +1,574 @@
+﻿@model IEnumerable<MCP_WEB.Models.VW_MFC_ProductionDailyReport1>
+@{
+    Layout = null;
+}
+<!DOCTYPE html>
+<html>
+<head>
+    <meta name="viewport" content="width=device-width" />
+    <title>Print Production Daily Report 1 </title>
+    <link href="~/css/paper.css" rel="stylesheet" type="text/css" />
+    <script>
+        function printContent(el) {
+            var restorepage = document.body.innerHTML;
+            var printcontent = document.getElementById(el).innerHTML;
+            document.body.innerHTML = printcontent;
+            window.print();
+            document.body.innerHTML = restorepage;
+        }
+
+        function getDate() {
+            var d = new Date();
+
+            var str;
+            //console.log(d.getMonth());
+            switch (d.getMonth() + 1) {
+
+                case 1:
+                    str = "มกราคม";
+                    break;
+                case 2:
+                    str = "กุมภาพันธ์";
+                    break;
+                case 3:
+                    str = "มีนาคม";
+                    break;
+                case 4:
+                    str = "เมษายน";
+                    break;
+                case 5:
+                    str = "พฤษภาคม";
+                    break;
+                case 6:
+                    str = "มิถุนายน";
+                    break;
+                case 7:
+                    str = "กรกฎาคม";
+                    break;
+                case 8:
+                    str = "สิงหาคม";
+                    break;
+                case 9:
+                    str = "กันยายน";
+                    break;
+                case 10:
+                    str = "ตุลาคม";
+                    break;
+                case 11:
+                    str = "พฤศจิกายน";
+                    break;
+                case 12:
+                    str = "ธันวาคม";
+                    break;
+            }
+            d = d.getDate() + ' ' + str + ' ' + (parseInt(d.getFullYear()) + 543) + ' ' + d.getHours() + ':' + d.getMinutes() + ' ' + ("น.");
+
+            return d;
+            //document.getElementById("lblDate").value = str;
+            //alert(d.getMonth());
+        }
+
+    </script>
+
+    <style type="text/css">
+        .stayVisible {
+            position: fixed;
+            top: 1em;
+            left: 1em;
+            width: 8.5em;
+            right: auto;
+            z-index: 3;
+        }
+
+        .btnPrint {
+            width: 70px;
+            height: 30px;
+        }
+
+        .boxBarcode {
+            border: 1px solid black;
+            width: 100%;
+            height: 150px;
+            text-align: center;
+            margin-right: 4px;
+        }
+
+        .page {
+            position: relative;
+            clear: both;
+            width: 100%;
+            height: 100%;
+            margin: 0;
+            padding: 0;
+            z-index: 2;
+            font-family: Tahoma;
+            font-style: normal;
+            font-variant: normal;
+            font-size: 12px;
+        }
+
+        .subReport {
+            position: relative;
+            float: left;
+            width: 33%;
+            height: 100%;
+            border: 1px solid black;
+        }
+
+        /*table {
+            border-collapse: collapse;
+        }*/
+
+
+
+
+        @@media print {
+            /*@@page {
+                size: A4 landscape;
+                max-height: 100%;
+                max-width: 100%
+            }*/
+            /*body {
+                width: 100%;
+                height: 100%;
+                -webkit-transform: rotate(-90deg) scale(.68,.68);
+                -moz-transform: rotate(-90deg) scale(.58,.58)
+            }*/
+        }
+
+        div.relative1 {
+            position: relative;
+            width: 100%;
+            height: 120px;
+            /*border: 1px solid lightgray;*/
+        }
+
+        .absolute1 {
+            position: absolute;
+            padding-top: 20px;
+            top: 10px;
+            right: 420px;
+            width: 300px;
+            height: 80px;
+            /*border: 1px solid lightgray;*/
+        }
+
+        .absoluteicon {
+            position: absolute;
+            padding-top: 10px;
+            top: 0px;
+            right: 600px;
+            width: 200px;
+            height: 40px;
+            /*border: 1px solid lightgray;*/
+        }
+
+        .absolute1_1 {
+            position: absolute;
+            padding-top: 60px;
+            padding-right: 15px;
+            padding-left: 15px;
+            top: 0px;
+            right: 820px;
+            width: 250px;
+            height: 80px;
+            text-align: center;
+            font-size: 14px;
+            border: 1px solid lightgray;
+        }
+
+        .absolute2 {
+            position: absolute;
+            padding-top: 20px;
+            top: 50px;
+            right: 400px;
+            width: 400px;
+            /*height: 70px;*/
+            text-align: left;
+            /*border: 1px solid lightgray;
+            border-right:none;
+            border-top:none;
+            border-bottom:none;*/
+        }
+
+        .absolute2_1 {
+            position: absolute;
+            padding-top: 60px;
+            padding-left: 10px;
+            padding-right: 10px;
+            top: 5px;
+            right: 550px;
+            width: 250px;
+            height: 80px;
+        }
+
+        div.absolute3 {
+            position: absolute;
+            padding-left: 0px;
+            padding-right: 15px;
+            padding-top: 5px;
+            top: 0px;
+            right: 55px;
+            width: 480px;
+            height: 25px;
+            font-size: 14px;
+            text-align: center;
+            border: 1px solid lightgray;
+            border-left: none;
+        }
+
+        .absolute3_1 {
+            position: absolute;
+            padding-top: 20px;
+            top: 32px;
+            right: 400px;
+            width: 150px;
+            height: 60px;
+            text-align: center;
+            font-size: 14px;
+            border: 1px solid lightgray;
+            border-left: none;
+            border-top: none;
+        }
+
+        .absolute3_2 {
+            position: absolute;
+            padding-top: 20px;
+            top: 32px;
+            right: 250px;
+            width: 150px;
+            height: 60px;
+            text-align: center;
+            font-size: 14px;
+            border: 1px solid lightgray;
+            border-left: none;
+            border-right: none;
+            border-top: none;
+        }
+
+        .absolute3_3 {
+            position: absolute;
+            padding-top: 20px;
+            top: 32px;
+            left: 850px;
+            width: 193px;
+            height: 89px;
+            text-align: center;
+            font-size: 11px;
+            border: 1px solid lightgray;
+            border-top: none;
+        }
+
+        .absolute3_4 {
+            position: absolute;
+            padding-top: 5px;
+            padding-left: 5px;
+            top: 112px;
+            right: 400px;
+            width: 145px;
+            height: 23px;
+            text-align: left;
+            font-size: 11px;
+            border: 1px solid lightgray;
+            /*border-top: none;*/
+            border-left: none;
+        }
+
+        .absolute3_5 {
+            position: absolute;
+            padding-top: 5px;
+            padding-left: 5px;
+            top: 112px;
+            right: 250px;
+            width: 145px;
+            height: 24px;
+            text-align: left;
+            font-size: 11px;
+            border: 1px solid lightgray;
+            border-top: none;
+            border-left: none;
+            border-right: none;
+        }
+
+        div.relative2 {
+            position: relative;
+            /*padding-left: 535px;*/
+            top: 20px;
+            /*right: 400px;*/
+            /*width: 720px;*/
+            /*height: 800px;*/
+            /*border: 1px solid lightgray;*/
+            /*border-left: none;*/
+        }
+
+        div.relative3 {
+            position: relative;
+            padding-left: 0;
+            top: 10px;
+            width: 296px;
+            height: 480px;
+            border: 1px solid lightgray;
+            border-top: none;
+            border-bottom: none;
+            border-left: none;
+            border-right: none;
+        }
+
+        .absoluteblock-1 {
+            /*position: absolute;*/
+            /*padding-bottom:2px;
+            padding-top:2px;*/
+            width: 70px;
+            height: 36px;
+            font-size: 7px;
+            border: 1px solid lightgray;
+        }
+
+        table, th, td {
+            border: 0.1px lightgray;
+            border-collapse: collapse;
+            text-align: center;
+        }
+
+        /*th, td {
+            padding: 0;
+        }*/
+
+        /*.csspositionjig {
+            right: 50px;
+            position: relative;
+            font-size: 12px;
+        }
+
+        .csspositionjig_1 {
+            position: absolute;
+            top: 0;
+            right: 20px;
+            width: 60px;
+            border: 1px solid lightgray;
+        }
+
+        .cssposition1 {
+            text-align: center;
+            width: 80px;
+            right: 900px;
+        }
+
+        .cssposition2 {
+            text-align: right;
+            width: 70px;
+            right: 800px;
+            border: 1px solid lightgray;
+        }
+
+        .tbmodelqty {
+            border: 1px solid lightgray;
+            height: 25px;
+            font-size: 12px;
+        }*/
+    </style>
+
+</head>
+<body class="A4 landscape">
+    <form>
+        &nbsp;&nbsp;&nbsp;
+        <div class="stayVisible">
+            <button class="btnPrint" onclick="printContent('print-content')">Print</button>
+        </div>
+
+        <div id="print-content">
+            @{List<MCP_WEB.Models.VW_MFC_ProductionDailyReport1>
+                            list = new List<MCP_WEB.Models.VW_MFC_ProductionDailyReport1>
+                                ();
+                list = Model.ToList();
+
+                int per = 0;
+                int excess = 0;
+                int count = 1;
+                int rowNo = 0;
+                //int sumBoxQty = 0; int sumExcessQty = 0;
+                int CUTOFFBAR = 0; int FRICTION = 0;
+                int FORGING = 0; int STELLITETIP = 0; int STELLITESEAT = 0;
+                int STRAIGHTENING = 0; int STEMROUGH = 0; int STEMFINISH = 0; int ISONITE = 0; int SEATFINISH = 0; int QCVISUAL = 0;
+                int Total = 0;
+                int getnumrow = 30;
+                int getlistcount = list.Count;
+                int ggnumrow = 0;
+            }
+
+            @if (getnumrow >= getlistcount)
+            {
+                per = 1;
+                excess = 0;
+            }
+            @if (getnumrow < getlistcount) { per = getlistcount / getnumrow; excess = getlistcount % getnumrow; }
+
+            @if (excess != 0) { per = per + 1; }
+            @*@foreach (var item in Model)
+            {*@
+
+                @while (count <= per)
+                {
+                    <section class="sheet padding-10mm">
+                        <div class="page">
+                            <div class="relative1">
+                                <div class="absoluteicon" style="top:0 ;font-size:11px; left:980px; "> Page : @count <label>/</label> @per</div>
+                                <div class="absoluteicon" style="right:800px;"><img style="width:80px;" src="~/images/logonittan.png" /></div>
+                                <div class="absolute2" style="font-size:14px; right:640px;"><b>NITTAN (THAILAND) CO.,LTD.</b><br />Production Daily Report 1<br />Period:@ViewBag.fromdate - @ViewBag.todate</div>
+                                @*<div class="absolute1" style="font-size:14px;"><b> ใบสั่งมอบสินค้าของหน่วย งาน QC</b></div>
+                            <div class="absolute1" style="left:670px;"><qrcode alt="QR Code" size="44" content="@Convert.ToString(ViewBag.codedn[x])" /></div>
+                            <div class="absolute1" style="font-size:11px; left:670px;top:55px;">@Convert.ToString(ViewBag.codedn[x])</div>
+
+                            <div class="absolute2" style="font-size:14px; padding-top:40px;"><b>เลขที่ Delivery Note : @Convert.ToString(ViewBag.codedn[x])</b></div>
+                            <div class="absolute2" style="font-size:14px; padding-top:10px;"><b>วันที่พิมพ์ <label id="ccdate_@count"></label> </b></div>
+                                                <script>
+                                    var ccdate = 'ccdate_@count';
+                                    console.log(ccdate);
+                                document.getElementById(ccdate).innerHTML = getDate();
+                                                </script>*@
+                            </div>
+                            <div class="relative2">
+                                <table style="width:100%; border: 1px solid lightgray;">
+                                    <tr style="border: 1px solid lightgray;">
+                                        <td style="border: 1px solid lightgray;">No.</td>
+                                        <td style="border: 1px solid lightgray;">FCode</td>
+                                        <td style="border: 1px solid lightgray;">Model</td>
+                                        <td style="border: 1px solid lightgray;">CUTOFFBAR</td>
+                                        <td style="border: 1px solid lightgray;">FRICTION</td>
+                                        <td style="border: 1px solid lightgray;">FORGING</td>
+                                        <td style="border: 1px solid lightgray;">STELLITETIP Qty</td>
+                                        <td style="border: 1px solid lightgray;">STELLITESEAT</td>
+                                        <td style="border: 1px solid lightgray;">STRAIGHTENING</td>
+                                        <td style="border: 1px solid lightgray;">STEMROUGH</td>
+                                        <td style="border: 1px solid lightgray;">STEMFINISH</td>
+                                        <td style="border: 1px solid lightgray;">ISONITE</td>
+                                        <td style="border: 1px solid lightgray;">SEATFINISH</td>
+                                        <td style="border: 1px solid lightgray;">QCVISUAL</td>
+                                        <td style="border: 1px solid lightgray;">Total</td>
+                                    </tr>
+                                    @*@while (rowNo <= 40) {*@
+
+                                    @if (getnumrow >= getlistcount)//กรณีที่มีหน้าเดียว ไม่ต้อง remove list
+                                    {
+                                        @for (int i = 0; i < list.Count; i++)
+                                        {
+                                            <tr style="border: 1px solid lightgray;">
+                                                @{rowNo++;}
+                                                <td style="border: 1px solid lightgray;"> @rowNo</td>
+                                                <td style="border: 1px solid lightgray;">@list[i].FCode</td>
+                                                <td style="border: 1px solid lightgray;">@list[i].Model</td>
+                                                <td style="text-align:right; border: 1px solid lightgray;">@string.Format("{0:N0}",list[i].CUTOFFBAR)</td>
+                                                <td style="text-align:right; border: 1px solid lightgray;">@string.Format("{0:N0}",list[i].FRICTION)</td>
+                                                <td style="text-align:right; border: 1px solid lightgray;">@string.Format("{0:N0}",list[i].FORGING)</td>
+                                                <td style="text-align:right; border: 1px solid lightgray;">@string.Format("{0:N0}",list[i].STELLITETIP)</td>
+                                                <td style="text-align:right; border: 1px solid lightgray;">@string.Format("{0:N0}",list[i].STELLITESEAT)</td>
+                                                <td style="text-align:right; border: 1px solid lightgray;">@string.Format("{0:N0}",list[i].STRAIGHTENING)</td>
+                                                <td style="text-align:right; border: 1px solid lightgray;">@string.Format("{0:N0}",list[i].STEMROUGH)</td>
+                                                <td style="text-align:right; border: 1px solid lightgray;">@string.Format("{0:N0}",list[i].STEMFINISH)</td>
+                                                <td style="text-align:right; border: 1px solid lightgray;">@string.Format("{0:N0}",list[i].ISONITE)</td>
+                                                <td style="text-align:right; border: 1px solid lightgray;">@string.Format("{0:N0}",list[i].SEATFINISH)</td>
+                                                <td style="text-align:right; border: 1px solid lightgray;">@string.Format("{0:N0}",list[i].QCVISUAL)</td>
+                                                <td style="text-align:right; border: 1px solid lightgray;">@string.Format("{0:N0}",list[i].Total)</td>
+                                            </tr>
+                                            CUTOFFBAR += Convert.ToInt32(list[i].CUTOFFBAR);
+                                                FRICTION += Convert.ToInt32(list[i].FRICTION);
+                                                FORGING += Convert.ToInt32(list[i].FORGING);
+                                                STELLITETIP += Convert.ToInt32(list[i].STELLITETIP);
+                                                STELLITESEAT += Convert.ToInt32(list[i].STELLITESEAT);
+                                                STRAIGHTENING += Convert.ToInt32(list[i].STRAIGHTENING);
+                                                STEMROUGH += Convert.ToInt32(list[i].STEMROUGH);
+                                                STEMFINISH += Convert.ToInt32(list[i].STEMFINISH);
+                                                ISONITE += Convert.ToInt32(list[i].ISONITE);
+                                                SEATFINISH += Convert.ToInt32(list[i].SEATFINISH);
+                                                QCVISUAL += Convert.ToInt32(list[i].QCVISUAL);
+                                                Total += Convert.ToInt32(list[i].Total);
+                                            @*@list.Count
+                                        <label>,</label>*@
+
+                                        }
+                                        count = per + 1;
+                                    }
+                                    @if (getnumrow < getlistcount)//กรณีที่มีหลายหน้า ให้ remove list ออกไป แล้วยึด item ตัวที่ 0 (itemตัวล่าสุดที่ยังเหลืออยู่ ) มาแสดงตลอด
+                                    {
+                                        ggnumrow = getnumrow;
+
+                                        @while (list.Count>0)
+                                        {
+
+                                            @if (ggnumrow == 0) { break; }
+                                            else
+                                            {
+                                                //@i
+                                                <tr style="border: 1px solid lightgray;">
+                                                    @{rowNo++;}
+                                                    <td style="border: 1px solid lightgray;"> @rowNo</td>
+                                                    <td style="border: 1px solid lightgray;">@list[0].FCode</td>
+                                                    <td style="border: 1px solid lightgray;">@list[0].Model</td>
+                                                    <td style="text-align:right; border: 1px solid lightgray;">@string.Format("{0:N0}",list[0].CUTOFFBAR)</td>
+                                                    <td style="text-align:right; border: 1px solid lightgray;">@string.Format("{0:N0}", list[0].FRICTION)</td>
+                                                    <td style="text-align:right; border: 1px solid lightgray;">@string.Format("{0:N0}", list[0].FORGING)</td>
+                                                    <td style="text-align:right; border: 1px solid lightgray;">@string.Format("{0:N0}", list[0].STELLITETIP)</td>
+                                                    <td style="text-align:right; border: 1px solid lightgray;">@string.Format("{0:N0}", list[0].STELLITESEAT)</td>
+                                                    <td style="text-align:right; border: 1px solid lightgray;">@string.Format("{0:N0}", list[0].STRAIGHTENING)</td>
+                                                    <td style="text-align:right; border: 1px solid lightgray;">@string.Format("{0:N0}", list[0].STEMROUGH)</td>
+                                                    <td style="text-align:right; border: 1px solid lightgray;">@string.Format("{0:N0}", list[0].STEMFINISH)</td>
+                                                    <td style="text-align:right; border: 1px solid lightgray;">@string.Format("{0:N0}", list[0].ISONITE)</td>
+                                                    <td style="text-align:right; border: 1px solid lightgray;">@string.Format("{0:N0}", list[0].SEATFINISH)</td>
+                                                    <td style="text-align:right; border: 1px solid lightgray;">@string.Format("{0:N0}", list[0].QCVISUAL)</td>
+                                                    <td style="text-align:right; border: 1px solid lightgray;">@string.Format("{0:N0}", list[0].Total)</td>
+                                                </tr>
+                                                CUTOFFBAR += Convert.ToInt32(list[0].CUTOFFBAR);
+                                                        FRICTION += Convert.ToInt32(list[0].FRICTION);
+                                                        FORGING += Convert.ToInt32(list[0].FORGING);
+                                                        STELLITETIP += Convert.ToInt32(list[0].STELLITETIP);
+                                                        STELLITESEAT += Convert.ToInt32(list[0].STELLITESEAT);
+                                                        STRAIGHTENING += Convert.ToInt32(list[0].STRAIGHTENING);
+                                                        STEMROUGH += Convert.ToInt32(list[0].STEMROUGH);
+                                                        STEMFINISH += Convert.ToInt32(list[0].STEMFINISH);
+                                                        ISONITE += Convert.ToInt32(list[0].ISONITE);
+                                                        SEATFINISH += Convert.ToInt32(list[0].SEATFINISH);
+                                                        QCVISUAL += Convert.ToInt32(list[0].QCVISUAL);
+                                                        Total += Convert.ToInt32(list[0].Total);
+                                                        list.Remove(list.Single(s => s.FCode == list[0].FCode));
+                                                        ggnumrow = ggnumrow - 1;
+                                                    }
+
+                                            @*@list.Count
+                                        <label>,</label>*@
+                                        }
+                                    }
+
+                                    @if (count >= per)
+                                    {
+                                        <tr style="border:none;">
+                                            <td colspan="3" style="text-align:right;">Total :</td>
+                                            <td style="text-align:right; border: 1px solid lightgray;">@string.Format("{0:N0}", CUTOFFBAR) </td>
+                                            <td style="text-align:right; border: 1px solid lightgray;">@string.Format("{0:N0}", FRICTION) </td>
+                                            <td style="text-align:right; border: 1px solid lightgray;">@string.Format("{0:N0}", FORGING) </td>
+                                            <td style="text-align:right; border: 1px solid lightgray;">@string.Format("{0:N0}", STELLITETIP) </td>
+                                            <td style="text-align:right; border: 1px solid lightgray;">@string.Format("{0:N0}", STELLITESEAT) </td>
+                                            <td style="text-align:right; border: 1px solid lightgray;">@string.Format("{0:N0}", STRAIGHTENING) </td>
+                                            <td style="text-align:right; border: 1px solid lightgray;">@string.Format("{0:N0}", STEMROUGH) </td>
+                                            <td style="text-align:right; border: 1px solid lightgray;">@string.Format("{0:N0}", STEMFINISH) </td>
+                                            <td style="text-align:right; border: 1px solid lightgray;">@string.Format("{0:N0}", ISONITE) </td>
+                                            <td style="text-align:right; border: 1px solid lightgray;">@string.Format("{0:N0}", SEATFINISH) </td>
+                                            <td style="text-align:right; border: 1px solid lightgray;">@string.Format("{0:N0}", QCVISUAL) </td>
+                                            <td style="text-align:right; border: 1px solid lightgray;">@string.Format("{0:N0}", Total) </td>
+                                        </tr>
+                                    }
+                                </table>
+                            </div>
+                        </div>
+                    </section>
+                    count++;
+                                            }
+
+            @*}*@
+
+
+
+        </div>
+    </form>
+</body>
+</html>
+

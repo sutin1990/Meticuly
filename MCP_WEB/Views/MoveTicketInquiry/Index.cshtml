@@ -1,0 +1,421 @@
+﻿<style>
+    a {
+        text-decoration: none !important;
+    }
+
+    .dx-link-edit-4x {
+        /*padding-right: 2px;*/
+        font-size: 1.2em;
+        width: auto;
+        height: auto;
+    }
+</style>
+
+
+
+<script>
+    var sumNumOfBox = [];
+    var sumQtyMT = [];
+    var sumQtyExcess = [];
+
+    var StatusMT = "";
+    function cellTemplate(element, cellInfo) {
+        $('<a/>')
+            .addClass('dx-link dx-link-edit dx-icon-edit dx-link-edit-4x ')
+            .on('dxclick', function () {
+                //$('#EditPopup').dxPopup('instance').option('visible', true);
+                OpenEdit(cellInfo.data);
+            }).appendTo(element);
+
+    }
+
+
+    function OpenEdit(data)
+    {
+        StatusMT = data.StatusMT;
+        var StorePartDesType= DevExpress.data.AspNet.createStore({
+            "key": "PackID",
+            "loadUrl": "@Url.Action("GetPackType", "GridLotinMoveticket", new { httproute = true })"
+        });
+         var StorePackingID= DevExpress.data.AspNet.createStore({
+            "key": "PackID",
+            "loadUrl": "@Url.Action("GetPackingID", "GridLotinMoveticket", new { httproute = true })"
+        });
+
+            $('#EditPopup')
+                    .dxPopup({
+                    title:"Edit MoveTicket",
+                    onShown: function () {
+                        $("#editscrollpop").dxScrollView({
+                            height: '100%',
+                            width: '100%'
+                        });
+
+                        if (data.StatusMT == "Void") {
+                            $("#EditbtnVoid").dxButton({
+                                disabled: true
+                            });
+                        } else {
+                            $("#EditbtnVoid").dxButton({
+                                disabled: false
+                            });
+                        }
+                        $("#edittxtMoveTicket").dxTextBox("instance").option("value", data.moveTicket);
+                        $("#edittxtModel").dxTextBox("instance").option("value", data.Model);
+                        $("#edittxtPartNo").dxTextBox("instance").option("value", data.ItemCode);
+                        //$("#edittxtPackingID").dxTextBox("instance").option("value", data.BoxType);
+                        $("#edittxtWIPQTY").dxTextBox("instance").option("value", data.QtyMT);
+
+                        $("#edittxtPackingID").dxSelectBox({ //จังหวะที่เลือก Packing ID
+                            value: data.BoxType,
+                            dataSource: StorePackingID,
+                            valueExpr: 'PackID',
+                            searchEnabled: true,
+                            searchExpr: ["PackID", "PackDesc"],
+                            displayExpr: function (e) {
+                                if (e == null) {
+                                    //console.log(arrMenuIdentityall);
+                                    display = ""
+                                } else {
+                                    display = e.PackID + " - " + e.PackDesc;
+                                }
+                                return display;
+                            },
+                            itemTemplate: function (itemData) {
+                                return $("<div />").append(
+                                    $("<p />").text(itemData.PackID + " - " + itemData.PackDesc)
+                                        .css("display", "inline-block")
+                                );
+                            }
+                        });
+
+                        $("#edittxtPartDesType").dxSelectBox({
+                            value: data.TagType,
+                            dataSource: StorePartDesType,
+                            valueExpr: 'PackID',
+                            searchEnabled: true,
+                            searchExpr: ["PackID", "PackDesc"],
+                            displayExpr: function (e) {
+                                if (e == null) {
+                                    display = ""
+                                } else {
+                                    display = e.PackID + " - " + e.PackDesc;
+                                }
+                                return display;
+                            },
+                            itemTemplate: function (itemData) {
+                                return $("<div />").append(
+                                    $("<p />").text(itemData.PackID + " - " + itemData.PackDesc)
+                                        .css("display", "inline-block")
+                                );
+                            }
+                        });
+
+                    },
+                        onHiding: function (options) {
+                            StatusMT = "";
+                           var grid = $('#gridContainer').dxDataGrid('instance');
+                               grid.refresh();
+                    }
+
+                }).dxPopup('instance').option('visible', true);
+
+    }
+
+</script>
+
+@(Html.DevExtreme().Popup().MaxHeight(500).MaxWidth(900)
+                .Position(po => po.My(HorizontalAlignment.Center, VerticalAlignment.Center)
+                .At(HorizontalAlignment.Center, VerticalAlignment.Center)
+                .Of(new JS("window"))).ID("EditPopup").Visible(false)
+                      .ElementAttr("class", "popup")
+                        .ContentTemplate(new TemplateName("Edit"))
+)
+
+@using (Html.DevExtreme().NamedTemplate("Edit"))
+{
+    @await Html.PartialAsync("_Edit")
+}
+
+@{
+    var filterValue = new object[] {
+        new object[] { "StatusMT", FilterBuilderFieldFilterOperations.NotEqual, "Void" }
+};
+}
+
+@(Html.DevExtreme().DataGrid<MCP_WEB.Models.VW_MFC_MoveTicketVoid>()
+                        .ID("gridContainer")
+                        .ShowBorders(true)
+                        .Export(e => e.Enabled(true)
+                                    .FileName("MoveTicket-" + DateTime.Now)
+                                    .AllowExportSelectedData(true)
+                        )
+                        .ColumnChooser(c => c.Enabled(true))
+                        .AllowColumnResizing(true)
+                        .AllowColumnReordering(true)
+                        .RemoteOperations(true)
+                        .ShowRowLines(true)
+                        .ColumnHidingEnabled(true)
+                        .ColumnAutoWidth(true)
+                        .ColumnMinWidth(100)
+                        .Selection(s => s.Mode(SelectionMode.Multiple)
+                            .ShowCheckBoxesMode(GridSelectionShowCheckBoxesMode.Always)
+                            .SelectAllMode(SelectAllMode.Page)
+                            )
+
+                        .HoverStateEnabled(true)
+                        .RowAlternationEnabled(true)
+                        .Paging(paging => paging.PageSize(10))
+                        .Pager(p => p
+                        .AllowedPageSizes(new int[] { 10, 25, 50, 100 })
+                        .ShowInfo(true)
+                        .ShowNavigationButtons(true)
+                        .ShowPageSizeSelector(true)
+                        .Visible(true))
+
+                        .DataSource(d => d.Mvc().Controller("GridLotinMoveticket").LoadAction("Get"))
+
+                        .FilterPanel(f => f.Visible(true))
+                        .HeaderFilter(h => h.Visible(true))
+                        .FilterValue(filterValue)
+
+                        .FilterRow(filterRow => filterRow
+                            .Visible(true)
+                            .ApplyFilter(GridApplyFilterMode.Auto)
+                            )
+
+                        .SearchPanel(searchPanel => searchPanel
+                            .Visible(true)
+                            .Width(240)
+                            .Placeholder("Search...")
+                        )
+
+                        .Columns(columns =>
+                        {
+                            columns.Add().Caption("Edit").Width(50).Alignment(HorizontalAlignment.Center)
+                            .CellTemplate(new JS("cellTemplate")).AllowExporting(false);
+                            columns.Add().DataField("moveTicket").Caption("Move Ticket").SortOrder(SortOrder.Asc);
+                            columns.Add().DataField("Model").Caption("Model");
+                            columns.Add().DataField("BoxType").Caption("Packing ID");
+                            columns.Add().DataField("TagType").Caption("Part DesType").Visible(false).ShowInColumnChooser(true);
+                            columns.Add().DataField("StatusMT").Caption("Status MT");
+                            columns.Add().DataField("NumOfBox").Caption("Box Qty");
+                            columns.Add().DataField("QtyMT").Caption("WIP Qty");
+                            columns.Add().DataField("QtyExcess").Caption("Excess Qty");
+
+
+                        }) // end .Columns
+
+                        .MasterDetail(md =>
+                        {
+                            md.Enabled(true);
+                            md.Template(@<text>@(Html.DevExtreme().DataGrid<MCP_WEB.Models.MoveTicket_LOT>()
+.ShowRowLines(true)
+.Selection(s => s.Mode(SelectionMode.Multiple)
+.ShowCheckBoxesMode(GridSelectionShowCheckBoxesMode.Always)
+.SelectAllMode(SelectAllMode.Page)
+)
+.Export(e => e.Enabled(true)
+.FileName("MoveTicket-" + DateTime.Now)
+.AllowExportSelectedData(true))
+.AllowColumnReordering(true)
+.Paging(paging => paging.PageSize(10))
+.Pager(p => p
+.AllowedPageSizes(new int[] { 10, 25, 50, 100 })
+.ShowInfo(true)
+.ShowNavigationButtons(true)
+.ShowPageSizeSelector(true)
+.Visible(true))
+.ColumnChooser(c => c.Enabled(true))
+.ColumnAutoWidth(true)
+.ShowBorders(true)
+.Columns(columns =>
+{
+             columns.AddFor(m => m.BoxNo).Caption("BoxNo");
+             columns.AddFor(m => m.Barcode).Caption("Serial No. of Barcode");
+             columns.AddFor(m => m.QtyLot).Caption("Qty in Box");
+         })
+.DataSource(d => d.Mvc()
+.Controller("GridLotinMoveticket")
+.LoadAction("GetDetails")
+.LoadParams(new { id = new JS("data.moveTicket") })
+)
+.Summary(s => s.TotalItems(items =>
+{
+           items.AddFor(m => m.QtyLot)
+               .SummaryType(SummaryType.Sum)
+               .ValueFormat(Format.Decimal).ValueFormat("#,##0").DisplayFormat("Total: {0}");
+
+
+       }))
+
+)</text>);
+
+            })
+.Summary(s => s.TotalItems(items =>
+{
+    items.AddFor(m => m.NumOfBox)
+        .SummaryType(SummaryType.Sum)
+        .Name("NumOfBox")
+        .ValueFormat(Format.Decimal).ValueFormat("#,##0").DisplayFormat("Total: {0}");
+
+    items.AddFor(m => m.QtyMT)
+        .SummaryType(SummaryType.Sum)
+        .Name("QtyMT")
+        .ValueFormat(Format.Decimal).ValueFormat("#,##0").DisplayFormat("Total: {0}");
+
+    items.AddFor(m => m.QtyExcess)
+    .SummaryType(SummaryType.Sum)
+    .Name("QtyExcess")
+    .ValueFormat(Format.Decimal).ValueFormat("#,##0").DisplayFormat("Total: {0}");
+
+}))
+.OnCellPrepared("oncellperparedgridIndex")
+.OnContentReady("oncontentready")
+
+
+)
+
+@(Html.DevExtreme().Button()
+                .ID("btnPrintPreview")
+                .Text("Print")
+                .Type(ButtonType.Default)
+                .OnClick("PrintPreview")
+)
+<script>
+    function oncellperparedgridIndex(e) {
+        //console.log(e); 
+        if (e.rowType === "data" && e.column.dataField === "NumOfBox" && e.rowIndex != undefined) {
+            sumNumOfBox.push(e.data.NumOfBox);
+        }
+        if (e.rowType === "data" && e.column.dataField === "QtyMT" && e.rowIndex != undefined) {
+            sumQtyMT.push(e.data.QtyMT);
+        }
+        if (e.rowType === "data" && e.column.dataField === "QtyExcess" && e.rowIndex != undefined) {
+            sumQtyExcess.push(e.data.QtyExcess);
+        }
+    }
+
+    function oncontentready(e) {
+        var gridItems = $("#gridContainer").dxDataGrid('instance');
+
+        var total1 = sumNumOfBox.reduce((a, b) => parseFloat(a) + parseFloat(b), 0);
+        var total2 = sumQtyMT.reduce((a, b) => parseFloat(a) + parseFloat(b), 0);
+        var total3 = sumQtyExcess.reduce((a, b) => parseFloat(a) + parseFloat(b), 0);
+
+        //console.log(total1);
+        var summaryCells = e.component.getController('data').footerItems()[0].summaryCells;
+        sumNumOfBox = [];
+        sumQtyMT = [];
+        sumQtyExcess = [];
+
+        $.each(summaryCells, function (item, value) {
+            if (value.length > 0) {
+                var name = value[0].name;
+                if (name == "NumOfBox") {
+                    gridItems.getController('data').footerItems()[0].summaryCells[item][0].value = total1;
+                }
+                if (name == "QtyMT") {
+                    gridItems.getController('data').footerItems()[0].summaryCells[item][0].value = total2;
+                }
+                if (name == "QtyExcess") {
+                    gridItems.getController('data').footerItems()[0].summaryCells[item][0].value = total3;
+                }
+                gridItems.getView('footerView').render();
+            }
+
+        });
+        NotSelection(gridItems);
+      
+    }
+
+
+    function PrintPreview(data) {
+        var grid = $('#gridContainer').dxDataGrid('instance');
+        var keys = grid.getSelectedRowKeys();
+        var text = "";
+       
+        console.log(type);
+        var checksame = false;
+        var s;
+        var comma = 0;
+        if (keys.length>0) {
+            var type = keys[0].TagType;
+            for (s in keys) {
+                //console.log(keys[s].TagType);
+                if (type == keys[s].TagType) {
+                    type = keys[s].TagType;
+                    if (text != "") {
+                        text += "&";
+                    }
+                    text += 'id=' + keys[s].moveTicket;
+
+                } else {
+                    checksame = true;
+                }
+
+            }
+            if (checksame == true) {
+                var ErrorSelectLotDialog = DevExpress.ui.dialog.custom({
+                    title: 'Select Move Ticket Incorrect !',
+                    message: 'Please select Move Ticket have only one format‘s part Des type.',
+                    toolbarItems: [
+                        { text: "Close", onClick: function () { return "Ok" } },
+                        //{ text: "Not Ok", onClick: function () { return "Not Ok" } }
+                    ],
+                    width: "500px"
+                });
+                ErrorSelectLotDialog.show().done(function (dialogResult) {
+                    //focus something ...                                   
+
+                });
+            } else {
+                window.open('TagCard5Type/' + type + '?' + text);
+            }   
+        } else {
+            var errorcustomDialog = DevExpress.ui.dialog.custom({
+                title: 'print part destype for move ticket incorrect ! ',
+                message: 'Please select Move Ticket.',
+                toolbarItems: [
+                    { text: "Close", onClick: function () { return "Ok" } }
+                   
+                ],
+                width: "500px"
+
+            });
+            errorcustomDialog.show().done(function (dialogResult) {
+                //focus something
+            });
+        }            
+      
+
+    }
+</script>
+@*<script>
+        $("#gridContainer").dxDataGrid({
+            //onInitialized: function (e) {
+            //    var parentKey = options.key;
+            //    var parentGrid = options.component;
+            //    if (parentGrid.isRowSelected(parentKey)) {
+            //        e.component.selectAll();
+            //    }
+            //},
+            selection: {
+                mode: "multiple"
+            },
+            onSelectionChanged: function (e) {
+               // console.log(e.currentSelectedRowKeys.length);
+                for (var i = 0; i < e.currentSelectedRowKeys.length; i++) {
+                    var el = e.element.find('[masterId="' + e.currentSelectedRowKeys[i] + '"]');
+                    if (el.length > 0)
+                        el.dxDataGrid('instance').selectAll();
+                }
+                for (var i = 0; i < e.currentDeselectedRowKeys.length; i++) {
+                    var el = e.element.find('[masterId="' + e.currentDeselectedRowKeys[i] + '"]');
+                    if (el.length > 0)
+                        el.dxDataGrid('instance').clearSelection();
+                }
+            },
+
+        });
+    </script>*@

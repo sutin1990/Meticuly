@@ -1,0 +1,243 @@
+﻿<style>
+    div.relative {
+        position: relative;
+        width: 100%;
+        border: 1px solid lightgray;
+        height: 120px;
+    }
+
+    div.absolute1 {
+        position: absolute;
+        left: 20px;
+        width: 250px;
+        /*height: 100px;*/
+        /*border: 1px solid #73AD21;*/
+    }
+
+    div.absolute2 {
+        position: absolute;
+        /*top: 10px;*/
+        left: 300px;
+        width: 250px;
+        /*height: 100px;*/
+        /*border: 1px solid #73AD21;*/
+    }
+
+    div.absolute3 {
+        position: absolute;
+        top: 5px;
+        left: 560px;
+        /*height: 100px;*/
+    }
+
+    div.absolute4 {
+        position: absolute;
+        top: 60px;
+        left: 20px;
+        /*height: 100px;*/
+    }
+
+    div.absolute5 {
+        position: absolute;
+        /*top: 10px;*/
+        left: 570px;
+        width: 250px;
+        /*height: 100px;*/
+        /*border: 1px solid #73AD21;*/
+    }
+
+    div.absolute6 {
+        position: absolute;
+        top: 60px;
+        left: 300px;
+        /*height: 100px;*/
+    }
+
+    div.absolute7 {
+        position: absolute;
+        top: 60px;
+        left: 580px;
+        /*height: 100px;*/
+    }
+
+    a {
+        text-decoration: none !important;
+    }
+
+    .dx-link-edit-4x {
+        padding-right: 6px;
+        font-size: 1.2em;
+        width: auto;
+        height: auto;
+    }
+</style>
+<script>
+
+    function cellTemplate(element, cellInfo) {
+        $('<a/>')
+            .addClass('dx-link dx-link-edit dx-icon-edit dx-link-edit-4x ')
+            .on('dxclick', function () {
+                OpenEdit(cellInfo.data);
+            }).appendTo(element);       
+
+
+    }
+</script>
+<form>
+
+
+
+    @(Html.DevExtreme().DataGrid<MCP_WEB.Models.VW_MFC_WIPAdjust>()
+                                        .ID("gridContainer")
+                                        .ShowBorders(true)
+                                        .Export(e => e.Enabled(true).FileName("Adjust Stock WIP-" + DateTime.Now).AllowExportSelectedData(true))
+                                        .ColumnChooser(c => c.Enabled(true))
+                                        .AllowColumnResizing(true)
+                                        .AllowColumnReordering(true)                                        
+                                        //.RemoteOperations(true)
+                                        .ShowRowLines(true)
+                                        //.ColumnHidingEnabled(true)
+                                        .ColumnAutoWidth(true)
+                                        .ColumnMinWidth(100)
+                                        .Selection(s => s.Mode(SelectionMode.Multiple)
+                                            .ShowCheckBoxesMode(GridSelectionShowCheckBoxesMode.Always)
+                                            .SelectAllMode(SelectAllMode.Page)
+                                            )
+
+                                        .HoverStateEnabled(true)
+                                        .RowAlternationEnabled(true)
+                                        .Paging(paging => paging.PageSize(10))
+                                        .Pager(p => p
+                                            .AllowedPageSizes(new int[] { 10, 25, 50, 100 })
+                                            .ShowInfo(true)
+                                            .ShowNavigationButtons(true)
+                                            .ShowPageSizeSelector(true)
+                                            .Visible(true))
+
+                                        .DataSource(d => d.Mvc().Controller("GridVW_MFC_WIPAdjust").LoadAction("Get_data"))
+
+                                        //.FilterPanel(f => f.Visible(true))
+                                        .HeaderFilter(h => h.Visible(true))
+                                        .FilterRow(filterRow => filterRow
+                                                .Visible(true)
+                                                .ApplyFilter(GridApplyFilterMode.Auto))
+                                        .SearchPanel(searchPanel => searchPanel
+                                            .Visible(true)
+                                            .Width(240)
+                                            .Placeholder("Search..."))
+
+                                        .Columns(columns =>
+                                        {
+                                            columns.Add().Caption("Edit").Width(100).Alignment(HorizontalAlignment.Center)
+                                            .CellTemplate(new JS("cellTemplate")).AllowExporting(false);
+
+                                            columns.Add().DataField("BarCode").Caption("Lot No.");
+                                            columns.Add().DataField("Operation").Caption("Operation");
+                                            columns.Add().DataField("ProcessCode").Caption("ProcessCode");
+                                            columns.Add().DataField("Model").Caption("Model");
+                                            columns.Add().DataField("WIPQty").Caption("WIPQty");
+
+                                        }) // end .Columns
+
+    )
+    <br />
+    
+
+    @(Html.DevExtreme().Popup().MaxHeight(500).MaxWidth(900)
+                       .Position(po => po.My(HorizontalAlignment.Center, VerticalAlignment.Center)
+                       .At(HorizontalAlignment.Center, VerticalAlignment.Center)
+                       .Of(new JS("window"))).ID("EditPopup").Title("Edit AdjustStockWIP").Visible(false)
+                             .ElementAttr("class", "popup")
+                               .ContentTemplate(new TemplateName("Edit"))
+    )
+
+    @using (Html.DevExtreme().NamedTemplate("Edit"))
+    {
+        @await Html.PartialAsync("_Edit")
+    }
+
+</form>
+
+<script>   
+    function OpenEdit(data) {
+        $('#EditPopup')
+            .dxPopup({
+                //title: "Edit Department Maintenance",
+                onShowing: function () {                    
+                    $('#txtQtyDiff').dxTextBox('instance').option('value', 0);
+                    $('#txtQtyAudit').dxTextBox('instance').option('value', '');
+                    $('#txtQtyDiff').removeClass('dx-invalid');
+                    $('#txtQtyAudit').removeClass('dx-invalid');                   
+                },
+                onShown: function () {
+                    //$("#listMenuIdentity").dxList('instance').reload();
+                    $("#scrollpop").dxScrollView({
+                        height: '100%',
+                        width: '100%'
+                    });
+
+                    $("#btnSave").dxButton({
+                        disabled: false
+                    }).dxButton("instance");
+
+                    $('#txtBarcode').dxTextBox('instance').option('value', data.BarCode);
+                    $('#txtProcesscode').dxTextBox('instance').option('value', data.ProcessCode);
+                    $('#txtModel').dxTextBox('instance').option('value', data.Model);
+                    $('#txtWIPQty').dxTextBox('instance').option('value', data.WIPQty);
+                    var WIPQty = data.WIPQty;
+                    $('#txtQtyAudit').dxTextBox({
+                        onValueChanged : function(e) {
+                            var txtQtyAudit = 0; 
+                            //console.log(isNaN(e.value));
+                            if (isNaN(e.value) === false) {
+                                txtQtyAudit = e.value;
+                                var diffqty = (parseFloat(WIPQty) - parseFloat(txtQtyAudit));
+                                if (diffqty < 0) {
+                                    diffqty = parseFloat(diffqty * (-1));
+                                }
+                                $('#txtQtyDiff').dxTextBox('instance').option('value', diffqty);
+                            } else {
+                                $('#txtQtyDiff').dxTextBox('instance').option('value', 0);
+                            }                           
+
+                            
+                            //if (parseFloat(WIPQty) <= parseFloat(txtQtyAudit)){
+                            //    $('#txtQtyDiff').dxTextBox('instance').option('value', 0);
+
+                            //} else {
+                            //    var diffqty = parseFloat(WIPQty) - parseFloat(txtQtyAudit);
+                                
+                            //}
+                            
+                            //console.log(e);
+                        }
+
+                    }).dxValidator({
+                        validationRules: [
+                        {
+                            type: "custom",
+                            message: "QtyAudit must be less than WIPQty.",
+                            validationCallback: function (e) {
+                                var txtQtyAudit = 0;
+                                txtQtyAudit = e.value;
+                                var flag = true;
+                                if (parseFloat(WIPQty) <= parseFloat(txtQtyAudit)) {
+                                    
+                                    flag = false;
+                                }                               
+                                return flag;
+                            }
+                        }
+                        ]
+                    });
+                    
+                },  
+                onHiding: function (options) {                   
+                    $("#gridContainer").dxDataGrid('instance').refresh();
+                }
+                
+            }).dxPopup('instance').option('visible', true);
+
+    }
+   
+</script>

@@ -1,0 +1,465 @@
+﻿<div id="GrdResource"></div>
+
+
+
+@*<div id="popupUpload">
+        <form id="uploadImg" enctype="multipart/form-data">
+            <div class="form-group">
+                <div class="row">
+                    <div class="col-xs-4">
+                        <input type="text" id="key" name="key" class="form-control" placeholder="Image Name" readonly>
+                    </div>
+                </div>
+            </div>
+            <div class="form-group">
+                <div class="col-md-10">
+                    <input type="file" class="form-control" name="files" accept="image/*" multiple />
+                </div>
+            </div>
+            <div class="form-group">
+                <div class="col-md-10">
+                    <input type="submit" class="btn btn-primary" value="Upload" />
+                </div>
+            </div>
+        </form>
+    </div>*@
+
+<script>
+    $(function () {
+        $('#uploadImg').submit(function (e) {
+            e.preventDefault();
+            alert("ddddd");
+            var formAction = $(this).attr("action");
+            var fdata = new FormData();
+
+            $.ajax({
+                type: 'post',
+                url: "@Url.Action("Index", "UploadFiles")",
+                data: fdata,
+                processData: false,
+                contentType: false
+            }).done(function (result) {
+                // do something with the result now
+                //console.log(result);
+                if (result.status == "success") {
+                    alert("FFFF");
+                } else {
+                    alert(result.message);
+                }
+            });
+        });
+    });
+
+    function moveEditColumnToLeft(dataGrid) {
+        dataGrid.columnOption("command:edit", {
+            visibleIndex: -1
+
+        });
+    }
+
+    $("#popupUpload").dxPopup({
+        showCloseButton: true,
+        buttons: [{ toolbar: 'bottom', location: 'center', onClick: function (e) { $("#popupContainer").dxPopup("instance").hide(); }, widget: 'button', options: { text: 'Ok' } }],
+        onShowing: function (e) {
+            $("#PartNo_Edit").dxLookup({
+                disabled: true
+            });
+
+        },
+        onHiding: function (e) {
+            //$("#PartNo_Edit").dxLookup({
+            //    disabled: false
+            //});
+            //$("#PartNo_Edit").dxLookup("instance").option("value", '');
+            //$("#PartName_Edit").text('');
+            //$("#Model_Edit").text('');
+            //$("#Fcode_Edit").text('');
+            //$("#GridEdit").dxDataGrid("instance").cancelEditData();
+            //$("#gridContainer").dxDataGrid("instance").refresh();
+        },
+        closeOnOutsideClick: function (e) {
+            return e.target === $("#someElement").get()[0];
+        }
+
+    });
+
+    $(function () {
+        let url = "api/m_Resource";
+        $("#GrdResource").dxDataGrid({
+            dataSource: DevExpress.data.AspNet.createStore({
+                key: ["ItemCode"],
+                loadUrl: url + "/Get",
+                insertUrl: url + "/Post",
+                updateUrl: url + "/Put",
+                deleteUrl: url + "/Delete",
+                onBeforeSend: function (method, ajaxOptions) {
+                    ajaxOptions.xhrFields = { withCredentials: true };
+                }
+            }),
+            editing: {
+                mode: "popup",
+                allowAdding: true,
+                allowUpdating: true,
+                allowDeleting: true,
+                useIcons: true
+            },
+            filterRow: {
+                visible: true
+            },
+            selection: {
+                mode: "multiple",
+                selectAllMode: "page",
+                recursive: false,
+                showCheckBoxesInMultipleMode: 'none'
+            },
+            headerFilter: {
+                visible: true
+            },
+            "export": {
+                enabled: true,
+                fileName: "Resource" + Date.now(),
+                allowExportSelectedData: true
+            },
+            loadPanel: false,
+            remoteOperations: true,
+            showColumnLines: true,
+            showRowLines: true,
+            rowAlternationEnabled: true,
+            showBorders: true,
+            allowColumnReordering: true,
+            allowColumnResizing: true,
+            columnAutoWidth: true,
+            showBorders: true,
+            columnHidingEnabled: true,
+            searchPanel: {
+                visible: true
+            },
+            paging: {
+                pageSize: 10
+            },
+            pager: {
+                showPageSizeSelector: true,
+                allowedPageSizes: [10, 25, 50, 100],
+                showInfo: true,
+                showNavigationButtons: true,
+                visible: true
+            },
+            columnChooser: {
+                enabled: true,
+                mode: "DragAndDrop"
+            },
+            selection: {
+                mode: "multiple",
+                selectAllMode: "page",
+                recursive: false,
+                showCheckBoxesInMultipleMode: 'none'
+            },
+            headerFilter: {
+                visible: true
+            },
+            columns: [
+
+                {
+                    dataField: "ItemCode",
+                    caption: "Item No/Part No",
+                    validationRules: [{ type: "required" }]
+                }, {
+                    dataField: "ItemName",
+                    caption: "ItemName",
+                    visible: false,
+                    validationRules: [{ type: "required" }]
+                }, {
+                    dataField: "Model",
+                    caption: "Mat Name/Model",
+                    validationRules: [{ type: "required" }]
+                }, {
+                    dataField: "Fcode",
+                    caption: "F-Code",
+                    validationRules: [{ type: "required" }]
+                }, {
+                    dataField: "BPCode",
+                    caption: "BPCode",
+                    lookup: {
+                        dataSource: DevExpress.data.AspNet.createStore({
+                            key: "BPCode",
+                            loadUrl: "api/BPCode/Get",
+                            onBeforeSend: function (method, ajaxOptions) {
+                                ajaxOptions.xhrFields = { withCredentials: true };
+                            }
+                        }),
+                        valueExpr: "BPCode",
+                        displayExpr: "BPName",
+                        allowClearing: true
+                    },
+                    editorOptions: {
+                        showClearButton: true
+                    },
+                    validationRules: [{ type: "required" }]
+                }, {
+                    dataField: "ItemType",
+                    caption: "ItemType",
+                    lookup: {
+                        dataSource: DevExpress.data.AspNet.createStore({
+                            key: "ItemTypeID",
+                            loadUrl: "api/ItemType/Get",
+                            onBeforeSend: function (method, ajaxOptions) {
+                                ajaxOptions.xhrFields = { withCredentials: true };
+                            }
+                        }),
+                        valueExpr: "ItemTypeID",
+                        displayExpr: "ItemTypeName",
+                        allowClearing: true
+                    },
+                    editorOptions: {
+                        showClearButton: true
+                    },
+                    validationRules: [{ type: "required" }]
+                }, {
+                    dataField: "StdLotSize",
+                    caption: "Std.LotSize",
+                    dataType: "number"
+                }, {
+                    dataField: "Tolerance",
+                    caption: "Tolerance",
+                    visible:false
+                }, {
+                    dataField: "Status",
+                    caption: "Status",
+                    lookup: {
+                        dataSource: DevExpress.data.AspNet.createStore({
+                            key: "StatusID",
+                            loadUrl: "api/Status/Get",
+                            onBeforeSend: function (method, ajaxOptions) {
+                                ajaxOptions.xhrFields = { withCredentials: true };
+                            }
+                        }),
+                        valueExpr: "StatusID",
+                        displayExpr: "StatusName",
+                        allowClearing: true
+                    },
+                    editorOptions: {
+                        showClearButton: true
+                    },
+                    visible:false
+                },
+                {
+                    dataField: "Dimension1",
+                    caption: "Ø1",
+                    visible: false,
+                    dataType: "number",
+                    format: "#,##0.00",
+                    editorOptions: {
+                        showClearButton: true
+                    }
+                }, {
+                    dataField: "Dimension2",
+                    caption: "Ø2",
+                    visible: false,
+                    dataType: "number",
+                    format: "#,##0.00",
+                    editorOptions: {
+                        showClearButton: true
+                    }
+                }, {
+                    dataField: "Color",
+                    caption: "Color",
+                    visible: false
+                }, {
+                    dataField: "Length",
+                    caption: "Length",
+                    visible: false
+                }, {
+                    dataField: "Batch1",
+                    caption: "Batch1",
+                    visible: false
+                }, {
+                    dataField: "Batch2",
+                    caption: "Batch2",
+                    visible: false
+                }, {
+                    dataField: "Uom",
+                    caption: "UOM",
+                    visible: false
+                }, {
+                    dataField: "HeatNo",
+                    caption: "HeatNo",
+                    visible: false
+                }, {
+                    dataField: "LengthUom",
+                    caption: "LengthUom",
+                    visible: false
+                }, {
+                    dataField: "ItemUserDef1",
+                    caption: "ItemUserDef1",
+                    visible: false
+                }, {
+                    dataField: "ItemUserDef2",
+                    caption: "ItemUserDef2",
+                    visible: false
+                }, {
+                    dataField: "ItemUserDef3",
+                    caption: "ItemUserDef3",
+                    visible: false
+                }, {
+                    dataField: "ItemUserDef4",
+                    caption: "ItemUserDef4",
+                    visible: false
+                }, {
+                    dataField: "ItemUserDef5",
+                    caption: "ItemUserDef5",
+                    visible: false
+                }, {
+                    dataField: "ItemImage",
+                    caption: 'ImagesName.',
+                    visible: false,
+                    showEditorAlways: true,
+                    editCellTemplate: function (container, options) {
+                        var table = $('<table class="table table-bordered"><tr><td><div class="txt"></div></td><td><div class="txt1"></div></td><td><div class="btn"></div></td></tr></table>');
+                        table.find('.txt').append($("<img>", { "src": "uploads/img/" + options.value , "style":"height:60px;"}));
+                        table.find('.txt1').append("<input type='file' id='myfile' name='myfile' accept='image/png, image/jpeg'>");
+
+                        console.log(options.value);
+
+                        table.find('.btn').dxButton({
+                            icon: 'upload',
+                            type: "default",
+                            onClick: function (e) {
+
+                                upload(options);
+                            }
+                        });
+                        table.appendTo(container);
+                    }
+
+                }, {
+                    dataField: "TransDate",
+                    caption: "TransDate",
+                    dataType: "datetime",
+                    format:"@ViewBag.format",
+                    visible: false
+                }, {
+                    dataField: "CreateDate",
+                    caption: "CreateDate",
+                    dataType: "datetime",
+                    format:"@ViewBag.format",
+                    visible: false
+                }, {
+                    dataField: "ModifyBy",
+                    caption: "ModifyBy",
+                    visible: false
+                }]
+            ,
+            onInitNewRow: function (e) {
+                var date = new Date();
+                e.component.columnOption("ItemCode", "allowEditing", true);
+                e.component.columnOption("Model", "allowEditing", true);
+                e.component.columnOption("Fcode", "allowEditing", true);
+
+                e.component.columnOption("ItemImage", "allowEditing", false);
+                e.component.columnOption("TransDate", "allowEditing", false);
+                e.component.columnOption("CreateDate", "allowEditing", false);
+                e.component.columnOption("ModifyBy", "allowEditing", false);
+
+                e.data.TransDate = date;
+                e.data.CreateDate = date;
+                e.data.ModifyBy = "@User.FindFirst("ContactName").Value";
+
+                if (e.dataField == "ItemCode") {
+                    $(e.editorElement).dxTextBox("instance").on("valueChanged", function (args) {
+                        var grid = $("#GrdResource").dxDataGrid("instance");
+                        var index = e.row.rowIndex;
+                        var result = args.value;
+                        grid.cellValue(index, "ItemImage", result);
+                        e.data.ItemImage = result;
+                    });
+                }
+            },
+            onRowInserting: function (e) {
+                //e.data.ItemImage = imagesname;
+            } ,
+            onEditingStart: function (e) {
+                var date = new Date();
+                e.component.columnOption("ItemCode", "allowEditing", false);
+                e.component.columnOption("Model", "allowEditing", false);
+                e.component.columnOption("Fcode", "allowEditing", false);
+                e.component.columnOption("ItemImage", "allowEditing", false);
+                e.component.columnOption("TransDate", "allowEditing", false);
+                e.component.columnOption("CreateDate", "allowEditing", false);
+                e.component.columnOption("ModifyBy", "allowEditing", false);
+
+
+             
+
+                if (e.data.ItemImage == null && e.data.ItemCode === null) {
+                    e.data.ItemImage = e.data.ItemCode;
+                }
+
+                e.data.TransDate = date;
+                e.data.ModifyBy = "@User.FindFirst("ContactName").Value";
+            },
+            onContentReady: function (e) {
+                moveEditColumnToLeft(e.component);
+            },
+            onEditorPreparing: function (e) {
+                if (e.dataField == "ItemCode" && e.parentType == "dataRow" ) {
+                    var standardHandler = e.editorOptions.onValueChanged;
+                    e.editorOptions.onValueChanged = function (e) { // Overriding the standard handler
+                        var grid = $("#GrdResource").dxDataGrid("instance");
+                        var result = e.value;
+                        grid.cellValue(0, "ItemImage", result);
+                        grid.cellValue(0, "ItemCode", result);
+                    };
+                }
+
+
+            }
+        });
+    });
+
+    function upload(options) {
+
+        var file = document.getElementById('myfile').files[0];
+        if (file) {
+            var form_data = new FormData();
+            form_data.append('files', file);
+
+            let extension = file.name.split('.')[1];
+
+            var grid = $("#GrdResource").dxDataGrid("instance");
+            var result = options.value + "." + extension;
+            grid.cellValue(options.row.rowIndex, "ItemImage", result);
+
+            $.ajax({
+
+                url: "@Url.Action("Index", "UploadFiles")?key=" + options.value,
+                data: form_data,
+                cache: false,
+                processData: false,
+                contentType: false,
+                dataType: 'text',
+                type: 'post',
+                success: function (message) {
+                    //alert(message);
+                },
+                error: function () {
+                    alert("There was error uploading files!");
+                }
+
+            }).done(function (result) {
+                if (result.status == "success") {
+                    //alert("FFFF");
+                } else {
+                    //alert(result.message);
+                }
+            });
+        }
+
+
+    }
+
+    function getFileUploaderInstance() {
+        return $("#fileUploader").dxFileUploader("instance");
+    }
+
+
+</script>

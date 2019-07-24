@@ -1,0 +1,498 @@
+﻿<style>
+    a {
+        text-decoration: none !important;
+    }
+
+    .dx-link-edit-4x {
+        /*padding-right: 2px;*/
+        font-size: 1.2em;
+        width: auto;
+        height: auto;
+    }
+
+    .dx-link-delete-4x {
+        /*padding-right: 2px;*/
+        font-size: 1.2em;
+        width: auto;
+        height: auto;
+       
+    }
+    .dx-icon-check {
+        color: white !important;
+    }
+
+    #Received {
+        background-color: #5cb85c;
+        /*border-color: aliceblue;*/
+        color: white !important;
+    }
+
+    #Received:hover {
+        background-color: #449D44; /* Green */
+    }
+    .dx-icon-revert {
+        color: white !important;
+    }
+
+    #Returned {
+        background-color: #f89854;
+        /*border-color: aliceblue;*/
+        color: white !important;
+    }
+
+    #Returned:hover {
+        background-color: #ff6a00; /* Green */
+    }
+</style>
+<script>
+
+    function toolbar_preparing(e) {        
+        e.toolbarOptions.items.unshift(            
+
+            {
+                location: "after",
+                widget: "dxButton",
+                locateInMenu: 'auto',
+                options:
+                {
+                    elementAttr: {
+                        id: 'Returned'
+                    },
+                    icon: "revert",
+                    text: "Return",                   
+                    onClick: function (c) {
+                        getkeyforRetruned(e);
+                    }                   
+                }
+            }, 
+
+            {
+                location: "after",
+                widget: "dxButton",
+                locateInMenu: 'auto',
+                options:
+                {
+                    elementAttr: {
+                        id: 'Received'
+                    },
+                    icon: "check",
+                    text: "Receive",
+                    onClick: function (c) {
+                        getkeyforReceived(e);
+                    }
+                   
+                }
+            }                  
+
+        );
+    }
+
+    function cellTemplate(element, cellInfo) {       
+            $('<a/>')
+                .addClass('dx-link dx-link-edit dx-icon-edit dx-link-edit-4x ')
+                .on('dxclick', function () {
+                    //$('#EditPopup').dxPopup('instance').option('visible', true);
+                    OpenEdit(cellInfo.data);
+                }).appendTo(element);
+            //console.log(cellInfo.data.StatusMT);
+    }
+
+    function onInitialized(e, gridData) {
+        //console.log(e.component.option("elementAttr", { id: "StatusMT" + gridData.StatusMT }));
+    }
+
+    function getkeyforRetruned(e) {
+        var grid = $('#gridContainer').dxDataGrid('instance');
+        var keys = grid.getSelectedRowKeys();
+        var arrDeliveryNote = [];     
+        var arrnotequalpacked = [];
+        var checkStatusMT = true;
+        var txtalert = [];
+        //console.log(grid);
+        //console.log(keys);
+        $.each(keys, function (item, value) {
+            arrDeliveryNote.push(value.DeliveryNote);
+        });
+       
+        //console.log(keys.length);
+        if (keys.length > 0) {
+            var result = DevExpress.ui.dialog.confirm("Are you sure of the Delivery Note:[" + arrDeliveryNote.join(",") + "] you choose?", "Confirm Returned");
+            result.done(function (dialogResult) {
+            if (dialogResult) {
+            //console.log(arrDeliveryNote); 
+                $.ajax({
+                    type: 'POST',
+                    url: '@Url.Action("CheckStatusMT", "GridReceiptbyDeliveryNote", new { httproute = true })',
+                    data: { "deliverynote": arrDeliveryNote },
+                    async: false,
+                    beforeSend: function () {/*loading*/ },
+                    dataType: 'json',
+                    success: function (result) {
+                        
+                        if (result.data.length > 0) {
+                            $.each(result, function (item, value) {
+                                for (var i = 0; i < value.length; i++) {
+                                    console.log(value[i].StatusMT); 
+                                    if (value[i].StatusMT != "Packed") {
+                                        arrnotequalpacked.push(value[i].DeliveryNote);
+                                        checkStatusMT = false;
+                                        break;
+                                    } 
+                                }
+                                                               
+                            });
+                            if (checkStatusMT == true) {
+
+                                $.ajax({
+                                    type: 'POST',
+                                    url: '@Url.Action("Click_ReturnedbyDeliveryNote", "GridReceiptbyDeliveryNote", new { httproute = true })',
+                                    data: { "deliverynote": arrDeliveryNote },
+                                    async: false,
+                                    beforeSend: function () {/*loading*/ },
+                                    dataType: 'json',
+                                    success: function (result) {
+                                        //console.log(result);
+                                        $.each(result, function (item, value) {
+                                            txtalert.push(value.DeliveryNote);
+                                        });
+                                        if (result.length > 0) {
+                                            var Dialogreturnedsuccess = DevExpress.ui.dialog.custom({
+                                                title: 'Returned by Delivery Note Success.',
+                                                message: "Returned by Delivery Note: " + txtalert.join(",")+" Success .",
+                                                toolbarItems: [
+                                                    { text: "Close", onClick: function () { return "Ok" } },
+                                                    //{ text: "Not Ok", onClick: function () { return "Not Ok" } }
+                                                ],
+                                                width: "500px"
+                                            });
+                                            Dialogreturnedsuccess.show().done(function (dialogResult) {
+                                                //var grid = $('#griddeliverly').dxDataGrid('instance');
+                                            });
+                                        } else {
+                                            DevExpress.ui.notify(errStr, "Returned by Delivery Note Error!", 2000);
+                                        }
+                                        //DevExpress.ui.notify("Delete success.", "success", 1000);
+                                        grid.refresh();                        
+                                    },
+                                    error: function (ob, errStr) {
+                                        //ob.stopPropagation();
+                                        DevExpress.ui.notify(errStr, "Cannot returned by delivery note", 2000);
+                                        grid.refresh();
+                                    }
+                                });
+
+                            } else {
+                                var DialogerrorReturned = DevExpress.ui.dialog.custom({
+                                    title: 'Returned by Delivery Note Error.',
+                                    message: "This Delivery Note In : [" + arrnotequalpacked.join(",") + "] the status is not equal to the packed.",
+                                    toolbarItems: [
+                                        { text: "Close", onClick: function () { return "Ok" } },
+                                        //{ text: "Not Ok", onClick: function () { return "Not Ok" } }
+                                    ],
+                                    width: "500px"
+                                });
+                                DialogerrorReturned.show().done(function (dialogResult) {
+                                    //var grid = $('#griddeliverly').dxDataGrid('instance');
+                                });
+                            }
+                        } else {
+                            //no data
+                        }
+                                          
+                    },
+                    error: function (ob, errStr) {
+                        //ob.stopPropagation();
+                        DevExpress.ui.notify(errStr, "Cannot returned by delivery note", 2000);
+                        grid.refresh();
+                    }
+                });
+            }
+        });
+
+        } else {
+            var Dialog = DevExpress.ui.dialog.custom({
+                title: 'Cannot returned by delivery note!',
+                message: "Please select delivery note.",
+                toolbarItems: [
+                    { text: "Close", onClick: function () { return "Ok" } },
+                    //{ text: "Not Ok", onClick: function () { return "Not Ok" } }
+                ],
+                width: "500px"
+            });
+            Dialog.show().done(function (dialogResult) {
+                //var grid = $('#griddeliverly').dxDataGrid('instance');
+            });
+        }
+
+        
+
+
+}
+
+function getkeyforReceived(e) {
+        var grid = $('#gridContainer').dxDataGrid('instance');
+        var keys = grid.getSelectedRowKeys();
+        var arrDeliveryNote = []; 
+        var arrnotequalpacked = [];
+        var txtalert = [];
+        var checkStatusMT = true;
+        $.each(keys, function (item, value) {
+            arrDeliveryNote.push(value.DeliveryNote);
+        });
+
+        
+        if (keys.length > 0) {           
+            var result = DevExpress.ui.dialog.confirm("Are you sure of the Delivery Note:[" + arrDeliveryNote.join(",") + "] you choose?", "Confirm Receipt");
+            result.done(function (dialogResult) {
+                if (dialogResult) {
+            $.ajax({
+                type: 'POST',
+                url: '@Url.Action("CheckStatusMT", "GridReceiptbyDeliveryNote", new { httproute = true })',
+                data: { "deliverynote": arrDeliveryNote },
+                async: false,
+                beforeSend: function () {/*loading*/ },
+                dataType: 'json',
+                success: function (result) {
+
+                    if (result.data.length > 0) {
+                        $.each(result, function (item, value) {
+                            for (var i = 0; i < value.length; i++) {
+                                //console.log(value[i].StatusMT);
+                                if (value[i].StatusMT != "Packed") {
+                                    arrnotequalpacked.push(value[i].DeliveryNote);
+                                    checkStatusMT = false;
+                                    break;
+                                }
+                            }
+
+                        });
+                        //console.log(checkStatusMT);
+                        if (checkStatusMT == true) {
+                            $.ajax({
+                                type: 'POST',
+                                url: '@Url.Action("Click_ReceivedbyDeliveryNote", "GridReceiptbyDeliveryNote", new { httproute = true })',
+                                data: { "deliverynote": arrDeliveryNote },
+                                async: false,
+                                beforeSend: function () {/*loading*/ },
+                                dataType: 'json',
+                                success: function (result) {
+                                    //console.log(result);
+                                    $.each(result, function (item, value) {
+                                        txtalert.push(value.DeliveryNote);
+                                    });
+                                    if (result.length > 0) {
+                                        var Dialog = DevExpress.ui.dialog.custom({
+                                            title: 'Receipt by Delivery Note Success.',
+                                            message: "Receipt by Delivery Note: " + txtalert.join(",")+" Success .",
+                                            toolbarItems: [
+                                                { text: "Close", onClick: function () { return "Ok" } },
+                                                //{ text: "Not Ok", onClick: function () { return "Not Ok" } }
+                                            ],
+                                            width: "500px"
+                                        });
+                                        Dialog.show().done(function (dialogResult) {
+                                            //var grid = $('#griddeliverly').dxDataGrid('instance');
+                                        });
+                                    } else {
+                                        DevExpress.ui.notify(errStr, "Receipt by Delivery Note Error!", 2000);
+                                    }
+                                    //DevExpress.ui.notify("Delete success.", "success", 1000);
+                                    grid.refresh();                        
+                                },
+                                error: function (ob, errStr) {
+                                    //ob.stopPropagation();
+                                    DevExpress.ui.notify(errStr, "error", 2000);
+                                    grid.refresh();
+                                }
+                            });
+
+                        } else {
+                            var DialogerrorReturned = DevExpress.ui.dialog.custom({
+                                title: 'Receipt by Delivery Note Error.',
+                                message: "This Delivery Note In : [" + arrnotequalpacked.join(",") + "] the status is not equal to the packed.",
+                                toolbarItems: [
+                                    { text: "Close", onClick: function () { return "Ok" } },
+                                    //{ text: "Not Ok", onClick: function () { return "Not Ok" } }
+                                ],
+                                width: "500px"
+                            });
+                            DialogerrorReturned.show().done(function (dialogResult) {
+                                //var grid = $('#griddeliverly').dxDataGrid('instance');
+                            });
+                        }
+                    }
+                },
+                error: function (ob, errStr) {
+                    //ob.stopPropagation();
+                    DevExpress.ui.notify(errStr, "stored error", 2000);
+                    grid.refresh();
+                }
+            });
+        }
+    });               
+
+        } else {
+            var Dialog = DevExpress.ui.dialog.custom({
+                title: 'Cannot receipt by delivery note!',
+                message: "Please select delivery note.",
+                toolbarItems: [
+                    { text: "Close", onClick: function () { return "Ok" } },
+                    //{ text: "Not Ok", onClick: function () { return "Not Ok" } }
+                ],
+                width: "500px"
+            });
+            Dialog.show().done(function (dialogResult) {
+                //var grid = $('#griddeliverly').dxDataGrid('instance');
+            });
+        }
+
+
+        
+
+
+    }
+</script>
+
+@(Html.DevExtreme().DataGrid<MCP_WEB.Models.VW_MFC_ReceiptbyDeliveryNote>()
+                            .ID("gridContainer")
+                            .ShowBorders(true)
+                            //.OnInitialized("function(e) { onInitialized(e, data);  }")
+                            //.OnCellPrepared("onCellPrepared")
+                            //.OnSelectionChanged("onSelectionChanged")
+                            .Export(e => e.Enabled(true)
+                                        .FileName("ReceiptbyDeliveryNote-" + DateTime.Now)
+                                        .AllowExportSelectedData(true)
+                            )
+                            .OnToolbarPreparing("toolbar_preparing")
+                            .ColumnChooser(c => c.Enabled(true))
+                            .ColumnHidingEnabled(true)
+                            .ColumnAutoWidth(true)
+                            .ColumnMinWidth(100)
+                            .AllowColumnResizing(true)
+                            .RemoteOperations(true)
+                            .ShowRowLines(true)
+                            .AllowColumnReordering(true)
+                            .Selection(s => s.Mode(SelectionMode.Multiple)
+                                .ShowCheckBoxesMode(GridSelectionShowCheckBoxesMode.Always)
+                                .SelectAllMode(SelectAllMode.Page)
+                                )
+
+                            .HoverStateEnabled(true)
+                            .RowAlternationEnabled(true)
+                            .Paging(paging => paging.PageSize(10))
+                            .Pager(p => p
+                            .AllowedPageSizes(new int[] { 10, 25, 50, 100 })
+                            .ShowInfo(true)
+                            .ShowNavigationButtons(true)
+                            .ShowPageSizeSelector(true)
+                            .Visible(true))
+
+                            .DataSource(d => d.Mvc().Controller("GridReceiptbyDeliveryNote").LoadAction("Get"))
+
+                            .FilterPanel(f => f.Visible(true))
+                            .HeaderFilter(h => h.Visible(true))
+                            //.FilterValue(filterValue)
+                            .FilterRow(filterRow => filterRow
+                                    .Visible(true)
+                                    .ApplyFilter(GridApplyFilterMode.Auto)
+                                    )
+
+                            .SearchPanel(searchPanel => searchPanel
+                                .Visible(true)
+                                .Width(240)
+                                .Placeholder("Search...")
+                            )
+                            .Grouping(grouping => grouping.AutoExpandAll(true))
+                            .GroupPanel(groupPanel => groupPanel.Visible(true))
+                            .Columns(columns =>
+                            {
+                                //columns.Add().Caption("Edit").Width(50).Alignment(HorizontalAlignment.Center)
+                                //       .CellTemplate(new JS("cellTemplate"));
+                                columns.Add().DataField("DeliveryNote").SortOrder(SortOrder.Asc);
+                                //columns.Add().DataField("Model");
+                                columns.Add().DataField("StatusDelivery").SortOrder(SortOrder.Asc);
+
+                            }) // end .Columns
+                            .MasterDetail(md =>
+                            {
+                                md.Enabled(true);
+                                md.Template(@<text>@(Html.DevExtreme().DataGrid<MCP_WEB.Models.VW_MFC_ReceiptbyDeliveryNote>()
+                                         .ShowRowLines(true)
+                                          .AllowColumnResizing(true)
+                                          .AllowColumnReordering(true)
+                                          .Paging(paging => paging.PageSize(10))
+                                            .Pager(p => p
+                                            .AllowedPageSizes(new int[] { 10, 25, 50, 100 })
+                                            .ShowInfo(true)
+                                            .ShowNavigationButtons(true)
+                                            .ShowPageSizeSelector(true)
+                                            .Visible(true))
+                                         .Selection(s => s.Mode(SelectionMode.Multiple)
+                                         .ShowCheckBoxesMode(GridSelectionShowCheckBoxesMode.Always)
+                                         .SelectAllMode(SelectAllMode.Page)
+                                         )
+                                         .Export(e => e.Enabled(true)
+                                         .FileName("ReceiptbyDeliveryNote-" + DateTime.Now)
+                                         .AllowExportSelectedData(true))
+                                         .ColumnChooser(c => c.Enabled(true))
+                                         .ColumnAutoWidth(true)
+                                         .ShowBorders(true)
+                                         .Columns(columns =>
+                                         {
+                                             columns.AddFor(m => m.DeliveryNote).Caption("Delivery Note").Width(100);
+                                             columns.AddFor(m => m.Model).Caption("Model");
+                                             columns.AddFor(m => m.MoveTicket).Caption("Move Ticket");
+                                             columns.AddFor(m => m.StatusMT).Caption("Status MT");
+                                             columns.AddFor(m => m.MTQty).Caption("MT Qty").Width(80);
+                                             columns.AddFor(m => m.BoxQty).Caption("Box Qty").Width(80);
+                                             columns.AddFor(m => m.ExcessQty).Caption("Excess Qty").Width(80);
+                                             columns.AddFor(m => m.FGQty).Caption("FG Qty").Width(80);
+                                             columns.AddFor(m => m.FGBoxQty).Caption("FG Box Qty").Width(80);
+                                             columns.AddFor(m => m.FGExcessQty).Caption("FG Excess Qty").Width(100);
+                                         })
+                                          .DataSource(d => d.Mvc()
+                                          .Controller("GridReceiptbyDeliveryNote")
+                                          .LoadAction("GetDetails")
+                                          .LoadParams(new { deliverynote = new JS("data.DeliveryNote") })
+                                      )
+                                        .Paging(paging => paging.PageSize(10))
+                                        .Pager(p => p
+                                        .AllowedPageSizes(new int[] { 10, 25, 50, 100 })
+                                        .ShowInfo(true)
+                                        .ShowNavigationButtons(true)
+                                        .ShowPageSizeSelector(true)
+                                        .Visible(true))
+                                        .Summary(s => s.TotalItems(items =>
+                                        {
+                                           items.AddFor(m => m.MTQty)
+                                               .SummaryType(SummaryType.Sum)
+                                               .ValueFormat(Format.Decimal).ValueFormat("#,##0").DisplayFormat("Total: {0}");
+
+                                           items.AddFor(m => m.BoxQty)
+                                               .SummaryType(SummaryType.Sum)
+                                               .ValueFormat(Format.Decimal).ValueFormat("#,##0").DisplayFormat("Total: {0}");
+
+                                           items.AddFor(m => m.ExcessQty)
+                                               .SummaryType(SummaryType.Sum)
+                                               .ValueFormat(Format.Decimal).ValueFormat("#,##0").DisplayFormat("Total: {0}");
+
+                                           items.AddFor(m => m.FGQty)
+                                               .SummaryType(SummaryType.Sum)
+                                               .ValueFormat(Format.Decimal).ValueFormat("#,##0").DisplayFormat("Total: {0}");
+
+                                           items.AddFor(m => m.FGBoxQty)
+                                              .SummaryType(SummaryType.Sum)
+                                              .ValueFormat(Format.Decimal).ValueFormat("#,##0").DisplayFormat("Total: {0}");
+
+                                           items.AddFor(m => m.FGExcessQty)
+                                              .SummaryType(SummaryType.Sum)
+                                              .ValueFormat(Format.Decimal).ValueFormat("#,##0").DisplayFormat("Total: {0}");
+
+                                       }))
+
+                )</text>);
+
+                                    })
+
+)
+

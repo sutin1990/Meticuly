@@ -1,0 +1,40 @@
+﻿.content-wrapper {
+    background-color: #ffffff;
+}
+
+
+@font-face {
+    font-family: 'THSarabun';
+    src: url('../Font/THSarabun.ttf'); /* IE9 Compat Modes */
+    src: url('../Font/THSarabun.ttf?#iefix') format('embedded-opentype'), /* IE6-IE8 */
+    url('../Font/THSarabun.ttf') format('woff2'), /* Super Modern Browsers */
+    url('../Font/THSarabun.ttf') format('woff'), /* Pretty Modern Browsers */
+    url('../Font/THSarabun.ttf') format('truetype'), /* Safari, Android, iOS */
+    url('../Font/THSarabun.ttf#svgFontName') format('svg'); /* Legacy iOS */
+}
+
+/*body {
+    font-family: 'THSarabun', Fallback, sans-serif;
+    font-size: 20px;
+}*/
+
+/*.content {
+    font-family: 'THSarabun', Fallback, sans-serif;
+}*/
+
+/*h1, h2, h3, h4, h5, h6, .h1, .h2, .h3, .h4, .h5, .h6 {
+    font-family: 'THSarabun', Fallback, sans-serif;
+}*/
+
+.dx-datagrid {
+    line-height: inherit;
+    font-size: small;
+}
+
+.content-wrapper {
+    height:100%;
+    min-height: 800px;
+}
+/*.treeview-menu > li > a {
+    font-size: 20px;
+}*/

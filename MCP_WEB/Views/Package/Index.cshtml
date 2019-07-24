@@ -1,0 +1,159 @@
+﻿
+@{
+   // ViewData["Title"] = "Index";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+@(Html.DevExtreme().DataGrid<MCP_WEB.Models.m_Package>()
+            .ID("gridContainer")
+            .Selection(s=> s.Mode(SelectionMode.Multiple)
+                            .SelectAllMode(SelectAllMode.Page))
+            .DataSource(ds => ds.Mvc()
+                .Controller("m_Package")
+                .LoadAction("Get")
+                .InsertAction("Post")
+                .UpdateAction("Put")
+                .DeleteAction("Delete")
+                .Key("PackID")
+            )
+
+            .RemoteOperations(true)
+            .ShowColumnLines(true)
+            .ShowRowLines(true)
+            .RowAlternationEnabled(true)
+            .ShowBorders(true)
+            .HeaderFilter(h => h.Visible(true))
+            .FilterRow(f => f.Visible(true))
+            .SearchPanel(p => p.Visible(true))
+            .Pager(p => p
+            .AllowedPageSizes(new int[] { 10, 25, 50, 100 })
+            .ShowInfo(true)
+            .ShowNavigationButtons(true)
+            .ShowPageSizeSelector(true)
+            .Visible(true))
+            .Paging(p => p.PageSize(10))
+            .ColumnChooser(c => c
+                .Enabled(true)
+                .Mode(GridColumnChooserMode.DragAndDrop))
+            .AllowColumnResizing(true)
+            .ColumnMinWidth(100)
+            .ColumnAutoWidth(true)
+            .ColumnHidingEnabled(true)
+            .Export(e => e.Enabled(true).FileName("Package - " + DateTime.Now).AllowExportSelectedData(true))
+            .Columns(columns =>
+            {
+
+                    columns.AddFor(m => m.PackID).Caption("ID.").DataType(GridColumnDataType.String).Alignment(HorizontalAlignment.Left).DataField("PackID").SortOrder(SortOrder.Asc);
+
+                    columns.AddFor(m => m.PackDesc).Caption("Description").DataType(GridColumnDataType.String).Alignment(HorizontalAlignment.Left).DataField("PackDesc");
+
+                    columns.AddFor(m => m.PackType)
+                        .Caption("Type")
+                        .DataType(GridColumnDataType.String)
+                        .Alignment(HorizontalAlignment.Left)
+                        .Lookup(lookup => lookup
+                            .DataSource(d => d.Mvc().Controller("m_Package").LoadAction("GetPackageTypeLookUp").Key("PackageTypeTd"))
+                            .DisplayExpr("PackageTypeName")
+                            .ValueExpr("PackageTypeTd")
+                        );
+                    ;
+
+                    columns.AddFor(m => m.PackQty).Caption("Qty/Lot(pcs.)").DataType(GridColumnDataType.String).Alignment(HorizontalAlignment.Left);
+
+                    columns.AddFor(m => m.TransDate)
+                        .Caption("Trans Date")
+                        .DataType(GridColumnDataType.DateTime)
+                        .Alignment(HorizontalAlignment.Left)
+                        .AllowEditing(false).Visible(false)
+                        .Format(ViewBag.GlobalDtFormat)
+                        ;
+
+                    columns.AddFor(m => m.CreateDate)
+                        .Caption("Create Date")
+                        .DataType(GridColumnDataType.DateTime)
+                        .Alignment(HorizontalAlignment.Left)
+                        .AllowEditing(false).Visible(true)
+                        .Format(ViewBag.GlobalDtFormat)
+                        ;
+
+                    columns.AddFor(m => m.ModifyBy)
+                        .Caption("ModifyBy")
+                        .DataType(GridColumnDataType.String)
+                        .Alignment(HorizontalAlignment.Left)
+                        .AllowEditing(false)
+                        .Visible(false);
+
+            })
+
+            .Editing(e => e.Mode(GridEditMode.Popup)
+                .AllowAdding(true)
+                .AllowUpdating(true)
+                .AllowDeleting(true)
+                .UseIcons(true)
+            .Popup(p => p
+                .Title("Package Info")
+                .ShowTitle(true)
+                .MaxWidth(700)
+                .MaxHeight(345)
+                .Position(pos => pos
+                .My(HorizontalAlignment.Center, VerticalAlignment.Center)
+                .At(HorizontalAlignment.Center, VerticalAlignment.Center)
+                .Of(new JS("window"))
+
+                    )
+                )
+            )
+
+            .Summary(s => s.TotalItems(items =>
+            {
+                items.AddFor(m => m.PackQty).SummaryType(SummaryType.Sum).ValueFormat(Format.Decimal).ValueFormat("#,##0");
+            }))
+
+            .OnContentReady(@<text>function(e){
+                moveEditColumnToLeft(e.component);
+                }</text>)
+
+            .OnEditingStart(@<text> function(e) {
+                e.component.columnOption("PackID", "allowEditing", false);
+                e.component.columnOption("CreateDate", "allowEditing", false);
+                e.component.columnOption("ModifyBy", "allowEditing", false);
+                
+                } </text>)
+
+            .OnInitNewRow(@<text>function(e) {
+                e.component.columnOption("PackID", "allowEditing", true);
+                InitNewRow(e)
+                }</text>)
+
+            @*.OnEditorPreparing(@<text> function(e) {
+                if (e.dataField == 'ModifyBy') {
+                    e.editorOptions.disabled = true;
+                    }
+                if (e.dataField == 'CreateDate') {
+                    e.editorOptions.disabled = true;
+                    }
+                if (e.dataField == 'TransDate') {
+                    e.editorOptions.disabled = true;
+                    }
+                }</text>)*@
+
+)
+
+<script>
+       
+    function moveEditColumnToLeft(dataGrid) {
+        dataGrid.columnOption("command:edit", {
+            visibleIndex: -1
+        
+        });
+    }
+
+    function InitNewRow(e) {
+        e.data.TransDate = new Date();
+        e.data.CreateDate = new Date();
+
+        var u = "@(ViewBag.UserName)";
+        e.data.ModifyBy = u;
+    }
+
+</script>

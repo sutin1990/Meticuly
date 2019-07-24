@@ -1,0 +1,309 @@
+﻿@{
+    ViewData["Title"] = "Index";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+@*<script>
+    var formatview = "";
+    function formatdatetime() {
+        var datatime = "";
+        //alert(data.value);
+        $.ajax({
+                type: 'GET',
+                url: '@Url.Action("FormatDate", "m_ProcessMaster", new { httproute = true })',
+                async: false,
+                dataType: 'json',
+                success: function (result) {
+                    $.each(result, function (key, value) {
+                        //alert(value.param_value);
+                        datatime = value.param_value.split("-");
+                        datatime = datatime[0] + "-" + datatime[1] + "-" + datatime[2].toLowerCase();
+                        //console.log(datatime);
+                    });
+                }
+        });
+        return datatime;
+    }
+    formatview = formatdatetime();
+</script>*@
+
+
+@(Html.DevExtreme().DataGrid<MCP_WEB.Models.m_ProcessMaster>()
+                        .DataSource(ds => ds.Mvc()
+                        .Controller("m_ProcessMaster")
+                        .LoadAction("Get")
+                        .InsertAction("Post")
+                        //.UpdateAction("Put")
+                        .DeleteAction("Delete")
+                        .Key("ProcessCode")
+                        )
+                        .ID("gridContainer")
+
+                        .RemoteOperations(true)
+                        .ShowColumnLines(true)
+                        .ShowRowLines(true)
+                        .RowAlternationEnabled(true)
+                        .AllowColumnReordering(true)
+                        .ShowBorders(true)
+                        .FilterRow(f => f.Visible(true).ApplyFilter(GridApplyFilterMode.Auto))
+                        .HeaderFilter(headerFilter => headerFilter.Visible(true))
+                        .SearchPanel(p => p.Visible(true))
+                        .Pager(p => p
+                        .AllowedPageSizes(new int[] { 10, 25, 50, 100 })
+                        .ShowInfo(true)
+                        .ShowNavigationButtons(true)
+                        .ShowPageSizeSelector(true)
+                        .Visible(true))
+                        .Paging(p => p.PageSize(10))
+                        .ColumnChooser(c => c
+                        .Enabled(true)
+                        .Mode(GridColumnChooserMode.DragAndDrop))
+                        .AllowColumnResizing(true)
+                        .OnInitNewRow("OnNewRow")
+                        .ColumnMinWidth(80)
+                        .ColumnAutoWidth(true)
+                        .ColumnHidingEnabled(true)
+                        .Export(e => e.Enabled(true).FileName("ProcessMaster - " + DateTime.Now).AllowExportSelectedData(true))
+                        .Columns(columns =>
+                        {
+
+
+                        columns.AddFor(m => m.ProcessCode)
+                        .Caption("Process Code");
+                        columns.AddFor(m => m.ProcessName)
+                        .Caption("Process Name");
+                        columns.AddFor(m => m.SysemProcessFLag)
+                        .Caption("Sysem ProcessFLag").Visible(false);
+                        columns.AddFor(m => m.AllowPartialFlag)
+                        .Caption("Allow PartialFlag").Visible(false);
+                        columns.AddFor(m => m.TransDate)
+                        .Caption("Trans Date")
+                        .DataType(GridColumnDataType.DateTime)
+                        .Alignment(HorizontalAlignment.Left)
+                        .Visible(false)
+                        .Format(ViewBag.GlobalDtFormat)
+                        ;
+                        columns.AddFor(m => m.CreateDate)
+                        .Caption("Create Date").AllowSearch(true)
+                        //.CalculateCellValue("calculateCellValue")
+
+                        ///.CalculateFilterExpression("calculateFilterExpression")
+                            @*.CalculateFilterExpression(@<text>
+                                function(value, selectedFilterOperations, target) {
+                                        //console.log(value+'=>'+selectedFilterOperations+'=>'+target);
+                                    if(target === "headerFilter" && value === "weekends") {
+                                        return [[getOrderDay, "=", 0], "or", [getOrderDay, "=", 6]];
+                                    }
+                                    return this.defaultCalculateFilterExpression.apply(this, arguments);
+                                }
+                            </text>)
+                            .HeaderFilter(filter => filter.DataSource(@<text>
+                                function(data) {
+                                    data.dataSource.postProcess = function(results) {
+                                        results.push({
+                                            text: "Weekends",
+                                            value: "weekends"
+                                        });
+                                        return results;
+                                    };
+                                }
+                            </text>))*@
+                            .DataType(GridColumnDataType.DateTime)
+                            .Alignment(HorizontalAlignment.Left)
+                            .Format(ViewBag.GlobalDtFormat)
+                            ;
+                            columns.AddFor(m => m.ModifyBy)
+                            .Caption("ModifyBy");
+                            columns.AddFor(m => m.SeqNo)
+                            .Caption("SeqNo").Visible(false);
+                            columns.AddFor(m => m.ProcessUserDef1)
+                            .Caption("Process UserDef1").Visible(false);
+                            columns.AddFor(m => m.ProcessUserDef2)
+                            .Caption("Process UserDef2").Visible(false);
+
+                        })
+
+                            .Editing(e => e.Mode(GridEditMode.Popup)
+                            .Form(f => f.CustomizeItem("customizeItem"))
+                            .AllowAdding(true)
+                            //.AllowUpdating(true)
+                            .AllowDeleting(true)
+                            .UseIcons(true)
+                            .Popup(p => p
+                                .Title("Process Master Insert")
+                                .ShowTitle(true)
+                                .MaxWidth(700)
+                                .MaxHeight(500)
+                                .Position(pos => pos
+                                    .My(HorizontalAlignment.Center, VerticalAlignment.Center)
+                                    .At(HorizontalAlignment.Center, VerticalAlignment.Center)
+                                    .Of(new JS("window"))
+                                )
+
+                            )
+                            ).OnOptionChanged("onOptionChanged")
+//.OnCellPrepared("onCellPrepared")
+
+)
+
+
+
+<script>
+    function onCellPrepared(e) {
+        if (e.rowType === "header" && e.column.dataField) {
+            $("<div>").appendTo(e.cellElement).dxButton({
+                text: "Clear",
+                onClick: function (arg) {
+                    let colName = e.column.dataField;
+                    e.component.beginUpdate();
+                    e.component.columnOption(colName, "filterValues", null);
+                    e.component.columnOption(colName, "filterValue", null);
+                    e.component.endUpdate();
+                    arg.event.stopPropagation();
+                }
+            })
+        }
+    }
+    function onOptionChanged(e) {
+        if ((e.fullName.endsWith("filterValue") || e.fullName.endsWith("selectedFilterOperation")) && e.value === null) {
+            console.log("Filter reset");
+        }
+    }
+    var itemVisible = true;
+
+    function onInitNewRow(opts) {
+        itemVisible = false;
+    }
+
+    function onEditingStart(opts) {
+        itemVisible = true;
+    }
+
+    function customizeItem(item) {
+        if (item.dataField == "SysemProcessFLag") {
+            item.visible = itemVisible;
+        }
+
+        if (item.dataField == "AllowPartialFlag") {
+            item.visible = itemVisible;
+        }
+
+        if (item.dataField == "SeqNo") {
+            item.visible = itemVisible;
+        }
+
+        if (item.dataField == "ProcessUserDef1") {
+            item.visible = itemVisible;
+        }
+
+        if (item.dataField == "ProcessUserDef2") {
+            item.visible = itemVisible;
+        }
+        //if (item.dataField == "CreateDate") {
+        //    item.visible = itemVisible;
+        //}
+
+        //if (item.dataField == "TransDate") {
+        //    item.visible = itemVisible;
+        //}
+    }
+    //function formatDate() {
+    //    var d = new Date;
+    //    var day = d.getDate();
+    //    var monthIndex = d.getMonth();
+    //    var year = d.getFullYear();
+
+    //    return monthIndex + '/' + day + '/' + year;
+    //}
+
+    function moveEditColumnToLeft(dataGrid) {
+        dataGrid.columnOption("command:edit", {
+            visibleIndex: -1
+
+        });
+    }
+
+
+    $("#gridContainer").dxDataGrid({
+            selection: {
+                mode: "multiple",
+                selectAllMode: "page",
+                recursive: false,
+                showCheckBoxesInMultipleMode: 'none'
+            },
+            headerFilter: {
+                visible: true
+            },
+        
+            onContentReady: function (e) {
+                moveEditColumnToLeft(e.component);
+        },
+        onEditorPreparing: function (e) {
+            if (e.parentType == "filterRow" && e.dataField == "CreateDate") {
+                //e.editorOptions.type = "date";
+                //e.editorElement.dxDateBox('instance').option('format', 'datetime');
+                }
+            }
+        //2018-10 - 24 10: 36: 49
+            
+        
+    });
+
+
+    function OnNewRow (e) {
+        onInitNewRow(e);
+        @*var date = "@ViewBag.s_GlobalPams";*@
+        //console.log(date)
+       var f = GetFormatDateTime();
+        console.log(f);
+        //var d = Globalize.formatDate(new Date(), { raw: date });
+        var d = Globalize.formatDate(new Date(), { raw: f });
+        //console.log(formatdatetime());
+        e.component.columnOption("SysemProcessFLag", "visible", false);
+        e.component.columnOption("CreateDate", "allowEditing", false);
+        e.component.columnOption("TransDate", "allowEditing", false);
+        //e.component.columnOption("CreateDate", "visible", false);
+        //e.component.columnOption("TransDate", "visible", false);
+        e.component.columnOption("ModifyBy", "allowEditing", false);
+        e.data.TransDate = d;
+        e.data.CreateDate = d;
+        e.data.ModifyBy = "@User.FindFirst("ContactName").Value";
+    }
+
+
+    function calculateCellValue(rowData) {
+
+        var d = new Date(rowData.CreateDate);
+        console.log(d);
+        return d.getMonth() + "/" + d.getDate() + "/" + d.getFullYear();
+    }
+    function calculateFilterExpression(filterValue, selectedFilterOperation) {
+        if (selectedFilterOperation === "between" && $.isArray(filterValue)) {
+            var filterExpression = [
+                [this.dataField, ">", filterValue[0]],
+                "and",
+                [this.dataField, "<", filterValue[1]]
+            ];
+            return filterExpression;
+        }
+        // Invokes the default filtering behavior
+        return this.defaultCalculateFilterExpression.apply(this, arguments);
+
+        //if (filterValue) {
+        //    //return [[getOrderDay, "=", 0], "or", [getOrderDay, "=", 6]];
+        //    var startValue = new Date(filterValue),
+        //        endValue;
+        //    startValue.setSeconds(0);
+        //    startValue.setMilliseconds(0);
+        //    endValue = new Date(startValue);
+        //    endValue.setMinutes(endValue.getMinutes() + 1);
+        //    return [[this.dataField, '>=', startValue], 'and', [this.dataField, '<', endValue]];
+           
+        //}
+        //return this.defaultCalculateFilterExpression.apply(this, arguments);
+    }
+
+    function getOrderDay(rowData) {
+        return (new Date(rowData.CreateDate)).getDay();
+    }
+    
+</script>

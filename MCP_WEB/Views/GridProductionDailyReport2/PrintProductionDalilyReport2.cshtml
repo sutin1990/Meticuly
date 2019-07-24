@@ -1,0 +1,12 @@
+﻿
+@model IEnumerable<MCP_WEB.Models.VW_MFC_ProductionDailyReport2>
+@{
+    //ViewData["Title"] = "PrintProductionDalilyReport2";
+  
+}
+
+@foreach(var item in Model.Where(w=>w.ProcessCode== "FORGING"))
+{
+    @item.FCode
+}
+

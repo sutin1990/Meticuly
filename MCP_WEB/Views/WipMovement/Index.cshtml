@@ -1,0 +1,816 @@
+﻿<style>
+    div.relative {
+        position: relative;
+        width: 100%;
+        border: 1px solid lightgray;
+        height: 100px;
+    }
+
+    div.absolute1 {
+        position: absolute;
+        left: 20px;
+        width: 250px;
+        /*height: 100px;*/
+        /*border: 1px solid #73AD21;*/
+    }
+
+    div.absolute2 {
+        position: absolute;
+        /*top: 10px;*/
+        left: 300px;
+        width: 250px;
+        /*height: 100px;*/
+        /*border: 1px solid #73AD21;*/
+    }
+
+    div.absolute3 {
+        position: absolute;
+        top: 5px;
+        right: 30px;
+        /*height: 100px;*/
+    }
+
+    div.absolute4 {
+        position: absolute;
+        top: 60px;
+        left: 20px;
+        /*height: 100px;*/
+    }
+
+    div.absolute5 {
+        position: absolute;
+        /*top: 10px;*/
+        left: 570px;
+        width: 250px;
+        /*height: 100px;*/
+        /*border: 1px solid #73AD21;*/
+    }
+
+    div.absolute6 {
+        position: absolute;
+        top: 60px;
+        left: 300px;
+        /*height: 100px;*/
+    }
+
+    div.absolute7 {
+        position: absolute;
+        top: 60px;
+        left: 580px;
+        /*height: 100px;*/
+    }
+</style>
+<form>
+    <br /><div class="relative">
+        <div class="absolute1"><label style="padding-top:10px">Date From:</label><div id="startdateBox" style="left:80px; bottom:30px;"></div></div>
+        <div class="absolute2"><label style="padding-top:10px">Date To:</label><div id="enddateBox" style="left:80px; bottom:30px;"></div></div>
+        <div class="absolute5"><label style="padding-top:10px">Process:</label><div id="select_ProcessMaster" style="left:90px; bottom:30px;"></div></div>
+        <div class="absolute4"><label>FCode:</label><div id="select_FCode" style="left:80px; bottom:30px;"></div></div>
+        <div class="absolute6"><label>Material:</label><div id="select_Material" style="left:80px; bottom:30px;"></div></div>
+        <div class="absolute7"><label>Model:</label><div id="select_Model" style="left:80px; bottom:30px;"></div></div>
+        <div class="absolute3">
+            @(Html.DevExtreme().Button()
+                                                    .ID("btnOK")
+                                                    .Text("Ok")
+                                                    .Type(ButtonType.Success)
+                                                    .OnClick("filter")
+            )
+        </div>
+    </div>
+    <br />
+
+
+    @(Html.DevExtreme().DataGrid<MCP_WEB.Models.WipMovement>()
+                                            .ID("gridContainer")
+
+                                            .ShowBorders(true)
+                                            .Export(e => e.Enabled(true).FileName("WipMovement-" + DateTime.Now).AllowExportSelectedData(true))
+                                            .ColumnChooser(c => c.Enabled(true))
+                                            .AllowColumnResizing(true)
+                                            .AllowColumnReordering(true)
+                                            //.RemoteOperations(true)
+                                            .ShowRowLines(true)
+                                            //.ColumnHidingEnabled(true)
+                                            .ColumnAutoWidth(true)
+                                            .ColumnMinWidth(100)
+                                            .Selection(s => s.Mode(SelectionMode.Multiple)
+                                                .ShowCheckBoxesMode(GridSelectionShowCheckBoxesMode.Always)
+                                                .SelectAllMode(SelectAllMode.Page)
+                                                )
+
+                                            .HoverStateEnabled(true)
+                                            .RowAlternationEnabled(true)
+                                            .Paging(paging => paging.PageSize(10))
+                                            .Pager(p => p
+                                                .AllowedPageSizes(new int[] { 10, 25, 50, 100 })
+                                                .ShowInfo(true)
+                                                .ShowNavigationButtons(true)
+                                                .ShowPageSizeSelector(true)
+                                                .Visible(true))
+
+                                            //.DataSource(d => d.Mvc().Controller("GridWipMovement").LoadAction("Get_data"))
+
+                                            //.FilterPanel(f => f.Visible(true))
+                                            .HeaderFilter(h => h.Visible(true))
+                                            .FilterRow(filterRow => filterRow
+                                                    .Visible(true)
+                                                    .ApplyFilter(GridApplyFilterMode.Auto))
+                                            .SearchPanel(searchPanel => searchPanel
+                                                .Visible(true)
+                                                .Width(240)
+                                                .Placeholder("Search..."))
+
+                                            .Columns(columns =>
+                                            {
+                                                columns.Add().DataField("ItemCode").ShowInColumnChooser(true).Visible(false);
+                                                columns.Add().DataField("Model").ShowInColumnChooser(true).Visible(false);
+                                                columns.Add().DataField("Fcode").ShowInColumnChooser(true).Visible(false);
+                                                columns.Add().DataField("Dimension1").ShowInColumnChooser(true).Visible(false);
+                                                columns.Add().DataField("Uom").ShowInColumnChooser(true).Visible(false);
+                                                columns.Add().DataField("Reference").ShowInColumnChooser(true).Visible(false);
+                                                columns.Add().DataField("ProcessCode").Caption("กระบวนการผลิต")
+                                                .CalculateCellValue(@<text>
+                                                    function(data) {
+                                                    return data.ProcessCode;
+                                                    }
+                                                </text>);
+                                                columns.Add().DataField("Barcode").Caption("Lot no.");
+                                                columns.Add().DataField("Trdate").Caption("Date").DataType(GridColumnDataType.DateTime).Format(ViewBag.wipmovementFormat);
+                                                columns.Add().DataField("BF").Caption("ยอดยกมา").Format("#,##0");
+                                                columns.Add().DataField("TRIN").Caption("รายรับ").Format("#,##0");
+                                                columns.Add().DataField("TROUT").Caption("รายจ่าย").Format("#,##0");
+                                                columns.Add().DataField("QtyMove").Caption("คงเหลือ").Format("#,##0")
+                                                .CalculateCellValue(@<text>
+                                                function(data) {
+                                                return parseFloat(data.QtyMove);
+                                                }
+                                            </text>);
+                                                        //columns.Add().DataField("Total").Caption("Total").Width(100);
+
+                                                    }) // end .Columns
+                                                        //                                   .Summary(s => s.TotalItems(items =>
+                                                        //                                   {
+
+                                //                                       items.AddFor(m => m.BF)
+                                //                                       .SummaryType(SummaryType.Sum).ValueFormat(Format.Decimal).ValueFormat("#,##0").DisplayFormat("Total: {0}");
+
+                                //                                       items.AddFor(m => m.TRIN)
+                                //                                       .SummaryType(SummaryType.Sum).ValueFormat(Format.Decimal).ValueFormat("#,##0").DisplayFormat("Total: {0}");
+
+                                //                                       items.AddFor(m => m.TROUT)
+                                //                                       .SummaryType(SummaryType.Sum).ValueFormat(Format.Decimal).ValueFormat("#,##0").DisplayFormat("Total: {0}");
+
+                                //                                       items.AddFor(m => m.QtyMove)
+                                //                                       .SummaryType(SummaryType.Sum).ValueFormat(Format.Decimal).ValueFormat("#,##0").DisplayFormat("Total: {0}");
+
+                                //                                   })
+                                //)
+
+    )
+    <br />
+
+    @(Html.DevExtreme().Button()
+                                    .ID("btnPrintPreviewT1")
+                                    .Text("Print")
+                                    .Type(ButtonType.Default)
+            //.UseSubmitBehavior(true)
+            .OnClick("PrintPreview")
+    )
+
+</form>
+
+<script>
+    //function convertnumber(e) {
+    //    console.log(e);
+    //    return e.QtyMove;
+    //}
+
+    const format = num => {
+        const n = String(num),
+            p = n.indexOf('.')
+        return n.replace(
+            /\d(?=(?:\d{3})+(?:\.|$))/g,
+            (m, i) => p < 0 || i < p ? `${m},` : m
+        )
+    }
+
+
+    var sumBF = [];
+    var sumTRIN = [];
+    var sumTROUT = [];
+    var sumQtyMove = [];
+
+    var source_m_Processmaster = DevExpress.data.AspNet.createStore({
+                //"key": "ID",
+                "loadUrl": "@Url.Action("Get_m_Processmaster", "GridWipMovement", new { httproute = true })",
+    });
+    var display = "";
+    var Process = "";
+    $("#select_ProcessMaster").dxSelectBox({
+        dataSource: source_m_Processmaster,
+        displayExpr: function (e) {
+            if (e) {
+                display = e.ProcessName;
+            }
+            return display;
+        },
+        //displayExpr: "DepDesc",
+        valueExpr: 'ProcessCode',
+        searchEnabled: true,
+        searchExpr: ["ProcessCode", "ProcessName"],
+
+        itemTemplate: function (itemData) {
+            return $("<div />").append(
+                $("<p />").text(itemData.ProcessName)
+                    .css("display", "inline-block")
+            );
+        },
+        onValueChanged: function (e) {
+            Process = e.value;
+        },
+    });
+
+    var source_FCode = DevExpress.data.AspNet.createStore({
+                //"key": "ID",
+                "loadUrl": "@Url.Action("Get_FCode_WeeklyPlan", "GridWipMovement", new { httproute = true })",
+    });
+    var display_FCode = "";
+    var FCode = "";
+    $("#select_FCode").dxSelectBox({
+        dataSource: source_FCode,
+        displayExpr: function (e) {
+            if (e) {
+                display_FCode = e.Fcode;
+            }
+            return display_FCode;
+        },
+        //displayExpr: "DepDesc",
+        valueExpr: 'Fcode',
+        searchEnabled: true,
+        searchExpr: ["Fcode", "Fcode"],
+
+        itemTemplate: function (itemData) {
+            return $("<div />").append(
+                $("<p />").text(itemData.Fcode)
+                    .css("display", "inline-block")
+            );
+        },
+        onValueChanged: function (e) {
+            FCode = e.value;
+        },
+    });
+
+    var source_Material = DevExpress.data.AspNet.createStore({
+                //"key": "ID",
+                "loadUrl": "@Url.Action("Get_Material_m_Resource", "GridWipMovement", new { httproute = true })",
+    });
+    var display_ItemCode = "";
+    var ItemCode = "";
+    $("#select_Material").dxSelectBox({
+        dataSource: source_Material,
+        displayExpr: function (e) {
+            if (e) {
+                display_ItemCode = e.ItemCode;
+            }
+            return display_ItemCode;
+        },
+        //displayExpr: "DepDesc",
+        valueExpr: 'ItemCode',
+        searchEnabled: true,
+        searchExpr: ["ItemCode", "ItemCode"],
+
+        itemTemplate: function (itemData) {
+            return $("<div />").append(
+                $("<p />").text(itemData.ItemCode)
+                    .css("display", "inline-block")
+            );
+        },
+        onValueChanged: function (e) {
+            ItemCode = e.value;
+        },
+    });
+
+    var source_Model = DevExpress.data.AspNet.createStore({
+                //"key": "ID",
+                "loadUrl": "@Url.Action("Get_FCode_WeeklyPlan", "GridWipMovement", new { httproute = true })",
+    });
+    var display_Model = "";
+    var Model = "";
+    $("#select_Model").dxSelectBox({
+        dataSource: source_Model,
+        displayExpr: function (e) {
+            if (e) {
+                display_Model = e.Model;
+            }
+            return display_Model;
+        },
+        //displayExpr: "DepDesc",
+        valueExpr: 'Model',
+        searchEnabled: true,
+        searchExpr: ["Model", "Model"],
+
+        itemTemplate: function (itemData) {
+            return $("<div />").append(
+                $("<p />").text(itemData.Model)
+                    .css("display", "inline-block")
+            );
+        },
+        onValueChanged: function (e) {
+            Model = e.value;
+        },
+    });
+
+    var startdateBox = new Date();
+    startdateBox = startdateBox.getFullYear() + "-" + (startdateBox.getMonth() + 1) + "-" + startdateBox.getDate();
+    var enddateBox = new Date();
+    enddateBox = enddateBox.getFullYear() + "-" + (enddateBox.getMonth() + 1) + "-" + enddateBox.getDate();
+
+    $("#startdateBox").dxDateBox({
+        min: new Date(2000, 0, 1),
+        max: new Date(2029, 11, 31),
+        value: new Date(),
+        displayFormat: "dd/MM/yyyy",
+        formatString: 'shortdate',
+        onValueChanged: function (e) {
+            var ed = $("#enddateBox").dxDateBox('instance').option('value');
+            if (e.value.getTime() >= ed.getTime()) {
+                $("#enddateBox").dxDateBox("instance").option("isValid", true);//clear validate dateBox
+            }
+            startdateBox = e.value;
+            startdateBox = startdateBox.getFullYear() + "-" + (startdateBox.getMonth() + 1) + "-" + startdateBox.getDate();
+
+        },
+
+    }).dxValidator({
+        validationRules: [{
+            type: "required",
+            message: "From Date is required."
+        },
+        {
+            type: "custom",
+            message: "please select again From Date Must not be over To Date.",
+            validationCallback: function (e) {
+                var ed = $("#enddateBox").dxDateBox('instance').option('value');
+                var sd = e.value;
+                return sd && ed && sd.getTime() <= ed.getTime();
+            }
+        }
+        ]
+    });
+
+    $("#enddateBox").dxDateBox({
+        min: new Date(2000, 0, 1),
+        max: new Date(2029, 11, 31),
+        value: new Date(),
+        displayFormat: "dd/MM/yyyy",
+        formatString: 'dd MMM yyyy',
+        onValueChanged: function (e) {
+            var sd = $("#startdateBox").dxDateBox('instance').option('value');
+            if (e.value.getTime() >= sd.getTime()) {
+                $("#startdateBox").dxDateBox("instance").option("isValid", true);
+            }
+            enddateBox = e.value;
+            enddateBox = enddateBox.getFullYear() + "-" + (enddateBox.getMonth() + 1) + "-" + enddateBox.getDate();
+
+        }
+
+    }).dxValidator({
+        validationRules: [{
+            type: "required",
+            message: "To Date is required."
+        },
+        {
+            type: "custom",
+            message: "please select again To date Must not be less than From Date.",
+            validationCallback: function (e) {
+                var sd = $("#startdateBox").dxDateBox('instance').option('value');
+                var ed = e.value;
+                return ed && sd && ed.getTime() >= sd.getTime();
+            }
+        }
+        ]
+    });
+    function sumDigits(num) {
+        var isNeg = num < 0,   // check whether the number is negative
+            numbers = (isNeg ? String(num).slice(1) : String(num)).split('').map(Number);
+        if (isNeg) numbers[0] *= -1;   // 'recovering' the number's sign
+
+        return numbers.reduce(function (a, b) { return a + b; });
+    }
+
+    function filter() {
+        var Grids = $("#gridContainer").dxDataGrid('instance');
+        Grids.clearSelection();      
+        
+
+        var check_enddate = $("#enddateBox").dxDateBox("instance").option('isValid');
+        var check_startdate = $("#startdateBox").dxDateBox("instance").option('isValid');
+        var total = [];
+        if (check_enddate == true && check_startdate == true) {
+
+            //console.log("start:", startdateBox);
+            //console.log("end:", enddateBox);
+            $.ajax({
+                type: 'POST',
+                url: "api/GridWipMovement/Filter",
+                data: { "fromdate": startdateBox, "todate": enddateBox, "Process": Process, "FCode": FCode, "ItemCode": ItemCode, "Model": Model },
+                async: false,
+                dataType: 'json',
+                success: function (result) {
+                    //console.log(result);
+                    //$.each(result, function (item, value) {
+
+                    //    source = value;
+                    //});
+
+                    $("#gridContainer").dxDataGrid({
+                        dataSource: result,
+                        key:"RowNumber",
+                        columns: [                           
+
+                            {
+                                dataField: "ItemCode",
+                                visible: false,
+                                showInColumnChooser:true
+                            },
+                            {
+                                dataField: "Model",
+                                visible: false,
+                                showInColumnChooser: true
+                            },
+                            {
+                                dataField: "Fcode",
+                                visible: false,
+                                showInColumnChooser: true
+                            },
+                            {
+                                dataField: "Dimension1",
+                                visible: false,
+                                showInColumnChooser: true
+                            },
+                            {
+                                dataField: "Uom",
+                                visible: false,
+                                showInColumnChooser: true
+                            },
+                            {
+                                dataField: "Refernce",
+                                visible: false,
+                                showInColumnChooser: true
+                            },
+                            {
+                                dataField: "ProcessCode",
+                                caption: "กระบวนการผลิต",
+                                showInColumnChooser: true
+                            },
+                            {
+                                dataField: "Barcode",
+                                caption: "Lot No.",
+                                showInColumnChooser: true
+                            },
+                            {
+                                dataField: "Trdate",
+                                caption: "Date",
+                                dataType: "date",
+                                format: "@ViewBag.wipmovementFormat",
+                                showInColumnChooser: true
+
+                            },
+                            {
+                                dataField: "BF",
+                                format: "#,##0",
+                                caption: "ยอดยกมา",
+                                showInColumnChooser: true
+                            },
+                            {
+                                dataField: "TRIN",
+                                format: "#,##0",
+                                caption: "รับ",
+                                showInColumnChooser: true
+                            },
+                            {
+                                dataField: "TROUT",
+                                format: "#,##0",
+                                caption: "จ่าย",
+                                showInColumnChooser: true
+                            },
+                            {
+                                dataField: "QtyMove",
+                                caption: "คงเหลือ",
+                                format: "#,##0",
+                                showInColumnChooser: true,
+                                calculateCellValue: function (rowdata) {
+                                    return parseFloat(rowdata.QtyMove);
+                                }
+                            },
+                            //{
+                            //    dataField: "",
+                            //    caption: "คงเหลือ",
+                            //    //dataType: "string",
+                            //    alignment: 'right',
+                            //    width: 200,
+                            //    allowSorting: true,
+                            //    //sortOrder: 'asc',
+                            //    calculateDisplayValue: function (rowData) {
+                            //        var xx;
+                            //        if (total.length > 0) {
+                            //            xx = total[0] + (parseInt(rowData.TRIN) - parseInt(rowData.TROUT));
+                            //            total = [];
+                            //            total.push(xx);
+                            //        } else {
+                            //            total.push(parseInt(rowData.TRIN) - parseInt(rowData.TROUT));
+                            //            xx = total[0];
+                            //        }
+
+                            //        return xx.toString();
+                            //    },
+
+
+                            //}
+                        ],
+                        onCellPrepared: function (e) {
+                            if (e.rowType === "data" && e.column.dataField === "BF" && e.rowIndex != undefined) {
+                                sumBF.push(e.data.BF);
+
+                            }
+                            if (e.rowType === "data" && e.column.dataField === "TRIN" && e.rowIndex != undefined) {
+                                sumTRIN.push(e.data.TRIN);
+
+                            }
+                            if (e.rowType === "data" && e.column.dataField === "TROUT" && e.rowIndex != undefined) {
+                                sumTROUT.push(e.data.TROUT);
+
+                            }
+                            if (e.rowType === "data" && e.column.dataField === "QtyMove" && e.rowIndex != undefined) {
+                                sumQtyMove.push(e.data.QtyMove);
+
+                            }
+                        },
+                        onContentReady: function (e) {
+                            var gridItems = $("#gridContainer").dxDataGrid('instance');
+
+                            var total1 = sumBF.reduce((a, b) => parseFloat(a) + parseFloat(b), 0);
+                            var total2 = sumTRIN.reduce((a, b) => parseFloat(a) + parseFloat(b), 0);
+                            var total3 = sumTROUT.reduce((a, b) => parseFloat(a) + parseFloat(b), 0);
+                            var total4 = sumQtyMove.reduce((a, b) => parseFloat(a) + parseFloat(b), 0);
+                            //console.log(sumQtyMove);
+                            var summaryCells = e.component.getController('data').footerItems()[0].summaryCells;
+                            $.each(summaryCells, function (item, value) {
+                                if (value.length > 0) {
+                                    //console.log(item + "=>" + value[0].name);
+                                    var name = value[0].name;
+                                    if (name == "BF") {
+                                        gridItems.getController('data').footerItems()[0].summaryCells[item][0].value = total1;
+                                    }
+                                    if (name == "TRIN") {
+                                        gridItems.getController('data').footerItems()[0].summaryCells[item][0].value = total2;
+                                    }
+                                    if (name == "TROUT") {
+                                        gridItems.getController('data').footerItems()[0].summaryCells[item][0].value = total3;
+                                    }
+                                    if (name == "QtyMove") {
+                                        gridItems.getController('data').footerItems()[0].summaryCells[item][0].value = total4;
+                                    }
+                                    gridItems.getView('footerView').render();
+                                }
+                            });
+                            sumBF = [];
+                            sumTRIN = [];
+                            sumTROUT = [];
+                            sumQtyMove = [];
+                            //var dataGrid = $('#gridContainer').dxDataGrid('getDataSource');
+                            //var Grids = $("#gridContainer").dxDataGrid('instance');
+                            NotSelection(gridItems);
+                            //console.log(dataGrid);
+                        },
+                        summary: {
+                            calculateCustomSummary: function (options) {
+                                if (options.name == "BF") {
+                                    if (options.summaryProcess == "start") {
+                                        options.totalValue = 0;
+                                    }
+                                    if (options.summaryProcess == "calculate") {
+                                        if (options.value) {
+                                            options.totalValue += options.value["BF"];
+                                        }
+                                    }
+                                }
+                                if (options.name == "TRIN") {
+                                    if (options.summaryProcess == "start") {
+                                        options.totalValue = 0;
+                                    }
+                                    if (options.summaryProcess == "calculate") {
+                                        if (options.value) {
+                                            options.totalValue += options.value["TRIN"];
+                                        }
+                                    }
+                                }
+                                if (options.name == "TROUT") {
+                                    if (options.summaryProcess == "start") {
+                                        options.totalValue = 0;
+                                    }
+                                    if (options.summaryProcess == "calculate") {
+                                        if (options.value) {
+                                            options.totalValue += options.value["TROUT"];
+                                        }
+                                    }
+                                }
+                                if (options.name == "QtyMove") {
+                                    if (options.summaryProcess == "start") {
+                                        options.totalValue = 0;
+                                    }
+                                    if (options.summaryProcess == "calculate") {
+                                        if (options.value) {                                            
+                                            options.totalValue = parseFloat(options.totalValue)+ parseFloat(options.value["QtyMove"]);
+                                        }
+                                    }
+                                }
+                            },
+                            totalItems: [{
+                                column: "Trdate",
+                                alignment: "right",
+                                customizeText: function (data) {
+                                    return "Total:";
+                                }
+                            },{
+                                showInColumn: "BF",
+                                name: "BF",
+                                summaryType: "custom",
+                                alignment: "right",
+                                valueFormat: "#,##0",
+                                //displayFormat: "#,##0",
+                                //customizeText: function (data) {
+                                //    var sum = sumBF.reduce((a, b) => parseFloat(a) + parseFloat(b), 0);
+                                //    var x = sum.toLocaleString(
+                                //        undefined, // leave undefined to use the browser's locale,
+                                //        // or use a string like 'en-US' to override it.
+                                //        { minimumFractionDigits: 0 }
+                                //    );
+                                //    return format(sum);
+                                //}
+                            },{
+                                showInColumn: "TRIN",
+                                name: "TRIN",
+                                summaryType: "custom",
+                                alignment: "right",
+                                valueFormat: "#,##0",
+                                //displayFormat:"#,##0",
+                                //customizeText: function (data) {
+                                //    var sum = sumTRIN.reduce((a, b) => parseFloat(a) + parseFloat(b), 0);
+                                //    var x =   sum.toLocaleString(
+                                //        undefined, // leave undefined to use the browser's locale,
+                                //        // or use a string like 'en-US' to override it.
+                                //        { minimumFractionDigits: 0 }
+                                //    );
+                                //    return format(sum);
+                                //}
+                            }, {
+                                    showInColumn: "TROUT",
+                                    name: "TROUT",
+                                    summaryType: "custom",
+                                    alignment: "right",
+                                    valueFormat: "#,##0",
+                                    //displayFormat: "#,##0",
+                                    //customizeText: function (data) {
+                                    //    var sum = sumTROUT.reduce((a, b) => parseFloat(a) + parseFloat(b), 0);
+                                    //    var total = sum.toLocaleString(
+                                    //        undefined, // leave undefined to use the browser's locale,
+                                    //        // or use a string like 'en-US' to override it.
+                                    //        { minimumFractionDigits: 0 }
+                                    //    );
+                                    //    return format(sum);
+                                    //}
+                                }, {
+                                    showInColumn: "QtyMove",
+                                    name: "QtyMove",
+                                    summaryType: "custom",
+                                    alignment: "right",
+                                    valueFormat: "#,##0",
+                                    //displayFormat: "#,##0",
+                                    //customizeText: function (data) {
+                                    //    //console.log(sumQtyMove.join(''));
+                                    //    //var sum = sumDigits(sumQtyMove.join(''));
+                                    //    var sum = sumQtyMove.reduce((a, b) => parseFloat(a) + parseFloat(b), 0);
+                                    //    var total = sum.toLocaleString(
+                                    //        undefined, // leave undefined to use the browser's locale,
+                                    //        // or use a string like 'en-US' to override it.
+                                    //        { minimumFractionDigits: 0 }
+                                    //    );
+                                    //    return format(sum);
+                                    //}
+                                }]
+                        }
+                    });
+                    $("#gridContainer").dxDataGrid("instance").refresh();
+
+                },
+                error: function (ob, errStr) {
+                    DevExpress.ui.notify(errStr, "This MachineCode OR Rang TransDate is not available in the database", 2000);
+                }
+            });
+
+
+        }
+
+
+
+    }
+</script>
+
+<script>
+        function PrintPreview(data) {
+            var grid = $('#gridContainer').dxDataGrid('instance');
+            
+    //console.log(grid);
+            var orderby = null;
+            orderby = grid.getDataSource().sort();
+            console.log(orderby);
+        var keys = grid.getSelectedRowKeys();
+        var text = "";
+        var s;
+        var comma = 0;
+        //var checkslectDN = false;
+        if (keys.length > 0) {
+            for (s in keys) {
+                comma = parseInt(s) + 1;
+                if (comma == keys.length) {
+                    text += keys[s].RowNumber;
+                }
+                else {
+                    text += keys[s].RowNumber + ",";
+                }
+            }
+            console.log(text);
+            //console.log("date:",startdateBox +'->'+ enddateBox)
+            //data.preventDefault();
+            //var element = this;
+            //window.open('api/ProductionDailyReport1_Print/PrintProductionDailyReport1?FCode=' + text);
+            if (Model == null) {
+                Model = "";
+            }
+            if (Process == null) {
+                Process = "";
+            }
+
+            if (FCode == null) {
+                FCode = "";
+            }
+
+            if (ItemCode == null) {
+                ItemCode = "";
+            }
+
+            if (startdateBox == null) {
+                startdateBox = "";
+            }
+
+            if (enddateBox == null) {
+                enddateBox = "";
+            }
+           
+            $.ajax({
+                type: 'POST',
+                url: "api/GridWipMovement/Print",
+                data: { "RowNumber": text, "fromdate": startdateBox, "todate": enddateBox, "Process": Process, "ItemCode": ItemCode, "Model": Model },
+                //contentType: "application/json; charset=utf-8",
+                //dataType: "html",
+                //async: false,
+                //dataType: 'json',
+                //cache: false,
+                //async: false,
+                //beforeSend: function () {/*loading*/ },
+                success: function (e) {  
+                    if (e) {                       
+                        if (orderby) {
+                            window.open('@Url.Action("Index", "PrintWipMovement")?Model=' + Model + '&process=' + Process + '&FCode=' + FCode + '&ItemCode=' + ItemCode + '&fromdate=' + startdateBox + '&todate=' + enddateBox + '&selector=' + orderby[0]["selector"] + '&desc=' + orderby[0]["desc"], '_blank').focus();
+                        } else {
+                            window.open('@Url.Action("Index", "PrintWipMovement")?Model=' + Model + '&process=' + Process + '&FCode=' + FCode + '&ItemCode=' + ItemCode + '&fromdate=' + startdateBox + '&todate=' + enddateBox, '_blank').focus();
+                        }                        
+                        
+                    }   
+                  
+                    
+                }
+            });
+            //window.open('api/ProductionDailyReport1/PrintProductionDailyReport1','_blank');
+            @*window.open('@Url.Action("Index", "PrintProduction1")', '_blank').focus();*@
+
+        } else {
+            var errorcustomDialog = DevExpress.ui.dialog.custom({
+                title: 'print WipMovement incorrect ! ',
+                message: 'Please Select Row Data.',
+                toolbarItems: [
+                    { text: "Close", onClick: function () { return "Ok" } },
+                    //{ text: "Not Ok", onClick: function () { return "Not Ok" } }
+                ],
+                width: "500px"
+
+            });
+            errorcustomDialog.show().done(function (dialogResult) {
+                //focus something
+            });
+        }
+             @*window.open('@Url.Action("Index", "PrintProduction1")', '_blank').focus();*@
+
+    }
+</script>

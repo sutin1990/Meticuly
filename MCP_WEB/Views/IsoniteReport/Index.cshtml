@@ -1,0 +1,101 @@
+﻿@(Html.DevExtreme().DataGrid<MCP_WEB.Models.Isonite>()
+                .ID("gridContainer")
+                .ShowBorders(true)
+                .Export(e => e.Enabled(true).FileName("Isonite-" + DateTime.Now).AllowExportSelectedData(true))
+                //.ColumnChooser(c => c.Enabled(true))
+                .AllowColumnResizing(true)
+                .AllowColumnReordering(true)
+                .RemoteOperations(true)
+                .ShowRowLines(true)
+                .Selection(s => s.Mode(SelectionMode.Multiple)
+                    .ShowCheckBoxesMode(GridSelectionShowCheckBoxesMode.Always)
+                    .SelectAllMode(SelectAllMode.Page)
+                    )
+
+                .HoverStateEnabled(true)
+                .RowAlternationEnabled(true)
+                .Paging(paging => paging.PageSize(10))
+                .Pager(pager =>
+                {
+                    pager.ShowPageSizeSelector(true);
+                    pager.AllowedPageSizes(new List<int> { 10, 25, 50, 100 });
+                    pager.ShowInfo(true);
+                })
+
+                .DataSource(d => d.Mvc().Controller("IsoniteReport").LoadAction("Get"))
+
+                //.FilterPanel(f => f.Visible(true))
+                .HeaderFilter(h => h.Visible(true))
+                .FilterRow(filterRow => filterRow
+                        .Visible(true)
+                        .ApplyFilter(GridApplyFilterMode.Auto))
+                .SearchPanel(searchPanel => searchPanel
+                    .Visible(true)
+                    .Width(240)
+                    .Placeholder("Search..."))
+
+                .Columns(columns =>
+                {       
+                    columns.Add().DataField("IsoniteCode").Caption("Isonite Code");
+                    columns.Add().DataField("DocStatus").Caption("Isonite Status");
+                }) // end .Columns
+
+)
+<br />
+
+@(Html.DevExtreme().Button()
+                .ID("btnPrintPreviewT1")
+                .Text("Print")
+                .Type(ButtonType.Default)
+                .OnClick("PrintPreview")
+)
+
+<script>
+    function PrintPreview(data) {
+        var grid = $('#gridContainer').dxDataGrid('instance');
+        var keys = grid.getSelectedRowKeys();
+        var text = "";
+        var s;
+        var comma = 0;
+        var checkslectDN = false;
+        if (keys.length > 0) {
+            for (s in keys) {                
+                    comma = parseInt(s) + 1;
+                    if (comma == keys.length) {
+                        text += keys[s].IsoniteCode;
+                    }
+                    else {
+                        text += keys[s].IsoniteCode + ",";
+                    }  
+            }
+            //for (s in keys) {
+            //    if (text != "") {
+            //        text += "&";
+            //    }
+            //    text += 'ison=' + keys[s].IsoniteCode;
+            //}
+          
+                window.open('api/Isonite/PrintIsonite?isonitecode=' + text);
+            //window.open('IsoniteGet/PrintLotControl?' + text);
+            
+
+        } else {
+            var errorcustomDialog = DevExpress.ui.dialog.custom({
+                title: 'Cannot print isonite! ',
+                message: 'Please select isonite.',
+                toolbarItems: [
+                    { text: "Close", onClick: function () { return "Ok" } },
+                    //{ text: "Not Ok", onClick: function () { return "Not Ok" } }
+                ],
+                width: "500px"
+
+            });
+            errorcustomDialog.show().done(function (dialogResult) {
+                //focus something
+            });
+        }
+
+        // 'LotControlTicket/PrintSelected?'
+        //window.location.href = 'LotControlTicket/PrintSelected?' + text;
+    }
+</script>

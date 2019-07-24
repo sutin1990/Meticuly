@@ -1,0 +1,644 @@
+﻿@{
+    var filterValue = new object[] {
+                //new object[] { "StatusDelivery", FilterBuilderFieldFilterOperations.NotEqual, "Cancelled" },
+                new object[] { "StatusMT", FilterBuilderFieldFilterOperations.NotEqual, "Void" }
+};
+}
+
+<style>
+    a {
+        text-decoration: none !important;
+    }
+
+    .dx-link-edit-4x {
+        /*padding-right: 2px;*/
+        font-size: 1.2em;
+        width: auto;
+        height: auto;
+    }
+
+    .dx-link-delete-4x {
+        /*padding-right: 2px;*/
+        font-size: 1.2em;
+        width: auto;
+        height: auto;
+    }
+</style>
+
+<script>
+   var sumMTQty = [];
+   var sumBoxQty = [];
+   var sumExcessQty = [];
+
+    function toolbar_preparing(e) {
+        e.toolbarOptions.items.unshift({
+            location: "after",
+            widget: "dxButton",
+            locateInMenu: 'auto',
+            options:
+            {
+                id: "Insert",
+                icon: "add",
+                onClick: function (c) {
+                    getkeydatagrid(e);
+                }
+            }
+        });
+    }
+
+    function cellTemplate(element, cellInfo) {
+        if (cellInfo.data.StatusDelivery!='Cancelled' && cellInfo.data.StatusMT == 'Packed') {
+            $('<a/>')
+                .addClass('dx-link dx-link-edit dx-icon-edit dx-link-edit-4x ')
+                .on('dxclick', function () {
+                    //$('#EditPopup').dxPopup('instance').option('visible', true);
+                    OpenEdit(cellInfo.data);
+                }).appendTo(element);
+            //console.log(cellInfo.data.StatusMT);
+        }
+
+    }
+
+    function cellTemplategridpopup(element, cellInfo) {
+
+        $('<a/>')
+            .addClass("dx-link dx-link-delete dx-icon-trash dx-link-delete-4x")
+            .on('dxclick', function () {
+                DeleteDeliveryNote(cellInfo.data);
+            })
+            .appendTo(element);
+
+    }
+     function DeleteDeliveryNote(data) {
+        var Moveticket = data.moveTicket;
+         var Deliverynote = $("#edittxtDeliverynote").dxTextBox("instance").option("value");   
+         var grid = $('#griddeliverly').dxDataGrid('instance');
+         var status = "";
+         var confirmdeletedialog = DevExpress.ui.dialog.confirm("Are you sure delete Move Ticket:[" + Moveticket + "] ?", "Confirm to Delete");
+         confirmdeletedialog.done(function (dialogResult) {
+             if (dialogResult) {
+                 $.ajax({
+                    type: "GET",
+                    url: "@Url.Action("deletedeliverynote","DeliverynoteSelect")",
+                    data: { "d_deliverynote": Deliverynote, "d_moveticket": Moveticket },
+                    async: false,
+                    dataType: "json",
+                    success: function (result) {
+                        $.each(result, function (item, value) {  
+                            console.log(value.SqlStatus);
+                            status = value.SqlStatus;
+                            countmoveticket = value.countmoveticket;
+                            //if (countmoveticket == 0) {
+                            //    $("#CancelledDeliveryNote").dxButton({
+                            //        disabled: true
+                            //    });
+                            //}
+                            if (value.SqlStatus == "Success") {
+                                var customDialog = DevExpress.ui.dialog.custom({
+                                    title: 'Delete Moveticket in Delivery Note : '+Deliverynote,
+                                    message: 'Delete Moveticket: ' + Moveticket + ' status: ' + status,
+                                    toolbarItems: [
+                                        { text: "Close", onClick: function () { return "Ok" } },
+                                        //{ text: "Not Ok", onClick: function () { return "Not Ok" } }
+                                    ],
+                                    width: "500px"
+
+                                });
+                                customDialog.show().done(function (dialogResult) {
+                                    
+                                });
+                            } else {
+                                DevExpress.ui.notify(' status: ' + status,'Exception: '+ value.SqlErrtext, 2000);
+                            }
+                        });
+                       
+                        grid.refresh();
+                    },
+                    error: function (ob, errStr) {
+                        DevExpress.ui.notify(errStr, "error", 2000);
+                    }
+                });
+             }
+         });
+        
+    }
+
+    function onCellPrepared(e) {
+        if (e.rowType === "data" && e.column.command === 'select' && e.data.StatusMT == 'Void') {
+            var instance = e.cellElement.find('.dx-select-checkbox').dxCheckBox("instance");
+            instance.option("disabled", true);
+            e.cellElement.off();
+        }
+    }
+
+    function onSelectionChanged(e){
+        var disabledKeys = e.currentSelectedRowKeys.filter(i => i.StatusMT == 'Void');
+        if (disabledKeys.length > 0)
+         {
+            e.component.deselectRows(disabledKeys);
+        }
+    }
+
+    function getkeydatagrid(e) {
+        var grid = $('#gridContainer').dxDataGrid('instance');
+        var keys = grid.getSelectedRowKeys();
+        var arrMoveTicket = [];
+        var checkchooseVoid;
+        //console.log(keys.length);
+        if (keys.length > 0) {
+            $.each(keys, function (item, value) {
+                if (value.StatusMT != 'New') {                    
+                    checkchooseVoid = 0;
+                    return false;
+                    //break;
+                } else {
+                    console.log(value.StatusMT);
+                    checkchooseVoid = 1;
+                }
+                arrMoveTicket.push(value.MoveTicket);
+
+            });
+            console.log(checkchooseVoid);
+            if (checkchooseVoid > 0) {
+                $.ajax({
+                    type: 'POST',
+                    url: '@Url.Action("createdeliverynote", "DeliverynoteSelect", new { httproute = true })',
+                    data: { "c_moveticket": arrMoveTicket },
+                    async: false,
+                    beforeSend: function () {/*loading*/ },
+                    dataType: 'json',
+                    success: function (result) {
+                        console.log(result);
+                        //DevExpress.ui.notify("Delete success.", "success", 1000);
+                        grid.refresh();
+                        //location.reload();
+                    },
+                    error: function (ob, errStr) {
+                        //ob.stopPropagation();
+                        //DevExpress.ui.notify(errStr, "error", 2000);
+                        grid.refresh();
+
+                    }
+                });
+            } else {
+                var customDialog = DevExpress.ui.dialog.custom({
+                    title: 'Delivery Note Error!',
+                    message: "Cannot create Delivery Note. Please select status MT 'New' only.",
+                    toolbarItems: [
+                        { text: "Close", onClick: function () { return "Ok" } },
+                        //{ text: "Not Ok", onClick: function () { return "Not Ok" } }
+                    ],
+                    width: "500px"
+
+                });
+                customDialog.show().done(function (dialogResult) {
+                    //var grid = $('#griddeliverly').dxDataGrid('instance');
+
+                });
+            }
+
+        } else {
+            var Dialog = DevExpress.ui.dialog.custom({
+                title: 'Create Delivery Note Error!',
+                message: "Please select Move Ticket.",
+                toolbarItems: [
+                    { text: "Close", onClick: function () { return "Ok" } },
+                    //{ text: "Not Ok", onClick: function () { return "Not Ok" } }
+                ],
+                width: "500px"
+
+            });
+            Dialog.show().done(function (dialogResult) {
+                //var grid = $('#griddeliverly').dxDataGrid('instance');
+
+            });
+        }
+
+
+    }
+</script>
+@(Html.DevExtreme().Popup().MaxHeight(500).MaxWidth(1000)
+                    .Position(po => po.My(HorizontalAlignment.Center, VerticalAlignment.Center)
+                    .At(HorizontalAlignment.Center, VerticalAlignment.Center)
+                    .Of(new JS("window"))).ID("EditPopup").Title("Edit Delivery Note.").Visible(false)
+                          .ElementAttr("class", "popup")
+                            .ContentTemplate(new TemplateName("Edit"))
+)
+
+@using (Html.DevExtreme().NamedTemplate("Edit"))
+{
+    @await Html.PartialAsync("_Edit")
+}
+
+@(Html.DevExtreme().DataGrid<MCP_WEB.Models.VW_MFC_Deliverynote_Select>()
+                    .ID("gridContainer")
+                    .ShowBorders(true)
+                    //.OnCellPrepared("onCellPrepared")
+                    //.OnSelectionChanged("onSelectionChanged")
+                    .Export(e => e.Enabled(true)
+                                .FileName("DeliveryNote-" + DateTime.Now)
+                                .AllowExportSelectedData(true)
+                    )
+                    .OnToolbarPreparing("toolbar_preparing")
+                    .ColumnChooser(c => c.Enabled(true))
+                    .AllowColumnResizing(true)
+                    .AllowColumnReordering(true)
+                    .RemoteOperations(true)
+                    .ShowRowLines(true)
+                    .ColumnHidingEnabled(true)
+                    .ColumnAutoWidth(true)
+                    .ColumnMinWidth(100)
+                    .Selection(s => s.Mode(SelectionMode.Multiple)
+                        .ShowCheckBoxesMode(GridSelectionShowCheckBoxesMode.Always)
+                        .SelectAllMode(SelectAllMode.Page)
+                        )
+
+                    .HoverStateEnabled(true)
+                    .RowAlternationEnabled(true)
+                    .Paging(paging => paging.PageSize(10))
+                    .Pager(p => p
+                    .AllowedPageSizes(new int[] { 10, 25, 50, 100 })
+                    .ShowInfo(true)
+                    .ShowNavigationButtons(true)
+                    .ShowPageSizeSelector(true)
+                    .Visible(true))
+
+                    .DataSource(d => d.Mvc().Controller("DeliverynoteSelect").LoadAction("Get"))
+
+                    .FilterPanel(f => f.Visible(true))
+                    .HeaderFilter(h => h.Visible(true))
+                    .FilterValue(filterValue)
+                    .FilterRow(filterRow => filterRow
+                            .Visible(true)
+                            .ApplyFilter(GridApplyFilterMode.Auto)
+                            )
+
+                    .SearchPanel(searchPanel => searchPanel
+                        .Visible(true)
+                        .Width(240)
+                        .Placeholder("Search...")
+                    )
+                    .Grouping(grouping => grouping.AutoExpandAll(true))
+                    .GroupPanel(groupPanel => groupPanel.Visible(true))
+                    .Columns(columns =>
+                    {
+                        columns.Add().Caption("Edit").Width(50).Alignment(HorizontalAlignment.Center)
+                               .CellTemplate(new JS("cellTemplate")).AllowExporting(false);
+                        columns.Add().DataField("DeliveryNote");
+
+                        columns.Add().DataField("StatusDelivery").Width(140).SortOrder(SortOrder.Asc);
+
+                        columns.Add().DataField("MoveTicket").SortOrder(SortOrder.Asc);
+
+                        columns.Add().DataField("StatusMT");
+
+                        columns.Add().DataField("FCode");
+
+                        columns.Add().DataField("Model");
+
+                        columns.Add().DataField("MTQty").Format("#,##0");
+                        columns.Add().DataField("BoxQty").Format("#,##0");
+                        columns.Add().DataField("ExcessQty").Format("#,##0");
+
+                    }) // end .Columns               
+
+                .Summary(s => s.TotalItems(items =>
+                {
+                    items.AddFor(m => m.MTQty)
+                        .SummaryType(SummaryType.Sum)
+                        .Name("MTQty")
+                        .ValueFormat(Format.Decimal).ValueFormat("#,##0").DisplayFormat("Total: {0}");
+
+                    items.AddFor(m => m.BoxQty)
+                       .SummaryType(SummaryType.Sum)
+                       .Name("BoxQty")
+                       .ValueFormat(Format.Decimal).ValueFormat("#,##0").DisplayFormat("Total: {0}");
+
+                    items.AddFor(m => m.ExcessQty)
+                       .SummaryType(SummaryType.Sum)
+                       .Name("ExcessQty")
+                       .ValueFormat(Format.Decimal).ValueFormat("#,##0").DisplayFormat("Total: {0}");
+
+                }))
+                .OnCellPrepared("oncellperparedgridIndex")
+                .OnContentReady("oncontentready")
+
+)
+
+@(Html.DevExtreme().Button()
+            .ID("btnPrintPreview")
+            .Text("Print")
+            .Type(ButtonType.Default)
+            .OnClick("PrintPreview")
+)
+<script>
+    function oncellperparedgridIndex(e) {
+        //console.log(e); 
+        if (e.rowType === "data" && e.column.dataField === "MTQty" && e.rowIndex != undefined) {
+            sumMTQty.push(e.data.MTQty);
+        }
+        if (e.rowType === "data" && e.column.dataField === "BoxQty" && e.rowIndex != undefined) {
+            sumBoxQty.push(e.data.BoxQty);
+        }
+        if (e.rowType === "data" && e.column.dataField === "ExcessQty" && e.rowIndex != undefined) {
+            sumExcessQty.push(e.data.ExcessQty);
+        }
+    }
+
+    function oncontentready(e) {
+        var gridItems = $("#gridContainer").dxDataGrid('instance');
+
+        var total1 = sumMTQty.reduce((a, b) => parseFloat(a) + parseFloat(b), 0);
+        var total2 = sumBoxQty.reduce((a, b) => parseFloat(a) + parseFloat(b), 0);
+        var total3 = sumExcessQty.reduce((a, b) => parseFloat(a) + parseFloat(b), 0);
+
+        //console.log(total1);
+        var summaryCells = e.component.getController('data').footerItems()[0].summaryCells;
+        sumMTQty = [];
+        sumBoxQty = [];
+        sumExcessQty = [];
+
+        $.each(summaryCells, function (item, value) {
+            if (value.length > 0) {
+                var name = value[0].name;
+                if (name == "MTQty") {
+                    gridItems.getController('data').footerItems()[0].summaryCells[item][0].value = total1;
+                }
+                if (name == "BoxQty") {
+                    gridItems.getController('data').footerItems()[0].summaryCells[item][0].value = total2;
+                }
+                if (name == "ExcessQty") {
+                    gridItems.getController('data').footerItems()[0].summaryCells[item][0].value = total3;
+                }
+                gridItems.getView('footerView').render();
+            }
+
+        });
+        NotSelection(gridItems);
+
+    }
+
+    function PrintPreview(data) {
+        var grid = $('#gridContainer').dxDataGrid('instance');
+        var keys = grid.getSelectedRowKeys();
+        
+        const result = keys.filter(function (i, v) { return i.DeliveryNote });
+        //console.log(unique);
+        //console.log(grid.getSelectedRowKeys().DeliveryNote);
+        var text = "";
+        var s;
+        var comma = 0;   
+        var checkslectDN = false;
+        var boxarray = [];
+       
+        
+        if (keys.length > 0) {
+            $.each(keys, function (i, v) {
+                boxarray.push(v.DeliveryNote);//เลือกเอาเฉพาะ delivery note
+            });
+            var unique = boxarray.filter((v, i, a) => a.indexOf(v) === i); //ตัดตัวซํ้าออก
+            for (s in unique) {
+                if (unique[s] === null) {
+                    checkslectDN = true;
+                    break;
+                } else {                   
+                    comma = parseInt(s) + 1;
+                    if (comma == unique.length) {
+                        text += unique[s];
+                    }
+                    else {
+                        text += unique[s] + ",";
+                    }
+                }                
+
+            }
+            if (checkslectDN === true) {
+                var errorcustomDialog = DevExpress.ui.dialog.custom({
+                    title: 'print Delivery Note Error ! ',
+                    message: 'Please select the information that is Delivery Notes only.',
+                    toolbarItems: [
+                        { text: "Close", onClick: function () { return "Ok" } },
+                        //{ text: "Not Ok", onClick: function () { return "Not Ok" } }
+                    ],
+                    width: "500px"
+
+                });
+                errorcustomDialog.show().done(function (dialogResult) {
+                    //focus something
+                });
+            } else {
+                window.open('PrintDeliveryNote/PrintDN?deliverynote=' + text);
+            }
+            
+        } else {
+            var errorcustomDialog = DevExpress.ui.dialog.custom({
+                title: 'print Delivery Note incorrect ! ',
+                message: 'Please select Delivery Note.',
+                toolbarItems: [
+                    { text: "Close", onClick: function () { return "Ok" } },
+                    //{ text: "Not Ok", onClick: function () { return "Not Ok" } }
+                ],
+                width: "500px"
+
+            });
+            errorcustomDialog.show().done(function (dialogResult) {
+                //focus something
+            });
+        }
+       
+        // 'LotControlTicket/PrintSelected?'
+        //window.location.href = 'LotControlTicket/PrintSelected?' + text;
+    }
+</script>
+
+<script>
+    var countmoveticket;
+        function OpenEdit(data)
+        {
+
+         var sourcegrid = DevExpress.data.AspNet.createStore({
+                        "key": "moveTicket",
+                        "loadUrl": "@Url.Action("GetMoveticket", "DeliverynoteSelect", new { httproute = true })",
+                        "loadParams": {"deliverynote": data.DeliveryNote}
+                    });
+            //console.log(sourcegrid);
+
+            $('#EditPopup')
+                    .dxPopup({
+                    title:"Edit Delivery Note.",
+                        onShown: function () {
+                            $("#editscrollpop").dxScrollView({
+                                height: '100%',
+                                width: '100%'
+                            });
+                        $("#edittxtDeliverynote").dxTextBox("instance").option("value", data.DeliveryNote);
+                        $("#edittxtModel").dxTextBox("instance").option("value", data.Model);
+
+                        $("#griddeliverly").dxDataGrid({
+                            dataSource: sourcegrid,
+                            onContentReady: function (e) {
+                                if (countmoveticket == 0) {
+                                    $("#CancelledDeliveryNote").dxButton({
+                                        disabled: true
+                                    });
+                                }
+
+                                var gridItems = $("#griddeliverly").dxDataGrid('instance')._controllers.data._dataSource._items;
+                                $.each(gridItems, function (item, value) {
+                                    console.log(value.StatusMT);
+                                    if (value.StatusMT != 'Packed') {
+                                        $("#CancelledDeliveryNote").dxButton({
+                                            disabled: true
+                                        });
+                                    } else {
+                                        $("#CancelledDeliveryNote").dxButton({
+                                            disabled: false
+                                        });
+                                    }
+                                });
+
+                            }
+                        });
+                    },
+                        onHiding: function (options) {
+                           var grid = $('#gridContainer').dxDataGrid('instance');
+                               grid.refresh();
+                    }
+
+                }).dxPopup('instance').option('visible', true);
+
+    }
+
+
+ 
+
+    //var myGrid = null;
+    //window.customSelectionFlag = false;
+    //var groupCellTemplate = function (groupCell, info) {
+
+    //    var colField = info.column.dataField.replace(".", "");
+    //    var editorID = "groupCheckBox" + colField + info.data.key;
+    //    var element = $('<div>')
+    //    var rowKeys = GetKeys(info.data, []);
+    //    $(element).attr("data-keys", rowKeys);
+    //    $(element).attr('id', editorID)
+    //        .appendTo(groupCell)
+    //        .dxCheckBox({
+    //            text: info.text,
+    //            onValueChanged: function (e) {
+    //                if (customSelectionFlag)
+    //                    return;
+    //                customSelectionFlag = true;
+    //                var keys = GetKeys(info.data, []);
+
+    //                if (e.value)
+    //                    myGrid.selectRows(keys, true);
+    //                else
+    //                    myGrid.deselectRows(keys);
+    //            }
+    //        })
+    //};
+    //function GetGroupedColumns(dataGrid) {
+    //    var colNames = [];
+    //    for (i = 0; i < dataGrid.columnCount(); i++) {
+    //        if (dataGrid.columnOption(i, "groupIndex") > -1) {
+
+    //            colNames.push(dataGrid.columnOption(i, "dataField"));
+    //        }
+
+    //    }
+
+    //    return colNames;
+    //}
+    //function GetKeys(data, keys) {
+    //    for (var i = 0; i < data.items.length; i++) {
+    //        if (data.items[i].items) {
+    //            GetKeys(data.items[i], keys)
+    //        } else
+    //            keys.push(data.items[i].ProductID);
+    //    }
+    //    return keys;
+    //}
+    //function CheckIfKeysAreSelected(currentKeys, selectedKeys) {
+    //    var flag = true;
+    //    for (var i = 0; i < currentKeys.length; i++) {
+    //        var keyValue = parseInt(currentKeys[i]);
+    //        if (selectedKeys.indexOf(keyValue) == -1) // key is not selected
+    //        {
+    //            flag = false;
+    //            break;
+    //        }
+    //    }
+    //    return flag;
+    //}
+    //function SynchronizeCheckBoxes(grid, keys, groupedColumnNames, isSelected) {
+    //    for (var i = 0; i < keys.length; i++) {
+    //        var keyValue = keys[i];
+    //        var rowIndex = grid.getRowIndexByKey(keyValue);
+    //        for (var j = 0; j < groupedColumnNames.length; j++) {
+    //            var columnField = groupedColumnNames[j];
+    //            var groupRowValue = grid.cellValue(rowIndex, columnField);
+    //            columnField = columnField.replace(".", "");
+    //            var checkBoxEl = $("#" + "groupCheckBox" + columnField + groupRowValue);
+    //            if (!checkBoxEl)
+    //                return;
+    //            var value = isSelected;
+    //            if (value) {
+    //                var rowKeys = $(checkBoxEl).attr("data-keys")
+    //                if (rowKeys)
+    //                    rowKeys = rowKeys.split(',');
+    //                else
+    //                    debugger;
+    //                value = CheckIfKeysAreSelected(rowKeys, keys);
+    //            }
+    //            var editor = $(checkBoxEl).dxCheckBox("instance");
+    //            if (editor)
+    //                editor.option("value", value);
+    //        }
+
+    //    }
+    //}
+    //function onGridSelectionChanged(args) {
+
+    //    if (window.customSelectionFlag) {
+    //        window.customSelectionFlag = false;
+    //        return;
+    //    }
+    //    console.log("onGridSelectionChanged");
+    //    var keys = args.selectedRowKeys;
+    //    var grid = args.component;
+    //    var groupedColumnNames = GetGroupedColumns(grid);
+    //    if (groupedColumnNames.length == 0)
+    //        return;
+    //    window.customSelectionFlag = true;
+    //    SynchronizeCheckBoxes(grid, args.currentDeselectedRowKeys, groupedColumnNames, false);
+    //    SynchronizeCheckBoxes(grid, args.selectedRowKeys, groupedColumnNames, true);
+    //    window.customSelectionFlag = false;
+
+    //}
+
+    //myGrid = $("#gridContainer").dxDataGrid({       
+    //    allowColumnResizing: true,
+    //    allowColumnReordering: true,
+    //    cellHintEnabled: true,
+    //    columnAutoWidth: true,
+    //    showWhenGrouped: true,
+    //    grouping: {
+    //        contextMenuEnabled: true,
+    //        expandMode: 'buttonClick'
+    //    },
+    //    groupPanel: {
+    //        visible: true // enables grouping using the group panel
+    //    },
+    //    onSelectionChanged: onGridSelectionChanged,
+       
+    //    rowAlternationEnabled: true,         
+        
+      
+    //    customizeColumns: function (columns) {
+    //        $.each(columns, function (_, element) {
+    //            element.groupCellTemplate = groupCellTemplate;
+    //        });
+    //    }
+    //}).dxDataGrid("instance");
+</script>

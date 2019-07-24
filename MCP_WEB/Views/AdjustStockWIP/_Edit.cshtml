@@ -1,0 +1,117 @@
+﻿<div id="scrollpop" class="scrollpop">
+    <div class="contentpop">
+        @model MCP_WEB.Models.VW_MFC_WIPAdjust
+        @using (Html.BeginForm())
+        {
+            using (Html.DevExtreme().ValidationGroup())
+            {
+                @Html.AntiForgeryToken()
+                <form id="form1" name="form1">
+                    <div class="form-group">
+
+                        <label class="col-lg-2">Serial No. : </label>
+                        <div class="col-lg-4">
+                            @(Html.DevExtreme().TextBox().ID("txtBarcode").Name("BarCode").ReadOnly(true)
+                            //.OnValueChanged("txtDepIDchanged")
+                            )
+                        </div>
+
+                        <label class="col-lg-2">ProcessKey : </label>
+                        <div class="col-lg-4" style="padding-bottom:10px;">
+                            @(Html.DevExtreme().TextBox().ID("txtProcesscode").Name("ProcessCode").ReadOnly(true))
+                        </div>
+
+                        <label class="col-lg-2">Model : </label>
+                        <div class="col-lg-4" style="padding-bottom:10px;">
+                            @(Html.DevExtreme().TextBox().ID("txtModel").Name("Model").ReadOnly(true))
+                        </div>
+
+                        <label class="col-lg-2">WIPQty : </label>
+                        <div class="col-lg-4" style="padding-bottom:10px;">
+                            @(Html.DevExtreme().TextBox().ID("txtWIPQty").Name("WIPQty").ReadOnly(true))
+                        </div>
+
+                        <label class="col-lg-2">Audit Qty : </label>
+                        <div class="col-lg-4" style="padding-bottom:10px;">
+                            @(Html.DevExtreme().TextBox().ID("txtQtyAudit").Name("QtyAudit"))
+                        </div>
+
+                        <label class="col-lg-2">Diff. Qty : </label>
+                        <div class="col-lg-4" style="padding-bottom:10px;">
+                            @(Html.DevExtreme().TextBox().ID("txtQtyDiff").Name("QtyDiff").ReadOnly(true))
+                        </div>
+
+
+                        <div class="col-sm-offset-2 col-sm-10" style="text-align:right;">
+
+                            @(Html.DevExtreme().Button().ID("btnSave")
+                                                        //.Icon("glyphicon glyphicon-floppy-disk")
+                                                        .Text("Save")
+
+                                                        //.Type(ButtonType.Success)
+                                                        //.UseSubmitBehavior(true)
+                                                        .OnClick("function (e) { SaveEdit(e); }"))
+                            @*.OnClick("function (e) {if(mode=='add'){SaveInsert();} if(mode=='edit'){SaveEdit();} }"))*@
+
+                            @(Html.DevExtreme().Button().Type(ButtonType.Normal)
+                                                        //.Icon("glyphicon glyphicon-remove")
+                                                        .Text("Cancel")
+                                                        .OnClick("function (e) { canselButtonClick() }"))
+                        </div>
+                    </div>
+                </form>
+            }
+        }
+    </div>
+</div>
+
+<script>
+
+    function canselButtonClick() {        
+        $('#EditPopup').dxPopup('instance').option('visible', false);
+    }
+
+    function SaveEdit(e) {
+        var txtBarcode =  $('#txtBarcode').dxTextBox('instance').option('value');
+        var txtProcesscode = $('#txtProcesscode').dxTextBox('instance').option('value');        
+        var txtQtyAudit = $('#txtQtyAudit').dxTextBox('instance').option('value');
+        var txtQtyDiff =  $('#txtQtyDiff').dxTextBox('instance').option('value');
+        console.log(e.validationGroup.validate().isValid);
+        var flag = e.validationGroup.validate().isValid;
+        if (flag) {
+            $.ajax({
+                type: 'POST',
+                url: "api/GridVW_MFC_WIPAdjust/Edit_data",
+                data: { "barcode": txtBarcode, "processcode": txtProcesscode, "qtyaudit": txtQtyAudit, "modifyby": "@ViewBag.UserName" },
+                //contentType: "application/json; charset=utf-8",
+                //dataType: "html",
+                //async: false,
+                //dataType: 'json',
+                success: function (e) {
+
+                    var msg = e;
+
+                    var customDialog = DevExpress.ui.dialog.custom({
+                        title: 'Adjust Stock WIP',
+                        message: msg,
+                        toolbarItems: [
+                            { text: "Close", onClick: function () { return "Ok" } },
+                            //{ text: "Not Ok", onClick: function () { return "Not Ok" } }
+                        ],
+                        width: "500px"
+
+                    });
+
+                    customDialog.show().done(function (dialogResult) {
+                        //$("#addtxtUserName").dxTextBox("instance").focus();
+                    });
+
+
+                }
+            });
+
+        } 
+    }
+        
+    
+</script>

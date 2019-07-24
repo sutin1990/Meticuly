@@ -1,0 +1,203 @@
+﻿
+@{
+    ViewData["Title"] = "Index";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<br />
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-lg-12 col-sm-12">
+            <div id="grdIsoniteSum"></div>          
+            @(Html.DevExtreme().Button()
+                                    .ID("btnPrintPreviewT1")
+                                    .Text("Print")
+                                    .Type(ButtonType.Default)
+                                    .OnClick("PrintPreview")
+            )
+
+        </div>
+    </div>
+</div>
+
+<script>
+
+    $("#grdIsoniteSum").dxDataGrid({
+        dataSource: DevExpress.data.AspNet.createStore({
+            key: ["IsoniteCode"],
+            loadUrl: "api/VW_MFC_Isonite_Summary/GetIsonite_Summary",
+            onBeforeSend: function (method, ajaxOptions) {
+                ajaxOptions.xhrFields = { withCredentials: true };
+            }
+        }), filterRow: {
+            visible: true
+        },
+        selection: {
+            mode: "multiple",
+            selectAllMode: "page",
+            recursive: false,
+            showCheckBoxesInMultipleMode: 'none'
+        },
+        headerFilter: {
+            visible: true
+        },
+        "export": {
+            enabled: true,
+            fileName: "VW_MFC_Isonite_Summary",
+            allowExportSelectedData: true
+        },
+        loadPanel: false,
+        remoteOperations: true,
+        showColumnLines: true,
+        showRowLines: true,
+        rowAlternationEnabled: true,
+        showBorders: true,
+        allowColumnReordering: true,
+        allowColumnResizing: true,
+        columnAutoWidth: true,
+        showBorders: true,
+        columnHidingEnabled: true,
+        searchPanel: {
+            visible: true
+        },
+        paging: {
+            pageSize: 10
+        },
+        pager: {
+            showPageSizeSelector: true,
+            allowedPageSizes: [10, 25, 50, 100],
+            showInfo: true,
+            showNavigationButtons: true,
+            visible: true
+        },
+        columnChooser: {
+            enabled: true,
+            mode: "DragAndDrop"
+        },
+        columns: [{
+            dataField: "IsoniteCode",
+            caption: "IsoniteCode.",
+            //width: "10%"
+        },
+        {
+            dataField: "JigNo",
+            caption: "JigNo.",
+            //width: "5%"
+        },
+        {
+            dataField: "Column",
+            caption: "Column.",
+            visible: false
+        },
+        {
+            dataField: "Row",
+            caption: "Row.",
+            visible: false
+        },
+        {
+            dataField: "BarCode",
+            caption: "BarCode.",
+            //width: "10%"
+        },
+        {
+            dataField: "SeriesLot",
+            caption: "SeriesLot.",
+            //width: "10%"
+        },
+        {
+            dataField: "Model",
+            caption: "Model.",
+            //width: "10%"
+        },
+        {
+            dataField: "WStatus",
+            caption: "WStatus.",
+            //width: "5%"
+        },
+        {
+            dataField: "QtyOrder",
+            caption: "QtyOrder.",
+            //width: "10%"
+        },
+        {
+            dataField: "WIPLeftQty",
+            caption: "WIPLeftQty.",
+            //width: "10%"
+        },
+        {
+            dataField: "IsoniteQty",
+            caption: "IsoniteQty.",
+            //width: "10%"
+        }
+        ],
+        onSelectionChanged: function (selectedItems) {
+
+        }
+        , summary: {
+            totalItems: [{
+                column: "QtyOrder",
+                summaryType: "sum",
+                valueFormat: "decimal",
+                valueFormat: "#,##0",
+                displayFormat:"Total: {0}"
+            }, {
+                column: "WIPLeftQty",
+                    summaryType: "sum",
+                    valueFormat: "decimal",
+                    valueFormat: "#,##0",
+                    displayFormat: "Total: {0}"
+            }, {
+                column: "IsoniteQty",
+                    summaryType: "sum",
+                    valueFormat: "decimal",
+                    valueFormat: "#,##0",
+                    displayFormat: "Total: {0}"
+            }]
+        }
+    });
+
+</script>
+
+
+<script>
+    function PrintPreview(data) {
+        var grid = $('#grdIsoniteSum').dxDataGrid('instance');
+        var keys = grid.getSelectedRowKeys();
+        var text = "";
+        var s;
+        var comma = 0;
+        var checkslectDN = false;
+        if (keys.length > 0) {
+            for (s in keys) {
+                comma = parseInt(s) + 1;
+                if (comma == keys.length) {
+                    text += keys[s].IsoniteCode;
+                }
+                else {
+                    text += keys[s].IsoniteCode + ",";
+                }
+            }
+
+            window.open('api/Isonite/PrintIsonite?isonitecode=' + text);
+
+
+        } else {
+            var errorcustomDialog = DevExpress.ui.dialog.custom({
+                title: 'Cannot print isonite! ',
+                message: 'Please select isonite.',
+                toolbarItems: [
+                    { text: "Close", onClick: function () { return "Ok" } },
+                    //{ text: "Not Ok", onClick: function () { return "Not Ok" } }
+                ],
+                width: "500px"
+
+            });
+            errorcustomDialog.show().done(function (dialogResult) {
+                //focus something
+            });
+        }
+
+        // 'LotControlTicket/PrintSelected?'
+        //window.location.href = 'LotControlTicket/PrintSelected?' + text;
+    }
+</script>

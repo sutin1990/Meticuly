@@ -1,0 +1,1503 @@
+﻿<style>
+    a {
+        text-decoration: none !important;
+    }
+
+    .dx-link-edit-4x {
+        /*padding-right: 2px;*/
+        font-size: 1.2em;
+        width: auto;
+        height: auto;
+    }
+
+    .dx-link-delete-4x {
+        /*padding-right: 2px;*/
+        font-size: 1.2em;
+        width: auto;
+        height: auto;
+    }
+    .dx-icon-check {
+        color: white !important;
+    }
+
+    #Received {
+        background-color: #5cb85c;
+        /*border-color: aliceblue;*/
+        color: white !important;
+    }
+
+        #Received:hover {
+            background-color: #449D44; /* Green */
+        }
+
+    .dx-icon-revert {
+        color: white !important;
+    }
+
+    #Returned {
+        background-color: #f89854;
+        /*border-color: aliceblue;*/
+        color: white !important;
+    }
+
+        #Returned:hover {
+            background-color: #ff6a00; /* Green */
+        }
+
+    .WrappedColumnClass {
+        white-space: normal;
+        word-wrap: break-word;
+    }
+</style>
+<script>
+    var valueBoxNoselected="";
+    var valueBoxNounselected="";
+    var arrayput = [];
+    var getselectedvalue;
+    var x = 0;
+    var arritem;
+   
+    var getdatainrow = [{}];
+    var txtremark = [];
+    var datarowbylot = {};
+
+    var arrputdata = [];
+    var totalrow = [];
+    
+    var sumarr = [];
+
+
+    var sumMTQty = [];
+    var sumBoxQty = [];
+    var sumExcessQty = [];
+    var sumFGQty = [];
+    var sumFGBoxQty = [];
+    var sumFGExcessQty = [];
+
+    var sumFGQtymasterdetail = [];
+
+    function toolbar_preparing(e) {
+        e.toolbarOptions.items.unshift(
+
+            {
+                location: "after",
+                widget: "dxButton",
+                locateInMenu: 'auto',
+                options:
+                {
+                    elementAttr: {
+                        id: 'Returned'
+                    },
+                    icon: "revert",
+                    text: "Return",
+                    onClick: function (c) {
+                        getkeyforRetruned(e);
+                    }
+                }
+            },
+
+            {
+                location: "after",
+                widget: "dxButton",
+                locateInMenu: 'auto',
+                options:
+                {
+                    elementAttr: {
+                        id: 'Received'
+                    },
+                    icon: "check",
+                    text: "Receive",
+                    onClick: function (c) {
+                        getkeyforReceipt(e);
+                    }
+
+                }
+            }
+
+        );
+    }
+
+    function getkeyforRetruned(e) {
+        var grid = $('#gridContainer').dxDataGrid('instance');
+        var keys = grid.getSelectedRowKeys();
+        var arrMoveTicket = [];     
+        var arrnotequalpacked = [];
+        var checkStatusMT = true;
+        var txtalert = [];
+        //console.log(grid);
+        //console.log(keys);
+        $.each(keys, function (item, value) {
+            arrMoveTicket.push(value.MoveTicket);
+        });
+       
+        //console.log(keys.length);
+        if (keys.length > 0) {
+            var result = DevExpress.ui.dialog.confirm("Are you sure of the Move Ticket:[" + arrMoveTicket.join(",") + "] you choose?", "Confirm Returned");
+            result.done(function (dialogResult) {
+            if (dialogResult) {
+            //console.log(arrMoveTicket); 
+                $.ajax({
+                    type: 'POST',
+                    url: '@Url.Action("CheckStatusMT", "DataGridReceiptByMoveTicket", new { httproute = true })',
+                    data: { "moveticket": arrMoveTicket },
+                    async: false,
+                    beforeSend: function () {/*loading*/ },
+                    dataType: 'json',
+                    success: function (result) {
+                        
+                        if (result.data.length > 0) {
+                            $.each(result, function (item, value) {
+                                for (var i = 0; i < value.length; i++) {
+                                    console.log(value[i].StatusMT); 
+                                    if (value[i].StatusMT != "Packed") {
+                                        arrnotequalpacked.push(value[i].MoveTicket);
+                                        checkStatusMT = false;
+                                        break;
+                                    } 
+                                }
+                                                               
+                            });
+                            if (checkStatusMT == true) {
+
+                                $.ajax({
+                                    type: 'POST',
+                                    url: '@Url.Action("Click_ReturnedbyMoveTicket", "DataGridReceiptByMoveTicket", new { httproute = true })',
+                                    data: { "moveticket": arrMoveTicket },
+                                    async: false,
+                                    beforeSend: function () {/*loading*/ },
+                                    dataType: 'json',
+                                    success: function (result) {
+                                        //console.log(result);
+                                        $.each(result, function (item, value) {
+                                            txtalert.push(value.MoveTicket);
+                                        });
+                                        if (result.length > 0) {
+                                            var Dialogreturnedsuccess = DevExpress.ui.dialog.custom({
+                                                title: 'Returned by Move Ticket Success.',
+                                                message: "Returned by Move Ticket: " + txtalert.join(",")+" Success .",
+                                                toolbarItems: [
+                                                    { text: "Close", onClick: function () { return "Ok" } },
+                                                    //{ text: "Not Ok", onClick: function () { return "Not Ok" } }
+                                                ],
+                                                width: "500px"
+                                            });
+                                            Dialogreturnedsuccess.show().done(function (dialogResult) {
+                                                //var grid = $('#griddeliverly').dxDataGrid('instance');
+                                            });
+                                        } else {
+                                            DevExpress.ui.notify(errStr, "Returned by Move Ticket Error!", 2000);
+                                        }
+                                        //DevExpress.ui.notify("Delete success.", "success", 1000);
+                                        grid.refresh();                        
+                                    },
+                                    error: function (ob, errStr) {
+                                        //ob.stopPropagation();
+                                        DevExpress.ui.notify(errStr, "error", 2000);
+                                        grid.refresh();
+                                    }
+                                });
+
+                            } else {
+                                var DialogerrorReturned = DevExpress.ui.dialog.custom({
+                                    title: 'Returned by Move Ticket Error.',
+                                    message: "This Move Ticket In : [" + arrnotequalpacked.join(",") + "] the status is not equal to the packed.",
+                                    toolbarItems: [
+                                        { text: "Close", onClick: function () { return "Ok" } },
+                                        //{ text: "Not Ok", onClick: function () { return "Not Ok" } }
+                                    ],
+                                    width: "500px"
+                                });
+                                DialogerrorReturned.show().done(function (dialogResult) {
+                                    //var grid = $('#griddeliverly').dxDataGrid('instance');
+                                });
+                            }
+                        } else {
+                            //no data
+                        }
+                                          
+                    },
+                    error: function (ob, errStr) {
+                        //ob.stopPropagation();
+                        DevExpress.ui.notify(errStr, "error", 2000);
+                        grid.refresh();
+                    }
+                });
+            }
+        });
+
+        } else {
+            var Dialog = DevExpress.ui.dialog.custom({
+                title: 'Returned by Move Ticket Error!',
+                message: "Please choose Move Ticket .",
+                toolbarItems: [
+                    { text: "Close", onClick: function () { return "Ok" } },
+                    //{ text: "Not Ok", onClick: function () { return "Not Ok" } }
+                ],
+                width: "500px"
+            });
+            Dialog.show().done(function (dialogResult) {
+                //var grid = $('#griddeliverly').dxDataGrid('instance');
+            });
+        }
+
+        
+
+
+}
+
+    function getkeyforReceipt(e) {
+        var grid = $('#gridContainer').dxDataGrid('instance');
+        var keys = grid.getSelectedRowKeys();
+        var arrMoveTicket = []; 
+        var arrnotequalpacked = [];
+        var txtalert = [];
+        var checkStatusMT = true;
+        $.each(keys, function (item, value) {
+            arrMoveTicket.push(value.MoveTicket);
+        });
+
+        
+        if (keys.length > 0) {           
+            var result = DevExpress.ui.dialog.confirm("Are you sure of the Move Ticket:[" + arrMoveTicket.join(",") + "] you choose?", "Confirm Received");
+            result.done(function (dialogResult) {
+                if (dialogResult) {
+            $.ajax({
+                type: 'POST',
+                url: '@Url.Action("CheckStatusMT", "DataGridReceiptByMoveTicket", new { httproute = true })',
+                data: { "moveticket": arrMoveTicket },
+                async: false,
+                beforeSend: function () {/*loading*/ },
+                dataType: 'json',
+                success: function (result) {
+
+                    if (result.data.length > 0) {
+                        $.each(result, function (item, value) {
+                            for (var i = 0; i < value.length; i++) {
+                                //console.log(value[i].StatusMT);
+                                if (value[i].StatusMT != "Packed") {
+                                    arrnotequalpacked.push(value[i].MoveTicket);
+                                    checkStatusMT = false;
+                                    break;
+                                }
+                            }
+
+                        });
+                        //console.log(checkStatusMT);
+                        if (checkStatusMT == true) {
+                            $.ajax({
+                                type: 'POST',
+                                url: '@Url.Action("Click_ReceiptbyMoveTicket", "DataGridReceiptByMoveTicket", new { httproute = true })',
+                                data: { "moveticket": arrMoveTicket },
+                                async: false,
+                                beforeSend: function () {/*loading*/ },
+                                dataType: 'json',
+                                success: function (result) {
+                                   
+                                    $.each(result, function (item, value) {
+                                        txtalert.push(value.MoveTicket);
+                                        
+                                    });
+                                    if (result.length > 0) {
+                                        var Dialog = DevExpress.ui.dialog.custom({
+                                            title: 'Receipt by Move Ticket Success.',
+                                            message: "Receipt by Move Ticket: " + txtalert.join(",")+" Success .",
+                                            toolbarItems: [
+                                                { text: "Close", onClick: function () { return "Ok" } },
+                                                //{ text: "Not Ok", onClick: function () { return "Not Ok" } }
+                                            ],
+                                            width: "500px"
+                                        });
+                                        Dialog.show().done(function (dialogResult) {
+                                            
+                                        });
+                                    } else {
+                                        DevExpress.ui.notify(errStr, "Receipt by Move Ticket Error!", 2000);
+                                    }                                    
+                                                           
+                                },
+                                error: function (ob, errStr) {
+                                    //ob.stopPropagation();
+                                    DevExpress.ui.notify(errStr, "error", 2000);
+                                   
+                                }
+                            });
+                            grid.refresh();
+
+                        } else {
+                            var DialogerrorReturned = DevExpress.ui.dialog.custom({
+                                title: 'Receipt by Move Ticket Error.',
+                                message: "This Move Ticket In : [" + arrnotequalpacked.join(",") + "] the status is not equal to the packed.",
+                                toolbarItems: [
+                                    { text: "Close", onClick: function () { return "Ok" } },
+                                    //{ text: "Not Ok", onClick: function () { return "Not Ok" } }
+                                ],
+                                width: "500px"
+                            });
+                            DialogerrorReturned.show().done(function (dialogResult) {
+                                //var grid = $('#griddeliverly').dxDataGrid('instance');
+                            });
+                        }
+                    }
+                },
+                error: function (ob, errStr) {
+                    //ob.stopPropagation();
+                    DevExpress.ui.notify(errStr, "stored error", 2000);
+                    grid.refresh();
+                }
+            });
+        }
+    });               
+
+        } else {
+            var Dialog = DevExpress.ui.dialog.custom({
+                title: 'Receipt by Move Ticket Error!',
+                message: "Please choose Move Ticket .",
+                toolbarItems: [
+                    { text: "Close", onClick: function () { return "Ok" } },
+                    //{ text: "Not Ok", onClick: function () { return "Not Ok" } }
+                ],
+                width: "500px"
+            });
+            Dialog.show().done(function (dialogResult) {
+                //var grid = $('#griddeliverly').dxDataGrid('instance');
+            });
+        }       
+
+
+    }
+
+    function cellTemplate(element, cellInfo) {
+        if (cellInfo.data.StatusMT == 'Packed') {
+            $('<a/>')
+                .addClass('dx-link dx-link-edit dx-icon-edit dx-link-edit-4x ')
+                .on('dxclick', function () {
+                    //$('#EditPopup').dxPopup('instance').option('visible', true);
+                    OpenEdit(cellInfo.data);
+                }).appendTo(element);
+        //console.log(cellInfo.data.StatusMT);
+        }
+       
+    }
+    function remove(array, element) {
+        return array.filter(el => el !== element);
+    }
+    
+    function onCellPrepared(e) {        
+       
+        //totalrow = [];
+        //totalrow.push(e.data);
+        //if (e.rowType == 'totalFooter') {
+        //    var summaryItem = e.cellElement.find('.dx-datagrid-summary-item');
+        //    if (summaryItem.length > 0) {
+        //        $.each(summaryItem, function (_, item) {
+        //            $(item).html($(item).text() + "</br> Your text")
+        //        });
+        //    }
+        //}  
+        if (valueBoxNoselected!="") {
+            if (e.rowType === "data" & e.column.command === 'select' && e.data.BoxNo === valueBoxNoselected) {
+                //var grid = $('#gridreceivedbymoveticket').dxDataGrid('instance');
+                //var keys = grid.getSelectedRowKeys();                
+                //var rowIndex;
+                //var arrvalue = [];
+                //console.log(keys);
+                //if (keys.length > 0) {
+                //    $.each(keys, function (item, value) {//on select one by one or select all 
+                //        console.log("select=>", value.BoxNo);                       
+                //        //console.log(item + '=>' + keys[item] + '=>' + grid.getRowIndexByKey(keys[item]) + '=>' + value.QtyLot);
+                //        grid.cellValue(grid.getRowIndexByKey(keys[item]), 'FGQty', value.QtyLot);                        
+
+                //    });
+                //    //console.log(sumFGQty);
+                //}
+                //e.cellElement.find('.dx-select-checkbox').dxCheckBox("instance").option("value", false);
+                //e.cellElement.find('.dx-select-checkbox').dxCheckBox("instance").option("value", true);                
+                //e.cellElement.off();
+            }
+        }
+        if (valueBoxNounselected != "") {
+            if (e.rowType === "data" & e.column.command === 'select' && e.data.BoxNo === valueBoxNounselected) {
+               
+                //e.cellElement.find('.dx-select-checkbox').dxCheckBox("instance").option("value", false);
+                //e.cellElement.find('.dx-select-checkbox').dxCheckBox("instance").option("disabled", false);  
+                //e.cellElement.off();
+            }
+        }
+
+        if (e.rowType === "data" && e.column.dataField === "FGQty" && e.rowIndex != undefined) {
+            sumarr.push(e.data.FGQty);
+
+        }
+
+        if (e.rowType === 'data' && e.column.command === 'select' && e.rowIndex != undefined) {           
+            
+            //if (arrputdata.length == 4) {
+                arrputdata.push(e.data);
+                //$.each(arrputdata, function (item, value) {
+                //    if (value.RECID == e.data.RECID) {
+                         arrputdata = arrputdata.filter((el) => {
+                        return el.RECID !== e.data.RECID;
+                    });
+                        //console.log(arrputdata);                    
+                        arrputdata.push(e.data); 
+                   
+                       //console.log(arrputdata);
+                   // }
+                    //console.log(value.RECID);
+                    //for (var i = 0; i < value.length; i++) {
+                    //    if (value[i].RECID == e.data.RECID) {
+                    //        console.log(arrputdata);
+                    //    }
+                    //}
+                //});
+            //}
+            //var countrow = e.data;
+            //console.log(countrow);
+            //if (arrputdata.length < 4) {
+            //    arrputdata.push(e.data);
+            //}
+            
+            //console.log(e.data);
+            //if (e.data.id == 1) {
+            //    e.cellElement.find('.dx-select-checkbox').hide();
+            //    e.cellElement.off();
+            //}
+        }
+        
+        //console.log(getselectedvalue);
+        //if (e.rowType === "data" && e.column.command === 'select' && e.data.FGQty == 'Void') {        
+        var cellElement = e.cellElement,
+            editorElement = cellElement.find(".dx-selectbox"),
+            category,
+            selectBox = editorElement.data("dxSelectBox");
+
+        if (e.column.dataField === "Reason") {
+            
+            //console.log(e.column.dataField);
+            selectBox = cellElement.find(".dx-selectbox").data("dxSelectBox");
+            //console.log(selectBox);
+           
+        }
+        
+        if (e.rowType === "data") {
+            //console.log(e.data);
+            if (e.column.dataField === "Reason") {
+               
+                //arrputdata.push(e.data)
+            }
+            
+            //console.log(e.data);
+            //category = e.data.Reason;
+           // console.log(category);
+            //if (selectBox && e.column.dataField === "Reason" && category) {
+            //    var items = selectBox.option("items");
+            //    selectBox.option({
+            //        dataSource: {
+            //            store: items
+            //            //filter: [["Reason", "=", category]]
+            //        },
+            //        //value: 1
+            //    });
+            //}
+
+            //var instance = e.cellElement.find('.dx-select-checkbox').dxCheckBox("instance");
+            //instance.option("disabled", true);
+            //e.cellElement.off();
+        }
+        
+    }
+
+    function onSelectionChanged(e) {        
+        e.component.refresh(true);
+        var grid = $('#gridreceivedbymoveticket').dxDataGrid('instance');
+        var keys = grid.getSelectedRowKeys();       
+        getselectedvalue = "";
+        var rowIndex;       
+        var arrvalue = [];
+        
+        //if (e.currentDeselectedRowKeys.length == 0) {
+        //    if (keys.length > 0) {
+        //        //console.log("keyslength=>", arrputdata.length + "=>" + keys.length);
+        //        if (arrputdata.length > e.currentSelectedRowKeys.length && e.currentSelectedRowKeys.length <= keys.length && e.currentSelectedRowKeys.length==1) {
+        //            //console.log(e.currentSelectedRowKeys.length);
+        //            if (e.currentSelectedRowKeys.length > 0) {
+        //                var keyselect = e.currentSelectedRowKeys[0];
+        //                //console.log(keyselect.QtyLot);
+        //                rowIndex = grid.getRowIndexByKey(keyselect);
+        //                grid.cellValue(rowIndex, 'FGQty', keyselect.QtyLot);
+
+        //            }
+        //        } else {
+        //            if (arrputdata.length == keys.length) {
+        //                $.each(keys, function (item, value) {//on select one by one or select all 
+        //                    // console.log("select=>", value.BoxNo);
+        //                    //valueBoxNoselected = value.BoxNo;
+        //                    //console.log(item + '=>' + keys[item] + '=>' + grid.getRowIndexByKey(keys[item]) + '=>' + value.QtyLot);
+        //                    grid.cellValue(grid.getRowIndexByKey(keys[item]), 'FGQty', value.QtyLot);
+        //                    //sumFGQty += value.QtyLot;
+
+        //                });
+        //            }
+        //            console.log(e.currentSelectedRowKeys.length);
+                   
+        //        }
+                    
+              
+        //            //$.each(arritem, function (item, value) {//on select one by one or select all 
+        //            //    // console.log("select=>", value.BoxNo);
+        //            //    //valueBoxNoselected = value.BoxNo;
+        //            //    //console.log(item + '=>' + keys[item] + '=>' + grid.getRowIndexByKey(keys[item]) + '=>' + value.QtyLot);
+        //            //    grid.cellValue(grid.getRowIndexByKey(arritem[item]), 'FGQty', value.QtyLot);
+        //            //    //sumFGQty += value.QtyLot;
+
+        //            //});
+                
+                
+        //    //console.log(sumFGQty);
+        //    }
+        //}
+
+        var countselected = e.currentSelectedRowKeys.length;
+        if (countselected > 0) {
+            if (countselected == 1) {
+                var keyselect = e.currentSelectedRowKeys[0];
+                //console.log(keyselect.QtyLot);
+                rowIndex = grid.getRowIndexByKey(keyselect);
+                grid.cellValue(rowIndex, 'FGQty', keyselect.QtyLot);
+            }
+
+            if (countselected > 1) {
+                $.each(e.currentSelectedRowKeys, function (item, value) {
+                    rowIndex = grid.getRowIndexByKey(e.currentSelectedRowKeys[item]);
+                    grid.cellValue(rowIndex, 'FGQty', value.QtyLot);
+                });
+            }
+        }
+        
+        //console.log(e.currentDeselectedRowKeys.length);
+        var countunselect = e.currentDeselectedRowKeys.length;
+        if (countunselect > 0) { // on deselect one by one
+            if (countunselect == 1) {
+                var keyunselect = e.currentDeselectedRowKeys[0];
+                if (keyunselect) {
+                    rowIndex = grid.getRowIndexByKey(keyunselect);
+                    getselectedvalue = 0;
+                    grid.cellValue(rowIndex, 'FGQty', getselectedvalue);
+                    
+                }
+            }
+
+            if (countunselect > 1) {
+                $.each(e.currentDeselectedRowKeys, function (item, value) {
+                    rowIndex = grid.getRowIndexByKey(e.currentDeselectedRowKeys[item]);
+                   // console.log(e.currentDeselectedRowKeys[item]);
+                    getselectedvalue = 0;
+                    grid.cellValue(rowIndex, 'FGQty', getselectedvalue);
+                    });                
+            }
+           
+        }
+
+        //if (keys.length == 0) { // on deselect all
+        //    //console.log(arritem);
+        //    $.each(arritem, function (item, value) {                
+        //        rowIndex = grid.getRowIndexByKey(arritem[item]);
+        //        //console.log(rowIndex);
+        //        getselectedvalue = 0;
+        //        grid.cellValue(rowIndex, 'FGQty', getselectedvalue);
+        //    });
+        //    sumFGQty = 0;
+        //    //console.log(sumFGQty);
+        //}
+        
+        //grid.cellValue(item, 'FGQty', value.QtyLot);
+        //var keyselect = e.currentSelectedRowKeys[0];
+        
+
+        //if (keyselect) {
+        //    rowIndex = grid.getRowIndexByKey(keyselect);
+        //    $.each(e.currentSelectedRowKeys, function (item, value) {
+        //        getselectedvalue = value.QtyLot;
+
+        //    });
+        //}
+       
+        //grid.cellValue(rowIndex, 'FGQty', getselectedvalue);
+        
+
+       
+    }
+
+
+    
+
+  
+    function FGqty(data) {
+       
+        if (getselectedvalue == data.RECID) {
+
+            x = data.QtyLot;
+
+        }
+        return x;
+    }
+    
+    function celltemplateselect(element, cellInfo) {
+        //console.log(cellInfo.data)
+        var sourceselect = DevExpress.data.AspNet.createStore({
+                    "key": "ReasonID",
+                    "loadUrl": "@Url.Action("GetReason", "DataGridReceiptByMoveTicket", new { httproute = true })"
+                    //"loadParams": { "moveticket": data.MoveTicket}
+    });
+        $("<div>")
+            .dxSelectBox(
+            {
+                dataSource: sourceselect,
+                attr: {
+                    id: 'ReasonId',
+                    name: 'ReasonName'
+                },
+                valueExpr: 'ReasonID',
+                displayExpr: 'DepDesc',
+                searchEnabled: true,
+                searchExpr: ["ReasonID", "DepDesc"],
+                itemTemplate: function (itemData) {
+                    return $("<div />").append(
+                        $("<p />").text(itemData.DepDesc)
+                            .css("display", "inline-block")
+                    );
+                },
+                onValueChanged: function (e) {
+                    var selectedItem = e.component.option('selectedItem');
+                    
+                    if (e.value != null) {
+                        //datarowbylot['rowindex'] = getdatainrow['rowindex'];
+                        //datarowbylot['RECID'] = getdatainrow['RECID'];
+                        getdatainrow['ReasonID'] = selectedItem.ReasonID;
+                        getdatainrow['DepDesc'] = selectedItem.DepDesc;
+                        if (arrayput.length > 0) {
+                            for (var i = 0; i < arrayput.length; i++) {
+                                //console.log(arrayput[i].RECID + '==' + getdatainrow['RECID']);
+                                if (arrayput[i].RECID == getdatainrow['RECID']) {
+                                    console.log(arrayput[i].RECID + '==' + getdatainrow['RECID']);
+                                    arrayput.splice(i, 1)
+                                    //break;
+                                    //arrayput.push(getdatainrow);
+                                }
+                            }
+                           
+                        }
+                        arrayput.push(getdatainrow);
+                        console.log(arrayput);
+                       
+                    }
+                   
+                    //var item = e.component.option('selectedItem');
+                    //$("#gridreceivedbymoveticket").dxDataGrid({
+                    //    onCellClick: function (e) {
+                    //        console.log(e.data);
+                    //    }
+                    //});
+                },
+                })            
+            .appendTo(element);
+        return;
+    }
+
+    function celltemplatetextbox(element, cellInfo) {
+       
+        $("<div>")
+            .dxTextBox(
+            {
+                onValueChanged: function (e) {
+                    //if (txtremark.length > 0) {
+                    //    if (getdatainrow['RECID']) {
+                    //        if (getdatainrow['RECID'] != "") {
+                    //            txtremark.push(getdatainrow['RECID']);
+                    //        }
+                    //    }
+                    //} else {
+
+                    //}
+                   
+                    //getdatainrow['Remark'] = e.value;
+                    console.log(e);
+                    }
+                })            
+            .appendTo(element);
+        return;
+    }
+
+     function OpenEdit(data)
+        {
+         
+         var sourcegrid = DevExpress.data.AspNet.createStore({
+                    //"key": "BoxNo",
+                    "loadUrl": "@Url.Action("Gridpopup_RecbyMT", "DataGridReceiptByMoveTicket", new { httproute = true })",
+                    "loadParams": { "moveticket": data.MoveTicket}
+                    });
+            //console.log(sourcegrid);
+          var sourceselect = DevExpress.data.AspNet.createStore({
+                    "key": "ReasonID",
+                    "loadUrl": "@Url.Action("GetReason", "DataGridReceiptByMoveTicket", new { httproute = true })"
+                    //"loadParams": { "moveticket": data.MoveTicket}
+    });
+
+            $('#EditPopup')
+                    .dxPopup({
+                        title: "Edit Delivery Note.",
+                        onShowing: function () {
+                            var grid = $('#gridreceivedbymoveticket').dxDataGrid('instance');
+                            grid.refresh();
+                            grid.deselectAll();
+                            //$('#gridreceivedbymoveticket .dx-datagrid-rowsview .dx-data-row .dx-cell-modified .dx-highlight-outline::after ').css({ 'border': 'none'});
+                            //$('#gridreceivedbymoveticket .dx-highlight-outline ').css({ 'font-style': 'italic'});
+                            
+                            $('#gridreceivedbymoveticket .dx-datagrid-rowsview .dx-data-row .dx-cell-modified .dx-highlight-outline::after ').replaceWith(function () {
+                                return $('#gridreceivedbymoveticket .dx-datagrid-rowsview .dx-data-row .dx-cell-modified .dx-highlight-outline::after ').css({ 'border': 'none' });
+                            });
+                        },
+                        onShown: function () {
+                            arrputdata = [];
+                            //$('#gridreceivedbymoveticket').dxDataGrid('instance').refresh();
+                            $("#editscrollpop").dxScrollView({
+                                height: '100%',
+                                width: '100%'
+                            });
+
+                           
+                            $("#edittxtDeliverynote").dxTextBox("instance").option("value", data.DeliveryNote);
+                            $("#edittxtMoveTicket").dxTextBox("instance").option("value", data.MoveTicket);
+                            $("#edittxtModel").dxTextBox("instance").option("value", data.Model);
+                            $("#edittxtBoxQty").dxTextBox("instance").option("value", data.BoxQty);
+                            $("#edittxtPackingQty").dxTextBox("instance").option("value", data.MTQty);
+                            $("#edittxtFGExcessQty").dxTextBox("instance").option("value", data.FGExcessQty);
+
+                            $("#gridreceivedbymoveticket").dxDataGrid({
+                                dataSource: sourcegrid,
+                                loadPanel: {
+                                    enabled: true
+                                },
+                                //scrolling: {
+                                //    columnRenderingMode: "virtual",
+                                //    mode: "virtual",                                   
+                                //    showScrollbar:"onScroll"
+                                //},
+                                paging: {
+                                    enabled: false
+                                },
+                                //sorting: {
+                                //    mode: "none"
+                                //},
+                                //onEditingStart: function (e) {
+                                //    //currentRow = e.data;
+
+                                //    //console.log('In onEditingStart Function: ');
+                                //    //console.log(e.data);
+
+                                //},
+                                //onRowPrepared: function (info) {
+                                //    //console.log(info);
+                                //    if (info.rowType == "header")
+                                //        info.rowElement.removeClass("qe-timelog-starttime");
+                                //},
+                                onEditorPreparing: function (e) {
+                                    //console.log(e);
+
+                                    if (e.parentType === 'dataRow') {
+                                        if (e.dataField === "BoxNo" || e.dataField === "Barcode" || e.dataField === "QtyLot" || e.dataField === "FGQty") {
+                                            e.editorOptions.disabled = true;
+                                        }
+                                        
+                                        //var grid = e.component;
+                                        //var index = 0;
+                                        //var value = grid.cellValue(index, "OrderID");
+                                        //if (value > 10270) {
+                                        //    e.editorOptions.disabled = true;
+                                        //}
+                                    } 
+
+                                    //if (e.parentType === 'dataRow' && e.command === 'select') {
+                                    //    //console.log(e.row.data);
+                                        
+                                    //}
+
+                                    if (e.parentType === 'dataRow' && e.dataField === "Remark") {
+                                        e.editorName = "dxTextArea";
+                                        var onValueChanged = e.editorOptions.onValueChanged;
+                                        e.editorOptions.onValueChanged = function (args) {
+                                            onValueChanged.apply(this, arguments);
+                                            //console.log(e.row.data);
+                                            //console.log(arrputdata.find((item) => item.RECID === 9778));
+
+                                            //$.each(arrputdata, function (item, value) {
+                                            //    if (value.RECID == e.row.data.RECID) {
+                                                    arrputdata = arrputdata.filter((el) => {
+                                                        return el.RECID !== e.row.data.RECID; //Remove object ที่ซํ้ากันออกก่อน แล้วค่อย push data
+                                                    });
+                                            //    }
+                                            //});
+
+                                            arrputdata.push(e.row.data);
+                                            //console.log(e.row.data);
+                                        }
+                                        
+                                    }
+
+                                    if (e.parentType === 'dataRow' && e.dataField === "Reason") 
+                                    {
+                                        //console.log(e.row.data);
+
+                                        e.editorOptions.onValueChanged = function (arg) {                                           
+                                            var entireObject = arg.component.option("selectedItem");
+                                            if (entireObject) {
+                                                e.setValue(arg.value);
+
+                                                //$.each(arrputdata, function (item,value) {
+                                                //    if (value.RECID == e.row.data.RECID) {
+                                                        arrputdata = arrputdata.filter((el) => {
+                                                            return el.RECID !== e.row.data.RECID; //Remove object ที่ซํ้ากันออกก่อน แล้วค่อย push data
+                                                        });
+                                                //    }
+                                                //});
+                                                //console.log(e.row.data.RECID)
+                                                
+                                                arrputdata.push(e.row.data);
+                                            }
+                                            //e.component.cellValue(e.row.rowIndex, 'Reason', entireObject.ReasonID + ' ' + entireObject.DepDesc);
+                                    }
+                                    //    //e.editorOptions.onKeyDown = function (arg) {
+                                    //    //    if (arg.jQueryEvent.keyCode === 13) {
+                                    //    //        var theGrid = e.component;
+                                    //    //        console.log(theGrid)
+                                    //    //        window.setTimeout(function () {
+                                    //    //            theGrid.saveEditData();
+                                    //    //        }, 0);
+                                    //    //    }
+                                    //    //}
+                                    }
+
+                                },
+                                onToolbarPreparing: function (e) {
+                                    var toolbarItems = e.toolbarOptions.items;
+                                    $.each(toolbarItems, function (_, item) {
+                                        if (item.name == "saveButton" || item.name == "revertButton") {
+                                            item.visible = false;
+                                        }
+                                    });
+                                },
+                                onCellClick: function (e) {
+                                    //if (e.columnIndex == 5 ) {
+                                    //    //console.log(e.data);
+                                    //    //console.log(e.rowIndex);
+                                             
+                                    //    getdatainrow['rowindex'] = e.rowIndex;
+                                    //    getdatainrow['RECID'] = e.data.RECID;                                       
+                                    //    //console.log(getdatainrow);
+                                    //}
+
+                                    //if (e.columnIndex == 6) {
+                                    //    //console.log(e.data);
+                                    //    //console.log(e.rowIndex);                                        
+                                    //    getdatainrow['rowindex'] = e.rowIndex;
+                                    //    getdatainrow['RECID'] = e.data.RECID;
+                                    //    //console.log(getdatainrow);
+                                    //}
+                                   
+                                },
+                                //onRowUpdating: function (e) {
+                                //    console.log(e);
+                                //}, 
+                                columns: [
+                                    //{
+                                    //    dataField:"No",
+                                    //    caption: '#',
+                                    //    cellTemplate: function (cellElement, cellInfo) {
+                                    //        cellElement.text(cellInfo.row.rowIndex+1)
+                                    //    }
+                                    //},
+                                {
+                                    dataField: "RECID",
+                                    caption: "RECID", 
+                                    fixed:true,
+                                    visible:false
+
+                                },
+                                {
+                                    dataField: "BoxNo",
+                                    fixed: true,
+                                    caption: "MT Box Runing",
+                                    width: 150
+                                },
+                                {
+                                    dataField: "Barcode",
+                                    fixed: true,
+                                    caption: "Lot",
+                                    width:150
+                                },
+                                {
+                                    dataField: "QtyLot",
+                                    fixed: true,
+                                    caption: "WIP Qty",
+                                    width: 90,
+                                    format: "#,##0"
+                                },
+                                {
+                                    dataField: "FGQty",
+                                    fixed: true,
+                                    caption: "FG Qty",
+                                    width: 90,
+                                    format: "#,##0"
+                                },
+                                {
+                                    dataField: "Reason",
+                                    fixed: true,
+                                    width: 200,
+                                    lookup: {
+                                        dataSource: sourceselect,
+                                        valueExpr: "DepDesc",
+                                        displayExpr: "DepDesc"
+                                    },
+                                    calculateSortValue: function (data) {
+                                        var value = this.calculateCellValue(data);
+                                        return this.lookup.calculateCellValue(value);
+                                    }
+                                },
+                                {
+                                    dataField: "Remark",
+                                    fixed: true,
+                                    caption: "Remark",
+                                    width: 200
+                                }
+                                ],
+                                summary: {
+                                    totalItems: [{
+                                        column: "QtyLot",
+                                        summaryType: "sum",
+                                        valueFormat: "#,##0",
+                                        displayFormat:"Total: {0}"
+                                    }
+                                        , {
+                                            column: "FGQty",
+                                            name: "SelectedRowsSummary",
+                                            summaryType: "sum",
+                                            valueFormat: "#,##0",
+                                            //displayFormat: "Total: {0}",
+                                            customizeText: function (data) {
+                                                
+                                                return "Total: " + sumarr.reduce((a, b) => a + b, 0);
+                                            }
+                                        }
+
+                                    ],
+                                  
+                                },
+                                customizeColumns: function (columns) {
+                                    columns[0].width = 70;
+                                },
+                                onContentReady: function (e) {  
+                                    e.component.option("loadPanel.enabled", false);//เวลาเลือกข้อมูลจะทำให้ไม่ต้องโหลดนาน
+                                    //$("#gridreceivedbymoveticket .dx-scrollable").dxScrollable({ showScrollbar: 'always' });
+                                    var grid = $('#gridreceivedbymoveticket').dxDataGrid('instance');
+                                    var keys = grid.getSelectedRowKeys();
+                                    //console.log(arrputdata.length);
+                                    sumarr = [];
+                                    //$.each(arrputdata, function (item, value) {
+                                    //    sumarr.push(value.FGQty);
+                                    //    //for (var i = 0; i < value.length; i++) {
+
+                                    //    //}
+
+                                    //});
+                                    //console.log(sumarr);
+                                    //console.log(sumarr.reduce((a, b) => a + b, 0));
+                                //    if (e.element.find(".dx-header-row").find(".dx-datagrid-column-chooser-button").length == 0) {
+                                //        e.element.find(".dx-datagrid-column-chooser-button").appendTo(e.element.find(".dx-header-row > .destinationColumn").text(" Total: " + sumarr.reduce((a, b) => a + b, 0)));
+                                //}
+                                    //e.element.find(".dx-datagrid-total-footer")
+                                    //    .css("border-top", 0)
+                                    //    .css("border-bottom", "1px solid #d3d3d3")
+                                    //    .insertBefore(e.element.find(".dx-datagrid-rowsview"))                                      
+                                    //    .text(" Total: " + sumarr.reduce((a, b) => a + b, 0));
+                                    //console.log(e.element.find('.dx-datagrid-summary-item'));
+                                    //$('#gridreceivedbymoveticket .dx-datagrid-summary-item ').replaceWith(function () {
+                                    //    return e.element.find('.dx-datagrid-summary-item').text(" Total: " + sumarr.reduce((a, b) => a + b, 0)); // this.outerHTML.replace('|||', '<br/>');
+                                    //});
+                                    //console.log(keys);
+                                    //for (var i = 0; i < keys.length; i++) {
+                                    //    console.log(grid.getKeyByRowIndex(i));
+                                    //}
+                                    
+                                    
+                                    if (keys.length > 0) {
+                                       // arritem = [];
+                                        arritem=keys;
+                                    }
+
+                                    //if (keys.length > 0) {
+                                    //    arritem = keys;
+                                    //    $.each(keys, function (item, value) {//on select one by one or select all 
+                                    //        //console.log(item + '=>' + keys[item] + '=>' + grid.getRowIndexByKey(keys[item]) + '=>' + value.QtyLot);
+                                    //        grid.cellValue(grid.getRowIndexByKey(keys[item]), 'FGQty', value.QtyLot);
+                                    //    });
+                                    //}
+                                   //console.log(e.component.selectRowsByIndexes([0]));                               
+
+                            },
+                            //contentReadyAction: function (e) {
+                            //    $checkBox = $('.dx-header-row .dx-checkbox').first();
+                            //    $checkBox.off('dxclick.MyNamespace');
+                            //    $checkBox.on('dxclick.MyNamespace', function () {
+                            //        alert($checkBox.dxCheckBox('instance').option('value'));
+                            //    });
+                            //}
+                        });
+                    },
+                        onHiding: function (options) {
+                           
+                           var grid = $('#gridContainer').dxDataGrid('instance');
+                            var gridInpopup = $('#gridreceivedbymoveticket').dxDataGrid('instance');
+                            
+                            //$.each(arrputdata, function (item, value) {
+                            //    console.log(item);
+                            //    gridInpopup.cellValue(item, 'FGQty', 0);
+                            //});
+                            //gridInpopup.cellValue(grid.getRowIndexByKey(keys[item]), 'FGQty', value.QtyLot);
+                            arrputdata = [];
+                           gridInpopup.refresh();
+                           grid.refresh();
+                    }
+
+                }).dxPopup('instance').option('visible', true);
+
+    }
+
+    $("gridContainer_details").dxDataGrid({
+        summary: {
+            totalItems: [{
+                column: "QtyLot",
+                summaryType: "sum",
+                valueFormat: "#,##0",
+                displayFormat: "Total: {0}"
+            }
+                , {
+                column: "FGQty",
+                name: "SelectedRowsSummary",
+                summaryType: "sum",
+                valueFormat: "#,##0",
+                displayFormat: "Total: {0}",
+                //customizeText: function (data) {
+
+                //    return "Total: " + sumFGQtymasterdetail.reduce((a, b) => a + b, 0);
+                //}
+            }
+
+            ],
+
+        }
+    });
+</script>
+
+@(Html.DevExtreme().Popup()
+                        .Position(po => po.My(HorizontalAlignment.Center, VerticalAlignment.Center)
+                        .At(HorizontalAlignment.Center, VerticalAlignment.Center)
+                        .Of(new JS("window"))).ID("EditPopup").Title("Edit Delivery Note.").Visible(false)
+                              .ElementAttr("class", "popup")
+                                .ContentTemplate(new TemplateName("Edit"))
+)
+
+@using (Html.DevExtreme().NamedTemplate("Edit"))
+{
+    @await Html.PartialAsync("_Edit")
+}
+
+@(Html.DevExtreme().DataGrid<MCP_WEB.Models.VW_MFC_ReceiptbyMoveTicket>()
+                                    .ID("gridContainer")
+                                    .ShowBorders(true)
+                                    //.OnInitialized("function(e) { onInitialized(e, data);  }")
+                                    .OnCellPrepared("oncellperparedgridIndex")
+                                    .OnContentReady("oncontentready")
+                                    //.OnSelectionChanged("onSelectionChanged")                                    
+                                    .Export(e => e.Enabled(true)
+                                                .FileName("ReceiptbyMoveticket-" + DateTime.Now)
+                                                .AllowExportSelectedData(true)
+                                    )
+                                    //.OnToolbarPreparing("toolbar_preparing")
+                                    .ColumnChooser(c => c.Enabled(true))
+                                    .AllowColumnResizing(true)
+                                    //.RemoteOperations(true)
+                                    .ShowRowLines(true)
+                                    .AllowColumnReordering(true)
+                                    .ColumnHidingEnabled(true)
+                                    .ColumnAutoWidth(true)
+                                    .ColumnMinWidth(100)
+                                    .Selection(s => s.Mode(SelectionMode.Multiple)
+                                        .ShowCheckBoxesMode(GridSelectionShowCheckBoxesMode.Always)
+                                        .SelectAllMode(SelectAllMode.Page)
+                                        )
+
+                                    .HoverStateEnabled(true)
+                                    .RowAlternationEnabled(true)
+                                    .Paging(paging => paging.PageSize(10))
+                                    .Pager(p => p
+                                    .AllowedPageSizes(new int[] { 10, 25, 50, 100 })
+                                    .ShowInfo(true)
+                                    .ShowNavigationButtons(true)
+                                    .ShowPageSizeSelector(true)
+                                    .Visible(true))
+
+                                    .DataSource(d => d.Mvc().Controller("DataGridReceiptByMoveTicket").LoadAction("Get"))
+
+                                    .FilterPanel(f => f.Visible(true))
+                                    .HeaderFilter(h => h.Visible(true))
+                                    //.FilterValue(filterValue)
+                                    .FilterRow(filterRow => filterRow
+                                            .Visible(true)
+                                            .ApplyFilter(GridApplyFilterMode.Auto)
+                                            )
+
+                                    .SearchPanel(searchPanel => searchPanel
+                                        .Visible(true)
+                                        .Width(240)
+                                        .Placeholder("Search...")
+                                    )
+                                    .Grouping(grouping => grouping.AutoExpandAll(true))
+                                    .GroupPanel(groupPanel => groupPanel.Visible(true))
+                                    .Columns(columns =>
+                                    {
+                                        columns.Add().Caption("Edit").Width(50).Alignment(HorizontalAlignment.Center)
+                                               .CellTemplate(new JS("cellTemplate")).AllowExporting(false);
+                                        columns.Add().DataField("DeliveryNote").SortOrder(SortOrder.Asc);
+                                        columns.Add().DataField("StatusDelivery").Visible(false).ShowInColumnChooser(true);
+                                        columns.Add().DataField("Model");
+                                        columns.Add().DataField("MoveTicket").SortOrder(SortOrder.Asc);
+                                        columns.Add().DataField("StatusMT");
+                                        columns.Add().DataField("MTQty");
+                                        columns.Add().DataField("BoxQty");
+                                        columns.Add().DataField("ExcessQty");
+                                        columns.Add().DataField("FGQty");
+                                        columns.Add().DataField("FGBoxQty");
+                                        columns.Add().DataField("FGExcessQty");
+
+                                    }) // end .Columns
+
+                                .Paging(paging => paging.PageSize(10))
+                                .Pager(p => p
+                                .AllowedPageSizes(new int[] { 10, 25, 50, 100 })
+                                .ShowInfo(true)
+                                .ShowNavigationButtons(true)
+                                .ShowPageSizeSelector(true)
+                                .Visible(true))
+                                     .Summary(s =>
+                                     s.TotalItems(items =>
+                                     {
+
+                                         items.AddFor(m => m.MTQty)
+                                          .SummaryType(SummaryType.Sum)
+                                          .Name("MTQty")
+                                          .ValueFormat(Format.Decimal).ValueFormat("#,##0").DisplayFormat("Total: {0}");
+
+                                         items.AddFor(m => m.BoxQty)
+                                          .SummaryType(SummaryType.Sum)
+                                          .Name("BoxQty")
+                                          .ValueFormat(Format.Decimal).ValueFormat("#,##0").DisplayFormat("Total: {0}");
+
+                                         items.AddFor(m => m.ExcessQty)
+                                         .SummaryType(SummaryType.Sum)
+                                         .Name("ExcessQty")
+                                         .ValueFormat(Format.Decimal).ValueFormat("#,##0").DisplayFormat("Total: {0}");
+
+                                         items.AddFor(m => m.FGQty)
+                                         .SummaryType(SummaryType.Sum)
+                                         .Name("FGQty")
+                                         .ValueFormat(Format.Decimal).ValueFormat("#,##0").DisplayFormat("Total: {0}");
+
+                                         items.AddFor(m => m.FGBoxQty)
+                                        .SummaryType(SummaryType.Sum)
+                                        .Name("FGBoxQty")
+                                        .ValueFormat(Format.Decimal).ValueFormat("#,##0").DisplayFormat("Total: {0}");
+
+                                         items.AddFor(m => m.FGExcessQty)
+                                        .SummaryType(SummaryType.Sum)
+                                        .Name("FGExcessQty")
+                                        .ValueFormat(Format.Decimal).ValueFormat("#,##0").DisplayFormat("Total: {0}");
+
+                                     }
+                                     )
+                                     @*.CalculateCustomSummary(@<text>
+                                            function (options) {
+                                                 if (options.name == "BoxQty") {
+                                                    if (options.summaryProcess == "start") {
+                                                        options.totalValue = 0;
+                                                    }
+                                                    if (options.summaryProcess == "calculate") {
+                                                        if (options.value) {
+                                                            options.totalValue += options.value["BoxQty"];
+                                                        }
+                                                    }
+                                                }
+                                            }
+                                        </text>)*@
+                                     )
+                                .MasterDetail(md =>
+                                {
+                                    md.Enabled(true);
+                                    md.Template(@<text>@(Html.DevExtreme().DataGrid<MCP_WEB.Models.VW_MFC_ReceiptbyMoveTicket_Detail>()
+                                        .ID("gridContainer_details")
+                                         .ShowRowLines(true)
+                                          .AllowColumnResizing(true)
+                                          .AllowColumnReordering(true)
+                                          .Paging(paging => paging.PageSize(10))
+                                            .Pager(p => p
+                                            .AllowedPageSizes(new int[] { 10, 25, 50, 100 })
+                                            .ShowInfo(true)
+                                            .ShowNavigationButtons(true)
+                                            .ShowPageSizeSelector(true)
+                                            .Visible(true))
+                                         .Selection(s => s.Mode(SelectionMode.Multiple)
+                                         .ShowCheckBoxesMode(GridSelectionShowCheckBoxesMode.Always)
+                                         .SelectAllMode(SelectAllMode.Page)
+                                         )
+                                         .Export(e => e.Enabled(true)
+                                         .FileName("ReceiptbyMoveTicket_LOT-" + DateTime.Now)
+                                         .AllowExportSelectedData(true))
+                                         .ColumnChooser(c => c.Enabled(true))
+                                         .ColumnAutoWidth(true)
+                                         .ShowBorders(true)
+                                         //.OnCellPrepared("oncellperparedmasterdetail")                                        
+                                         .Columns(columns =>
+                                         {
+                                             columns.Add().DataField("BoxNo").Caption("MT Box Runing").Width(100);
+                                             columns.Add().DataField("Barcode").Caption("Lot").Width(150);
+                                             columns.Add().DataField("QtyLot").Caption("WIP Qty").Width(80);
+                                             columns.Add().DataField("FGQty").Caption("FG Qty").Width(80);
+                                             columns.Add().DataField("MoveTicketLOTUserDef1").Caption("Reason");
+                                             columns.Add().DataField("Remarks").Caption("Remarks").Width(270).CssClass("WrappedColumnClass");
+                                             //.CellTemplate("function(container, options)){ $('< div /> ').dxTextArea({ value: options.data.Remarks, height: function() {return '300px' }}).appendTo(container);}");
+                                             //.CustomizeText("function (e) { return e.value.replace(/(?:\r\n|\r|\n)/g, '<br />'); }");
+                                             columns.Add().DataField("StatusLot").Caption("StatusLot").Visible(false).ShowInColumnChooser(true);
+
+                                })
+                                          .DataSource(d => d.Mvc()
+                                          .Controller("DataGridReceiptByMoveTicket")
+                                          .LoadAction("Getmasterdetail")
+                                          .LoadParams(new { moveticket = new JS("data.MoveTicket") })
+                                      )
+                                        .Paging(paging => paging.PageSize(10))
+                                        .Pager(p => p
+                                        .AllowedPageSizes(new int[] { 10, 25, 50, 100 })
+                                        .ShowInfo(true)
+                                        .ShowNavigationButtons(true)
+                                        .ShowPageSizeSelector(true)
+                                        .Visible(true))
+                                        //.OnContentReady("function(e){sumFGQtymasterdetail=[];}")
+                                        .Summary(s => s.TotalItems(items =>
+                                        {
+                                            //items.Add().Column("FGQty").SummaryType(SummaryType.Sum)
+                                            ////.CustomizeText("function(e){ return 'Total: ' + sumFGQtymasterdetail.reduce((a, b) => a + b, 0); }")
+                                            //.ValueFormat(Format.Decimal).ValueFormat("#,##0").DisplayFormat("Total: {0}")
+                                            //;
+
+                                            items.AddFor(m => m.QtyLot)
+                                                .SummaryType(SummaryType.Sum)
+                                                .ValueFormat(Format.Decimal).ValueFormat("#,##0").DisplayFormat("Total: {0}");
+
+                                            items.AddFor(m => m.FGQty)
+                                                .SummaryType(SummaryType.Sum)
+                                                .ValueFormat(Format.Decimal).ValueFormat("#,##0").DisplayFormat("Total: {0}");
+
+
+                                        }))
+
+                )</text>);
+
+  })
+
+
+
+)
+
+<script>
+    //$('#gridContainer').dxDataGrid({
+    //    onCellPrepared: function (e) {
+    //        if (e.rowType === "data" && e.column.dataField === "MTQty" && e.rowIndex != undefined) {
+    //            sumMTQty.push(e.data.MTQty);
+    //        }
+    //    },
+    //    onContentReady: function (e) {
+    //        var gridItems = $("#gridContainer").dxDataGrid('instance');
+
+    //        var total1 = sumMTQty.reduce((a, b) => parseFloat(a) + parseFloat(b), 0);
+
+    //        sumMTQty = [];
+    //        //var total2 = sumTRIN.reduce((a, b) => parseFloat(a) + parseFloat(b), 0);
+    //        //var total3 = sumTROUT.reduce((a, b) => parseFloat(a) + parseFloat(b), 0);
+    //        //var total4 = sumQtyMove.reduce((a, b) => parseFloat(a) + parseFloat(b), 0);
+    //        console.log(e);
+    //        //var summaryCells = e.component.getController('data').footerItems()[0].summaryCells;
+
+    //        //$.each(summaryCells, function (item, value) {
+    //        //    if (value.length > 0) {
+    //        //        var name = value[0].name;
+    //        //        if (name == "BF") {
+    //        //            gridItems.getController('MTQty').footerItems()[0].summaryCells[item][0].value = total1;
+    //        //        }
+
+    //        //        gridItems.getView('footerView').render();
+    //        //    }
+
+    //        //});
+    //        //NotSelection(gridItems);
+    //    },
+    //    //summary: {
+    //    //    calculateCustomSummary: function (options) {
+    //    //        if (options.name == "MTQty") {
+    //    //            if (options.summaryProcess == "start") {
+    //    //                options.totalValue = 0;
+    //    //            }
+    //    //            if (options.summaryProcess == "calculate") {
+    //    //                if (options.value) {
+    //    //                    options.totalValue += options.value["MTQty"];
+    //    //                }
+    //    //            }
+    //    //        }
+    //    //    },
+    //    //    //totalItems: [{
+    //    //    //    column: "StatusMT",
+    //    //    //    alignment: "right",
+    //    //    //    customizeText: function (data) {
+    //    //    //        return "Total:";
+    //    //    //    }
+    //    //    //}, {
+    //    //    //    showInColumn: "MTQty",
+    //    //    //    name: "MTQty",
+    //    //    //    summaryType: "custom",
+    //    //    //    alignment: "right",
+    //    //    //    valueFormat: "#,##0",
+    //    //    //}]
+                
+    //    //}
+
+    //});
+
+    //function custom(options) {
+    //    if (options.name == "MTQty") {
+    //        if (options.summaryProcess == "start") {
+    //            options.totalValue = 0;
+    //        }
+    //        if (options.summaryProcess == "calculate") {
+    //            if (options.value) {
+    //                options.totalValue += options.value["MTQty"];
+    //            }
+    //        }
+    //    }
+    //}
+
+    function oncellperparedmasterdetail(cellElement, cellInfo) {
+
+        if (cellElement.rowType === "data" && cellElement.column.dataField === "Remarks" && cellElement.rowIndex != undefined) {
+            //cellElement.data.Remarks.replace(/(?:\r\n|\r|\n)/g, '<br>');
+            //console.log(e);
+            //cellElement.addClass('white-space-pre');
+            var display = "cZXcZaddcZXcZ\naddcZXcZadd";
+            
+            //display = display.replace('\n', '<br />');
+            display = display.replace(new RegExp('\r?\n', 'g'), '<br />');
+            //cellElement.cellElement.html(display);
+            
+            //cellElement.style.fontWeight = "bold";
+            //cellElement.cellElement.addClass({ white-space: pre-wrap; })
+            //cellElement.cellElement.addClass('dx-user-name-cell');
+            //text - overflow: ellipsis;
+           //cellElement.cellElement.css("word-wrap",'break-word');
+            //console.log(cellElement.cellElement.css);
+        }
+
+        //if (e.rowType === "data" && e.column.dataField === "FGQty" && e.data.StatusLot === 'Shipped' && e.rowIndex != undefined) {
+        //    var grid = $('#gridContainer_details').dxDataGrid('instance');
+        //    var rowindex = e.row.rowIndex;
+        //    var fieldHtml  = e.data.QtyLot;
+        //    sumFGQtymasterdetail.push(fieldHtml);
+        //    e.cellElement.html(fieldHtml);
+           
+        //}
+    }
+    function oncontentready(e) {
+        var gridItems = $("#gridContainer").dxDataGrid('instance');
+
+        var total1 = sumMTQty.reduce((a, b) => parseFloat(a) + parseFloat(b), 0);
+        var total2 = sumBoxQty.reduce((a, b) => parseFloat(a) + parseFloat(b), 0);
+        var total3 = sumExcessQty.reduce((a, b) => parseFloat(a) + parseFloat(b), 0);
+        var total4 = sumFGQty.reduce((a, b) => parseFloat(a) + parseFloat(b), 0);
+        var total5 = sumFGBoxQty.reduce((a, b) => parseFloat(a) + parseFloat(b), 0);
+        var total6 = sumFGExcessQty.reduce((a, b) => parseFloat(a) + parseFloat(b), 0);
+        
+        //console.log(total1);
+        var summaryCells = e.component.getController('data').footerItems()[0].summaryCells;
+        sumMTQty = [];
+        sumBoxQty = [];
+        sumExcessQty = [];
+        sumFGQty = [];
+        sumFGBoxQty = [];
+        sumFGExcessQty = [];
+
+         $.each(summaryCells, function (item, value) {
+                if (value.length > 0) {
+                    var name = value[0].name;
+                    if (name == "MTQty") {
+                        gridItems.getController('data').footerItems()[0].summaryCells[item][0].value = total1;
+                    }
+                    if (name == "BoxQty") {
+                        gridItems.getController('data').footerItems()[0].summaryCells[item][0].value = total2;
+                    }
+                    if (name == "ExcessQty") {
+                        gridItems.getController('data').footerItems()[0].summaryCells[item][0].value = total3;
+                    }
+                    if (name == "FGQty") {
+                        gridItems.getController('data').footerItems()[0].summaryCells[item][0].value = total4;
+                    }
+                    if (name == "FGBoxQty") {
+                        gridItems.getController('data').footerItems()[0].summaryCells[item][0].value = total5;
+                    }
+                    if (name == "FGExcessQty") {
+                        gridItems.getController('data').footerItems()[0].summaryCells[item][0].value = total6;
+                    }
+                    gridItems.getView('footerView').render();
+                }
+
+            });
+            NotSelection(gridItems);
+        //console.log(e);
+       
+    }
+
+    function oncellperparedgridIndex(e) {
+        //console.log(e); 
+        if (e.rowType === "data" && e.column.dataField === "MTQty" && e.rowIndex != undefined) {
+            sumMTQty.push(e.data.MTQty);
+        }
+        if (e.rowType === "data" && e.column.dataField === "BoxQty" && e.rowIndex != undefined) {
+            sumBoxQty.push(e.data.BoxQty);
+        }
+        if (e.rowType === "data" && e.column.dataField === "ExcessQty" && e.rowIndex != undefined) {
+            sumExcessQty.push(e.data.ExcessQty);
+        }
+        if (e.rowType === "data" && e.column.dataField === "FGQty" && e.rowIndex != undefined) {
+            sumFGQty.push(e.data.FGQty);
+        }
+        if (e.rowType === "data" && e.column.dataField === "FGBoxQty" && e.rowIndex != undefined) {
+            sumFGBoxQty.push(e.data.FGBoxQty);
+        }
+        if (e.rowType === "data" && e.column.dataField === "FGExcessQty" && e.rowIndex != undefined) {
+            sumFGExcessQty.push(e.data.FGExcessQty);
+        }
+
+        //console.log(e);
+        //if (e.rowType === "data" && e.column.command === 'select' && e.data.StatusMT !== 'Packed') { ปิดการใช้งานcheckbox ที่ statusmt ไม่เท่ากับ Packed
+        //    var instance = e.cellElement.find('.dx-select-checkbox').dxCheckBox("instance");
+        //    instance.option("visible", false);
+        //    e.cellElement.off();
+        //}
+    }
+
+</script>

@@ -1,0 +1,512 @@
+﻿@model MCP_WEB.Models.ReportingProcess
+
+<style>
+
+    .set-padding-left {
+        padding-right: 0px;
+        padding-left: 2px;
+        margin-top: 10px;
+        margin-bottom: 10px;
+    }
+
+    .set-padding-right {
+        padding-right: 2px;
+        padding-left: 0px;
+        margin-top: 10px;
+        margin-bottom: 10px;
+    }
+
+    .no-padding {
+        padding-right: 0px;
+        padding-left: 0px;
+        margin-top: 10px;
+        margin-bottom: 10px;
+    }
+
+    body {
+        font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+        font-size: 14px;
+        line-height: 1.2;
+        color: #333;
+        background-color: #fff;
+    }
+
+    /*Iphone6/7/8 Plus*/
+    @@media only screen and (max-width : 420px) {
+        .set-padding-left {
+            padding-right: 0px;
+            padding-left: 2px;
+            margin-top: 8px;
+            margin-bottom: 8px;
+        }
+
+        .set-padding-right {
+            padding-right: 2px;
+            padding-left: 0px;
+            margin-top: 8px;
+            margin-bottom: 8px;
+        }
+
+        .no-padding {
+            padding-right: 0px;
+            padding-left: 0px;
+            margin-top: 8px;
+            margin-bottom: 8px;
+        }
+
+        body {
+            font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+            font-size: 14px;
+            line-height: 1.3;
+            color: #333;
+            background-color: #fff;
+        }
+    }
+
+    /*Iphone6/7/8*/
+    @@media only screen and (max-width : 375px) {
+        .set-padding-left {
+            padding-right: 0px;
+            padding-left: 2px;
+            margin-top: 8px;
+            margin-bottom: 8px;
+        }
+
+        .set-padding-right {
+            padding-right: 2px;
+            padding-left: 0px;
+            margin-top: 8px;
+            margin-bottom: 8px;
+        }
+
+        .no-padding {
+            padding-right: 0px;
+            padding-left: 0px;
+            margin-top: 8px;
+            margin-bottom: 8px;
+        }
+
+        body {
+            font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+            font-size: 14px;
+            line-height: 0.8;
+            color: #333;
+            background-color: #fff;
+        }
+    }
+
+    /*Iphone5*/
+    @@media only screen and (max-width : 330px) {
+        .set-padding-left {
+            padding-right: 0px;
+            padding-left: 2px;
+            margin-top: 0px;
+            margin-bottom: 0px;
+        }
+
+        .set-padding-right {
+            padding-right: 2px;
+            padding-left: 0px;
+            margin-top: 0px;
+            margin-bottom: 0px;
+        }
+
+        .no-padding {
+            padding-right: 0px;
+            padding-left: 0px;
+            margin-top: 0px;
+            margin-bottom: 0px;
+        }
+
+        body {
+            font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+            font-size: 14px;
+            line-height: 1.0;
+            color: #333;
+            background-color: #fff;
+        }
+    }
+
+    .content {
+        min-height: 250px;
+        padding: 0px;
+        margin-right: auto;
+        margin-left: auto;
+        padding-left: 0px;
+        padding-right: 0px;
+    }
+
+    .padding-top {
+        padding-top: 5px;
+    }
+
+
+    .no-margin-bottom {
+        margin-bottom: 0px;
+    }
+
+    label {
+        display: contents;
+        max-width: 100%;
+        margin-bottom: 5px;
+        font-weight: bold;
+        font-size: x-small;
+    }
+
+    .set-background-readonly {
+        background-color: #bfbfbf;
+    }
+</style>
+
+@{
+    ViewData["Title"] = "Index";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="container">
+    <div class='row'>
+        <div class='col-md-12'>
+            @*<form>*@
+            <div style="margin:0;padding:0;display:inline"><input name="utf8" type="hidden" value="✓" /><input name="_method" type="hidden" value="PUT" /><input name="authenticity_token" type="hidden" value="qLZ9cScer7ZxqulsUWazw4x3cSEzv899SP/7ThPCOV8=" /></div>
+
+            <input type="hidden" name="ProcessText" id="ProcessText" value="@ViewBag.ProcessText" />
+            <input type="hidden" name="OperationNo" id="OperationNo" value="@Model.OperationNo" />
+
+            <div class="form-row">
+                <div class="col-xs-6 form-group set-padding-right">
+                    <label class="control-label" for="Barcode">Serial Lot No.</label>
+                    <input type="text" class="input-sm form-control cke_required" id="Barcode" name="Barcode" placeholder="Scan Barcode" value="@Model.Barcode">
+                </div>
+                <div class="col-xs-6 form-group date set-padding-left">
+                    <label class="control-label" for="GetDate">Date</label>
+                    <input type="text" class="input-sm form-control" id="txtGetDate" name="GetDate">
+                </div>
+            </div>
+
+            <div class="form-row">
+                <div class="col-xs-6 form-group set-padding-right">
+                    <label class="control-label" for="Model">Model</label>
+                    <input type="text" readonly="readonly" class="input-sm form-control set-background-readonly" id="Model" name="Model" value="@Model.Model">
+                </div>
+                <div class="col-xs-6 form-group set-padding-left">
+                    <label class="control-label" for="ShiftID">Shift</label>
+                    <select name="ShiftID" id="ShiftID"
+                            asp-items="@ViewBag.ShiftList" class="input-sm form-control"></select>
+                </div>
+            </div>
+
+            <div class="form-row">
+                <div class="col-xs-6 form-group set-padding-right">
+                    <label class="control-label" for="Material1">Mat#1</label>
+                    <input type="text" readonly="readonly" class="input-sm form-control" id="Material1" name="Material1" value="@Model.Material1">
+                </div>
+                <div class="col-xs-3 form-group set-padding-left">
+                    <label class="control-label" for="MachineCode">M/C</label>
+                    <select name="MachineCode" id="MachineCode"
+                            asp-items="@ViewBag.MachineList" class="input-sm form-control">
+                        <option></option>
+                    </select>
+                </div>
+                <div class="col-xs-3 form-group  no-padding">
+                    <label class="control-label" for="PStatus">Status</label>
+                    <input type="text" class="input-sm form-control" readonly="readonly" id="PStatus" name="PStatus" value="@Model.PStatus">
+                </div>
+            </div>
+
+            <div class="form-row">
+                <div class="col-xs-6 form-group set-padding-right">
+                    <label class="control-label" for="Material2">Mat#2</label>
+                    <input type="text" class="input-sm form-control" readonly="readonly" id="Material2" name="Material2" value="@Model.Material2">
+                </div>
+                <div class="col-xs-6 form-group set-padding-left">
+                    <label class="control-label" for="OrderQty">Order Qty</label>
+                    <input type="text" class="input-sm form-control" readonly="readonly" id="OrderQty" name="OrderQty" value="@Model.QtyOrder">
+                </div>
+            </div>
+
+            <div class="form-row">
+                <div class="col-md-6 col-xs-6  form-group form-group-sm set-padding-right">
+                    <label class="control-label" for="PreProcess">Pre-Process</label>
+                    <input type="text" class="input-sm form-control" readonly="readonly" id="PreProcess" name="PreProcess">
+                </div>
+                <div class="col-md-3 col-xs-3 form-group set-padding-left">
+                    <label class="control-label" for="QtyComplete">Acc ProQty</label>
+                    <input type="text" class="input-sm form-control" readonly="readonly" id="QtyComplete" name="QtyComplete" value="@Model.QtyComplete">
+                </div>
+                <div class="col-md-3 col-xs-3 form-group no-padding">
+                    <label class="control-label" for="QtyNG">NG</label>
+                    <input type="text" class="input-sm form-control" readonly="readonly" id="QtyNG" name="QtyNG" value="@Model.QtyNG">
+                </div>
+            </div>
+
+            <div class="form-row">
+                <div class="col-md-3 col-xs-3 form-group form-group-sm no-padding">
+                    <label class="control-label" for="PPQtyComplete">Pre-Qty OK</label>
+                    <input type="text" class="form-control input-sm" readonly="readonly" id="PPQtyComplete" name="PPQtyComplete" value="@Model.PPQtyComplete">
+                </div>
+
+                <div class="col-xs-3 form-group set-padding-right">
+                    <label class="control-label" for="PPQtyNG">NG</label>
+                    <input type="text" class="form-control input-sm" readonly="readonly" id="PPQtyNG" name="PPQtyNG" value="@Model.PPQtyNG">
+                </div>
+                <div class="col-xs-6 form-group set-padding-left">
+                    <label class="control-label" for="QtyNC">NC</label>
+                    <input type="text" class="form-control input-sm" readonly="readonly" id="QtyNC" name="QtyNC" value="@Model.QtyNC">
+                </div>
+            </div>
+
+            <div class="form-row">
+                <div class="col-md-3 col-xs-3 form-group form-group-sm no-padding">
+                    <label class="control-label" for="TOQtyComplete">Trans-Out Qty</label>
+                    <input type="text" class="form-control input-sm form-control" readonly="readonly" id="TOQtyComplete" name="TOQtyComplete" value="@Model.TOQtyComplete">
+                </div>
+                <div class="col-md-3 col-xs-3 form-group form-group-sm set-padding-right">
+                    <label class="control-label" for="TOQtyNG">NG</label>
+                    <input type="text" class="form-control input-sm form-control" readonly="readonly" id="TOQtyNG" name="TOQtyNG" value="@Model.TOQtyNG">
+                </div>
+                <div class="col-md-3 col-xs-3 form-group  form-group-sm set-padding-left">
+                    <label class="control-label" for="ProQtyOK">ProQty OK</label>
+                    <input type="text" class="form-control input-sm form-control" name="ProQtyOK" id="ProQtyOK">
+                </div>
+                <div class="col-md-3 col-xs-3 form-group form-group-sm no-padding">
+                    <label class="control-label" for="ProQtyNg">NG</label>
+                    <input type="text" class="form-control input-sm form-control" id="ProQtyNg" name="ProQtyNg">
+                </div>
+            </div>
+
+            <div class='form-row'>
+                <div class='col-lg-4 col-xs-4 form-group form-group-sm padding-top'>
+                    @*<button method="POST" asp-action="Confirm" class='form-control btn btn-primary submit-button btn-xs' type='submit' id="myButton">Confirm</button>*@
+                    <button class='form-control btn btn-primary submit-button btn-xs' type='button' name="btnConfirm" id="btnConfirm">Confirm</button>
+                </div>
+                <div class='col-lg-4 col-xs-4 form-group form-group-sm padding-top'>
+                    <button class='form-control btn btn-success submit-button btn-xs' type='submit' name="btnSave" id="btnSave">Save</button>
+                </div>
+                <div class='col-lg-4 col-xs-4 form-group form-group-sm padding-top'>
+                    <button class='form-control btn btn-warning submit-button btn-xs' type='submit' name="btnCancle" id="btnCancle">Cancel</button>
+                </div>
+            </div>
+            <div class="form-row hidden">
+                @*<button method="post" asp-action="Scan" class='form-control btn btn-primary submit-button btn-xs' type='submit' id="btnScan">Scan</button>*@
+            </div>
+            @*</form>*@
+
+        </div>
+
+    </div>
+    <div class='col-md-4'></div>
+</div>
+
+@*Error Popup*@
+@(Html.DevExtreme().Popup().ID("ErrPopup").Title("Information Message").Visible(false)
+                                    .ElementAttr("class", "popup")
+                                    .DragEnabled(false)
+                                    .CloseOnOutsideClick(true)
+                                    .ResizeEnabled(true)
+                                    .MaxHeight(200)
+                                    .MaxWidth(500)
+                                    .OnHidden(@<text>function(){
+                                         setFocusToTextBox();
+                                        }</text>)
+                                    .ContentTemplate(new TemplateName("SqlExceptionTemplate"))
+)
+
+@using (Html.DevExtreme().NamedTemplate("SqlExceptionTemplate"))
+{
+    @await Html.PartialAsync("_SqlException")
+}
+
+@*Confirm Popup*@
+@(Html.DevExtreme().Popup().ID("ConfirmPopup").Title("Confirm Message").Visible(false)
+                                    .ElementAttr("class", "popup")
+                                    .DragEnabled(false)
+                                    .CloseOnOutsideClick(true)
+                                    .ResizeEnabled(true)
+                                    .MaxHeight(200)
+                                    .MaxWidth(500)
+                                    .OnHidden(@<text>function(){
+                                        setFocusToTextBox();
+                                        }</text>)
+                                    .ContentTemplate(new TemplateName("ConfirmTemplate"))
+)
+
+@using (Html.DevExtreme().NamedTemplate("ConfirmTemplate"))
+{
+    @await Html.PartialAsync("_ConfirmMsg")
+}
+
+<script>
+    //Onload
+        $(document).ready(function () {
+        setFocusToTextBox();
+        var f = "@(ViewBag.GlobalDtFormat)";
+        var d = Globalize.formatDate(new Date(), { raw: f });
+        document.getElementById("txtGetDate").value = d;
+    });
+
+    //Set default shift id
+    $("#ShiftID").val(@ViewBag.ShiftDefault);
+        
+    //Confirm button
+    $('#btnConfirm').click(function () {
+        $('#ConfirmPopup').dxPopup('instance').option('visible', true);
+        $('#Confirmdesc').html("Confirm Yes/No ?");
+    });
+    
+    //Save button
+    $('#btnSave').click(function () {
+        var processtext = "@(ViewBag.ProcessText)";
+        var barcode = document.getElementById("Barcode").value.toString();
+        var operationno = $('#OperationNo').val();
+        var shiftid = $('#ShiftID').val();
+        var pstatus = "S";
+        var machinecode = $('#MachineCode').val();
+
+        var proqtyok = $('#ProQtyOK').val();
+        if (proqtyok === 0) {
+            proqtyok = 0;
+        };
+
+        var qtyng = $('#ProQtyNg').val();
+        if (qtyng === '') {
+            qtyng = 0;
+        };
+
+        //alert(operationno);
+        //alert(processtext);
+        //alert(barcode);
+        //alert(shiftid);
+        //alert(pstatus);
+        //alert(qtycomplete);
+        //alert(qtyng);
+        
+        $.ajax({
+            url: 'Confirm',
+            data: JSON.stringify({ ProcessText: processtext, Barcode: barcode, OperationNo: operationno, ShiftID: shiftid, PStatus: pstatus, QtyComplete: proqtyok, QtyNG: qtyng, MachineCode: machinecode }),
+            dataType: 'json',
+            type: "Post",
+            contentType: "application/json; charset=utf-8",
+            success: function (obj) {
+
+                if (obj.SqlStatus === "OK") {
+                    $('#ErrPopup').dxPopup('instance').option('visible', true);
+                    $('#desc').html("Save Success");
+
+                    $('#ProQtyOK').val("");
+                    $('#ProQtyNg').val("");
+
+                    scan();
+                 }
+                else {
+                    $('#ErrPopup').dxPopup('instance').option('visible', true);
+                    $('#desc').html(obj.SqlErrtext);
+                }
+            },
+            error: function (xhr, status, error) {
+                alert(xhr.responseText);
+                alert(status);
+                alert(error);
+            }
+        });
+    });
+
+    //Cancle button
+    $('#btnCancle').click(function () {
+        ClearScreen();
+    });
+
+    //Scan barcode
+    $("#Barcode").keyup(function (event) {
+        if (event.keyCode === 13) {
+            scan();
+        }
+    });
+
+    function scan() {
+            var processtext = "@(ViewBag.ProcessText)";
+            var barcode = document.getElementById("Barcode").value.toString();
+
+            $.ajax({
+                url: 'Scan',
+                data: JSON.stringify({ ProcessText: processtext, Barcode: barcode }),
+                dataType: 'json',
+                type: "Post",
+                contentType: "application/json; charset=utf-8",
+                success: function (obj) {
+
+                    if (obj.SqlStatus === "OK") {
+                        $("#Barcode").val(obj.Barcode);
+                        $("#OperationNo").val(obj.OperationNo);
+                        $("#Model").val(obj.Model);
+                        //$("#ShiftID").val(obj.ShiftID);
+                        $("#Material1").val(obj.Material1);
+                        $("#MachineCode").val(obj.MachineCode);
+                        $("#PStatus").val(obj.PStatus);
+                        $("#Material2").val(obj.Material2);
+                        $("#OrderQty").val(obj.QtyOrder);
+                        $("#PreProcess").val(obj.PreProcess);
+                        $("#QtyComplete").val(obj.QtyComplete);
+                        $("#QtyNG").val(obj.QtyNG);
+                        $("#PPQtyComplete").val(obj.PPQtyComplete);
+                        $("#PPQtyNG").val(obj.PPQtyNG);
+                        $("#QtyNC").val(obj.QtyNC);
+                        $("#TOQtyComplete").val(obj.TOQtyComplete);
+                        $("#TOQtyNG").val(obj.TOQtyNG);
+
+                        //console.log(obj);
+
+                        setFocusToTextBox();
+                    }
+                    else {
+                        $('#ErrPopup').dxPopup('instance').option('visible', true);
+                        $('#desc').html(obj.SqlErrtext);
+
+                        ClearScreen();
+                    }
+                },
+                error: function (xhr, status, error) {
+                    alert(xhr.responseText);
+                    alert(status);
+                    alert(error);
+                }
+            });
+    };
+
+    //Focus text box
+    function setFocusToTextBox() {
+        if (document.getElementById("Barcode").value.toString() == '') {
+            document.getElementById("Barcode").focus();
+        }
+        else {
+            document.getElementById("ProQtyOK").focus();
+        }
+    };
+
+    //Clear 
+    function ClearScreen() {
+        $("#Barcode").val("");
+        $("#Model").val("");
+        //$("#ShiftID").val(obj.ShiftID);
+        $("#Material1").val("");
+        $("#MachineCode").val("");
+        $("#PStatus").val("");
+        $("#Material2").val("");
+        $("#OrderQty").val("");
+        $("#PreProcess").val("");
+        $("#QtyComplete").val("");
+        $("#QtyNG").val("");
+        $("#PPQtyComplete").val("");
+        $('#ProQtyOK').val("");
+        $("#PPQtyNG").val("");
+        $("#QtyNC").val("");
+        $("#TOQtyComplete").val("");
+        $("#TOQtyNG").val("");
+        
+        var f = "@(ViewBag.GlobalDtFormat)";
+        var d = Globalize.formatDate(new Date(), { raw: f });
+        document.getElementById("txtGetDate").value = d;
+
+        setFocusToTextBox();
+    };
+
+</script>

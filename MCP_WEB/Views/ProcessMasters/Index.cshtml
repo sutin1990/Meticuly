@@ -1,0 +1,259 @@
+﻿@{
+    ViewData["Title"] = "Index";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+@*<h4>Jig Master</h4>*@
+
+<script>
+    var formatview = "";
+    function formatdatetime() {
+        var datatime = "";
+        //alert(data.value);
+        $.ajax({
+                type: 'GET',
+                url: '@Url.Action("FormatDate", "GridProcessMasters", new { httproute = true })',
+                async: false,
+                dataType: 'json',
+            success: function (result) {
+                console.log(result[0].param_value);
+                datatime = result[0].param_value;
+                    //$.each(result, function (key, value) {
+                    //    //alert(value.param_value);
+                    //    datatime = value.param_value.split("-");
+                    //    datatime = datatime[0] + "-" + datatime[1] + "-" + datatime[2].toLowerCase();
+                    //    //console.log(datatime);
+                    //});
+                }
+        });
+        return datatime;
+    }
+    formatview = formatdatetime();
+</script>
+
+@(Html.DevExtreme().DataGrid<MCP_WEB.Models.m_ProcessMaster>()
+        .ID("gridContainer")
+        .ShowBorders(true)
+        .DataSource(ds => ds.Mvc()
+            .Controller("GridProcessMaster")
+            .LoadAction("Get")
+            .InsertAction("Post")
+            .UpdateAction("Put")
+            .DeleteAction("Delete")
+            .Key("ProcessCode")
+        )
+        .ShowColumnLines(true)
+        .ShowRowLines(true)
+        .RowAlternationEnabled(true)
+        .HoverStateEnabled(true)
+        .RowAlternationEnabled(true)
+        .RemoteOperations(true)
+        .AllowColumnReordering(true)
+        .AllowColumnResizing(true)
+        .Export(e => e.Enabled(true).FileName("ProcessMaster-" + DateTime.Now).AllowExportSelectedData(true))
+        .GroupPanel(p => p.Visible(false))
+        .ColumnChooser(c => c.Enabled(true))
+        .AllowColumnResizing(true)
+        .ColumnHidingEnabled(true)
+        .ColumnAutoWidth(true)
+        .ColumnMinWidth(100)        
+        .Selection(s =>
+        {
+            s.Mode(SelectionMode.Multiple);
+
+        })
+        .Paging(paging =>
+        {
+            paging.Enabled(true);
+            paging.PageSize(10);
+        })
+        .Pager(pager =>
+        {
+            pager.ShowPageSizeSelector(true);
+            pager.AllowedPageSizes(new List<int> { 10, 25, 50, 100 });
+            pager.ShowInfo(true);
+        })
+
+        .Columns(columns =>
+        {
+
+        columns.AddFor(m => m.ProcessCode)
+        .Caption("Process Code");
+        columns.AddFor(m => m.ProcessName)
+        .Caption("Process Name");
+        columns.AddFor(m => m.SysemProcessFLag)
+        .Caption("Sysem ProcessFLag").Visible(false);
+        columns.AddFor(m => m.AllowPartialFlag)
+        .Caption("Allow PartialFlag").Visible(false);
+        columns.AddFor(m => m.TransDate)
+        .Caption("Trans Date")
+        .DataType(GridColumnDataType.DateTime)
+        .Format(ViewBag.GlobalDtFormat)
+        //.Alignment(HorizontalAlignment.Left)
+                    @*.Format(
+                        @<text>
+                    function(e){
+                    var datetime = "";
+                    if(e.value==null){
+                    datetime = "";
+                    }else{
+                    datetime = Globalize.formatDate(new Date(e.value), { raw: formatdatetime() });
+                    }
+
+                    return datetime;
+                    }
+                </text>
+                        )*@
+                    .Visible(false)
+                     ;
+                    columns.AddFor(m => m.CreateDate)
+                    .Caption("Create Date")
+                    .DataType(GridColumnDataType.DateTime)
+                    .Format(ViewBag.GlobalDtFormat)
+                    //.Alignment(HorizontalAlignment.Left)
+                    @*.CustomizeText(@<text>
+                    function(e){
+                    var datetime = "";
+                    if(e.value==null){
+                    datetime = "";
+                    }else{
+                    datetime = Globalize.formatDate(new Date(e.value), { raw: formatdatetime() });
+                    }
+
+                    return datetime;
+                    }
+                </text>)*@
+                    ;
+                    //.Format(ViewBag.GlobalDtFormat)
+                    columns.AddFor(m => m.ModifyBy)
+                    .Caption("ModifyBy");
+                    columns.AddFor(m => m.SeqNo)
+                    .Caption("SeqNo").Visible(false);
+                    columns.AddFor(m => m.ProcessUserDef1)
+                    .Caption("Process UserDef1").Visible(false);
+                    columns.AddFor(m => m.ProcessUserDef2)
+                    .Caption("Process UserDef2").Visible(false);
+
+                })
+
+        .Editing(e => e.Mode(GridEditMode.Popup)
+        .Form(f => f.CustomizeItem("customizeItem"))
+            .AllowAdding(true)
+            .AllowUpdating(true)
+            .AllowDeleting(true)
+            .UseIcons(true)
+            .Popup(p => p
+                .Title("Process Master Insert")
+                .ShowTitle(true)
+                .MaxWidth(700)
+                .MaxHeight(345)
+                .Position(pos => pos
+                    .My(HorizontalAlignment.Center, VerticalAlignment.Center)
+                    .At(HorizontalAlignment.Center, VerticalAlignment.Center)
+                    .Of(new JS("window"))
+                        )
+                )
+        )
+        .HeaderFilter(h => h.Visible(true))
+        .FilterRow(filterRow => filterRow
+            .Visible(true)
+            .ApplyFilter(GridApplyFilterMode.Auto)
+        )
+        .SearchPanel(searchPanel => searchPanel
+            .Visible(true)
+            .Width(240)
+            .Placeholder("Search...")
+        )
+        .OnContentReady(@<text>
+            function(e)
+            {moveEditColumnToLeft(e.component);}
+        </text>)
+        .OnEditingStart("OnEditingStart")
+        .OnInitNewRow(@<text>function(e) {                        
+                        onInitNewRow(e)
+                        }</text>
+    
+    )
+
+)
+
+<script>
+    var itemVisible = true;
+
+    function OnEditingStart(opts) {
+        itemVisible = false;
+        
+        //var d = Globalize.formatDate(new Date(), { raw: "yyyy-MM-dd hh:mm:ss" });
+        //opts.data.TransDate = new Date();
+        //opts.data.CreateDate = new Date();
+        
+        opts.component.columnOption("CreateDate", "allowEditing", false);
+        opts.component.columnOption("TransDate", "allowEditing", false);
+        opts.component.columnOption("ModifyBy", "allowEditing", false);
+        opts.data.ModifyBy = "@User.FindFirst("ContactName").Value";
+        if (opts.data.SysemProcessFLag == "Y") {
+            opts.component.columnOption("ProcessCode", "allowEditing", false);
+        }
+    }
+
+    function onInitNewRow(opts) {
+        itemVisible = false;
+        
+        //var d = Globalize.formatDate(new Date(), { raw: "yyyy-MM-dd hh:mm:ss" });
+        opts.data.TransDate = new Date();
+        opts.data.CreateDate = new Date();
+        opts.component.columnOption("CreateDate", "allowEditing", false);
+        opts.component.columnOption("TransDate", "allowEditing", false);
+        opts.component.columnOption("ModifyBy", "allowEditing", false);
+        opts.data.ModifyBy = "@User.FindFirst("ContactName").Value";
+        console.log(opts);
+    }
+
+    function onEditingStart(opts) {
+        itemVisible = true;
+    }
+
+    function moveEditColumnToLeft(dataGrid) {
+        dataGrid.columnOption("command:edit", {
+            visibleIndex: -1
+        });
+    }
+
+
+    function customizeItem(item) {
+        if (item.dataField == "SysemProcessFLag") {
+            item.visible = itemVisible;
+        }
+
+        if (item.dataField == "AllowPartialFlag") {
+            item.visible = itemVisible;
+        }
+
+        if (item.dataField == "SeqNo") {
+            item.visible = itemVisible;
+        }
+
+        if (item.dataField == "ProcessUserDef1") {
+            item.visible = itemVisible;
+        }
+
+        if (item.dataField == "ProcessUserDef2") {
+            item.visible = itemVisible;
+        }
+
+        //if (item.dataField == "CreateDate") {
+        //    item.visible = itemVisible;
+        //}
+
+        //if (item.dataField == "TransDate") {
+        //    item.visible = itemVisible;
+        //}
+
+        //if (item.dataField == "ModifyBy") {
+        //    item.visible = itemVisible;
+        //}
+    }
+
+    
+
+</script>

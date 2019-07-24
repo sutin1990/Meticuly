@@ -1,0 +1,56 @@
+﻿
+<div class="h4">AJAX Select list</div>
+
+<div class="container">
+    <div class="row col-xs-12 form-group">
+        <label class="control-label" for="MachineCode">M/C</label>
+        <select name="MachineCode" id="MachineCode"
+                asp-items="@ViewBag.MachineList" class="input-sm form-control">
+            <option></option>
+        </select>
+    </div>
+   
+    <div class="row col-xs-12 form-group" >
+        <button class="btn btn-default" id="btnBind">Bind List</button>
+    </div>
+</div>
+
+
+<script>
+    $(document).ready(function () {
+        SetMachineList();
+    });
+
+    $("#btnBind").click(function () {
+        SetMachineList();
+    });
+
+    function SetMachineList() {
+        var mcode = document.getElementById("MachineCode").value.toString()
+        alert(mcode);
+
+        $.ajax({
+            url: 'Form/GetPackingLookUp',
+            data: { id: mcode },
+            type: "GET",
+            contentType: "application/json; charset=utf-8",
+            success: function (response) {
+
+                var list1 = document.getElementById('MachineCode');
+                list1.options[0] = new Option('--Select--', '');
+
+                $.each(response, function (i, item) {
+                    //console.log(item);
+                    list1.options[i + 1] = new Option(item.PackageTypeName, item.PackageTypeId);
+                });
+                //console.log(list1);
+            },
+            error: function (xhr, status, error) {
+                alert(xhr.responseText);
+                alert(status);
+                alert(error);
+            }
+        });
+    };
+
+</script>

@@ -1,0 +1,768 @@
+﻿@model IEnumerable<MCP_WEB.Models.LotControlViewModel>
+
+@{
+    Layout = null;
+}
+<!DOCTYPE html>
+<html>
+<head>
+    <meta name="viewport" content="width=device-width" />
+    <title>Print Lot Control Ticket</title>
+    <link href="~/css/paper.css" rel="stylesheet" type="text/css" />
+    <script>
+        function printContent(el) {
+            var restorepage = document.body.innerHTML;
+            var printcontent = document.getElementById(el).innerHTML;
+            document.body.innerHTML = printcontent;
+            window.print();
+            document.body.innerHTML = restorepage;
+        }
+
+        function getMonth() {
+            var d = new Date();
+            var str;
+            switch (d.getMonth() + 1) {
+                case 1:
+                    str = "มกราคม";
+                    break;
+                case 2:
+                    str = "กุมภาพันธ์";
+                    break;
+                case 3:
+                    str = "มีนาคม";
+                    break;
+                case 4:
+                    str = "เมษายน";
+                    break;
+                case 5:
+                    str = "พฤษภาคม";
+                    break;
+                case 6:
+                    str = "มิถุนายน";
+                    break;
+                case 7:
+                    str = "กรกฎาคม";
+                    break;
+                case 8:
+                    str = "สิงหาคม";
+                    break;
+                case 9:
+                    str = "กันยายน";
+                    break;
+                case 10:
+                    str = "ตุลาคม";
+                    break;
+                case 11:
+                    str = "พฤศจิกายน";
+                    break;
+                case 12:
+                    str = "ธันวาคม";
+                    break;
+            }
+            return str;
+            //document.getElementById("lblDate").value = str;
+            // alert(d.getMonth());
+        }
+    </script>
+
+    <style type="text/css">
+        /*@@media print {
+            * {
+                background-color: #1a4567 !important;
+                -webkit-print-color-adjust: exact;
+            }
+        }*/
+        /*@@media print {
+            * {
+                color: white !important;
+            }
+        }*/
+
+        .stayVisible {
+            position: fixed;
+            top: 1em;
+            left: 1em;
+            width: 8.5em;
+            right: auto;
+            z-index: 3;
+        }
+
+        .btnPrint {
+            width: 70px;
+            height: 30px;
+        }
+
+        .boxBarcode {
+            border: 1px solid black;
+            width: 100%;
+            height: 150px;
+            text-align: center;
+            margin-right: 4px;
+        }
+
+        .page {
+            position: relative;
+            clear: both;
+            width: 100%;
+            height: 100%;
+            margin: 0;
+            padding: 0;
+            z-index: 2;
+        }
+
+        .subReport {
+            position: relative;
+            float: left;
+            width: 32%;
+            height: 100%;
+            border: 1px solid black;
+            margin-left: 1.5mm;
+            margin-right: 1.5mm;
+        }
+
+        table {
+            border-collapse: collapse;
+        }
+
+        .noBorder {
+            border: 0;
+        }
+
+        .showBorder {
+            border: 1px solid black;
+        }
+        /* ===================== Header ===================== */
+        .divHeader {
+            margin-left: 3px;
+            margin-right: 2px;
+        }
+
+        .tableHeader {
+            z-index:3;
+            width: 99%;
+            height: 180px;
+            vertical-align: top;
+            padding: 2px 2px 1px 4px;
+            border: 0;
+            font-size: 10px;
+        }
+
+        .tdBarcode {
+            width: 80px;
+        }
+
+        .rowHeader {
+            vertical-align: top;
+        }
+        /* =====================  Detail  ===================== */
+        .tableDetail {
+            width: 100%;
+            border: 1px solid black;
+            border-collapse: collapse;
+        }
+
+        .trDetailHead {
+            height: 31px;
+            font-size: 10px;
+            vertical-align: central;
+            text-align: center;
+            border: 1px solid black;
+        }
+
+        .trDetail {
+            height: 17px;
+            font-size: 10px;
+            border: 1px solid black;
+        }
+
+        .trDetail0 {
+            z-index: 1;
+            /*background-color: lightgray;*/
+            background-color: rgba(80, 80, 80);
+            opacity: 0.3;
+            height: 17px;
+            border: 1px solid black;
+            /*-webkit-print-color-adjust: exact;*/
+        }
+
+        @@media print {
+            .trDetail0 {               
+                height: 17px;
+                border: 1px solid black;
+                background-color: lightgray !important;
+                -webkit-print-color-adjust: exact;
+            }
+        }
+
+       
+
+        .tdOperationNo {
+            width: 5%;
+        }
+
+        .tdProcess {
+            width: 30%;
+        }
+
+        .tdMC {
+            width: 14%;
+        }
+
+        .tdOut {
+            width: 14%;
+        }
+
+        .tdDate {
+            width: 11%;
+        }
+
+        .tdNG {
+            width: 14%;
+        }
+
+        .tdCheck {
+        }
+
+        .tableSign {
+            width: 100%;
+            height: 45px;
+            vertical-align: top;
+            text-align: center;
+            font-size: 11px;
+            /*margin: 0px 2px 0px 2px;*/
+            /*padding: 0px;*/
+            border: 1px solid black;
+        }
+
+        .trSign {
+            vertical-align: top;
+        }
+        /* ============================== */
+        .row {
+            clear: both;
+            width: 100%;
+            height: 20px;
+        }
+
+        .col10 {
+            float: left;
+            width: 10%;
+        }
+
+        .col15 {
+            float: left;
+            width: 15%;
+        }
+
+        .col20 {
+            float: left;
+            width: 20%;
+        }
+
+        .col25 {
+            float: left;
+            width: 25%;
+        }
+
+        .col30 {
+            float: left;
+            width: 30%;
+        }
+
+        .col40 {
+            float: left;
+            width: 40%;
+        }
+
+        .col50 {
+            float: left;
+            width: 50%;
+        }
+
+        .col60 {
+            float: left;
+            width: 60%;
+        }
+
+        .col70 {
+            float: left;
+            width: 70%;
+        }
+
+        .col80 {
+            float: left;
+            width: 80%;
+        }
+
+        .headBarCode {
+            float: left;
+            width: 60%;
+            font-size: 20px;
+        }
+
+        .headHB {
+            float: left;
+            width: 10%;
+        }
+
+        .headPcsPerLot {
+            float: right;
+            width: 90px;
+            height: 20px;
+            vertical-align: central;
+            text-align: center;
+            font-size: 11px;
+            font-weight: bold;
+            border: 1px solid;
+           
+        }
+
+        .row1 {
+            clear: both;
+            width: 100%;
+        }
+
+        .hPartNo {
+            float: left;
+            width: 60%;
+            border-bottom: 1px solid black;
+        }
+
+        .hPartName {
+            float: left;
+            width: 60%;
+            border-bottom: 1px solid black;
+        }
+
+        .hRawMaterial {
+            float: left;
+            width: 60%;
+            border-bottom: 1px solid black;
+        }
+
+        .hColorLabel {
+            float: left;
+            width: 15%;
+        }
+
+        .hColor {
+            float: left;
+            width: 30%;
+            border-bottom: 1px solid black;
+        }
+
+        .hHeatNoLabel {
+            float: left;
+            width: 20%;
+        }
+
+        .hHeatNo {
+            float: left;
+            width: 30%;
+            border-bottom: 1px solid black;
+        }
+
+        .hBatchLabel {
+            float: left;
+            width: 20%;
+        }
+
+        .hBatch {
+            float: left;
+            width: 30%;
+            border-bottom: 1px solid black;
+        }
+
+        .MyUnderline {
+            border-bottom: 1px solid black;
+        }
+
+        .Circle {
+            text-align: center;
+            font-size: 10px;
+            line-height: 25px;
+            border-radius: 50%;
+            border: 1px solid black;
+            height: 25px;
+            width: 25px;
+            margin: 0 auto 1px;
+        }
+
+        /* Make Watermark */
+        .content {
+            width:342px;
+            position: absolute;
+            z-index: 0;
+            margin-left: 2px;
+            margin-right: 2px;
+        }
+
+        @@media print {
+            #background {               
+                -webkit-print-color-adjust: exact;
+                color:white;
+            }
+        }
+
+        #background {
+            z-index: -1;
+            background: transparent;
+            position: absolute;
+            /*z-index: 1;*/
+            display: block;
+            min-height: 50%;
+            min-width: 99%;
+            /*color: yellow;*/
+            margin-top: 120px;
+            margin-left: 75px;
+            /*opacity:0.5;*/
+            /*-webkit-text-stroke-width: 1px;
+            -webkit-text-stroke-color: black;*/
+        }
+
+        
+
+
+
+        #bg-text {
+            /*background: transparent;*/
+            /*-webkit-appearance: none;*/
+            /*color: transparent;*/
+            /*-webkit-print-color-adjust: exact;*/
+            font-size: 90px;
+            /*font-weight: bolder;*/
+            /*transform: rotate(90deg);*/
+            -webkit-transform: rotate(90deg);
+            -webkit-text-fill-color: white;
+            display: block;
+            /*-webkit-text-fill-color: rgba(0,0,0,.1);*/
+            /*-webkit-text-stroke-width: 1px;
+            -webkit-text-stroke-color: black;*/
+            text-shadow: -1px 0 black, 0 1px black, 1px 0 black, 0 -1px black;
+            font-family: Arial Black;           
+            font-style: italic;
+            /*border: 1px;            
+            border-style:solid;*/
+        }
+
+        #BPAddress6 {
+            font-size: 12px;
+            text-align: right;
+            margin: 0px auto;
+        }
+
+        .logoNT {
+            width: 100%;
+        }
+
+        /* Logo, LotControl, pcs/lot */
+        .Header1 {
+            height: 50px;
+            width: 100%;
+            clear: both;
+        }
+
+        .colLeft {
+            width: 35%;
+            height: 100%;
+            float: left;
+            display: inline-block;
+            margin: 0;
+            padding: 0;
+        }
+
+        .colRight {
+            width: 65%;
+            float: right;
+            height: 100%;
+            display: inline-block;
+            margin: 0;
+            padding: 0;
+
+        }
+
+        .block1 {
+            width: 100%;
+            height: 35px;
+            margin: 0;
+            padding: 0;
+        }
+
+        .block2 {
+            width: 100%;
+            height: 25px;
+            margin: 0;
+            padding-top: 4px;
+            padding-left: 20px;
+            font-size: 14px;
+        }
+
+        .block3 {
+            width: 100%;
+            height: 25px;
+            margin: 0;
+            padding: 0;
+            
+        }
+    </style>
+
+</head>
+<body class="A4 landscape">
+
+    &nbsp;&nbsp;&nbsp;
+    <div class="stayVisible">
+        <button class="btnPrint" onclick="printContent('print-content')">Print</button>
+    </div>
+
+    <div id="print-content">
+        @for (int p = 1; p <= ViewBag.PageCount; p++)
+        {
+            <section class="sheet" style="padding:10mm; padding-left:5mm; padding-right:5mm;">
+                @*<article>page : @p / <text>@ViewBag.PageCount</text></article>*@                
+                <div class="page">
+
+                    @for (int i = 1; i <= 3; i++)
+                    {
+                        <div class="subReport">
+                            @{
+                                int row = 0;
+                                row = 3 * (p - 1) + i;
+                            }
+                            @foreach (var item in Model.Where(x => x.PageNum == p && x.RowNum == @row).OrderBy(y => y.WeeklyPlanVM.BarCode))
+                            {
+                                <!-- Add Content Here =============================== -->
+                                <div class="divHeader">
+                                    <table class="tableHeader">
+                                        <tr class="rowHeader">
+                                            <td>
+                                                <div class="Header1">
+                                                    <div class="colLeft">
+                                                        <div class="block1">
+                                                            <img class="logoNT" src="~/images/NTT_logo.png" />
+                                                        </div>
+                                                    </div>
+
+                                                    <div class="colRight">
+                                                        <div class="block2">
+                                                            LOT CONTROL <br />                                                            
+                                                            @if (item.m_resourceVM.ItemUserDef4 == "HA")
+                                                            {
+                                                                <img class="logoNT" style="width:25px;" src="~/images/HA.png" />
+                                                            }
+                                                            @if (item.m_resourceVM.ItemUserDef4 == "HB")
+                                                            {
+                                                                <img class="logoNT" style="width:25px;" src="~/images/HB.png" />
+                                                            }
+
+                                                            @*@if (item.m_BPMasterVM.BPName.ToUpper().Contains("honda".ToUpper()))
+                                                            {
+
+
+                                                            }*@
+                                                        </div>
+                                                        
+                                                        @*<div style="border: 1px solid; left:20px; width:20%;">
+
+        </div>*@
+                                                        <div class="block3">
+                                                            <div class="col40">&nbsp;</div>
+                                                            <div class="headPcsPerLot">@string.Format("{0:N0}",item.WeeklyPlanVM.QtyOrder) pcs./lot</div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+
+                                                <div class="row">
+                                                    <div class="col30">
+                                                        <b>Part No. </b>
+                                                    </div>
+                                                    <div class="hPartNo">
+                                                        <text>@item.m_resourceVM.ItemCode</text>
+                                                    </div>
+                                                </div>
+
+                                                <div class="row">
+                                                    <div class="col30">
+                                                        <b>Part Name </b>
+                                                    </div>
+                                                    <div class="hPartName">
+                                                        @item.m_resourceVM.Model
+                                                    </div>
+                                                </div>
+
+                                                <div class="row">
+                                                    <div class="col30">
+                                                        <b>Raw Material</b>
+                                                    </div>
+                                                    <div class="hRawMaterial">
+
+                                                        @{string[] split = item.WeeklyPlanVM.BarCode.Split("-").Select(s => s.Trim()).ToArray();
+
+
+                                                        }
+                                                        @if (split.Count() == 1)
+                                                        {
+                                                            @item.m_BomVM.Material1
+                                                            @:&nbsp; &nbsp;
+                                                            @item.m_BomVM.Material2
+                                                        }
+                                                        else
+                                                        {
+                                                            switch (item.WeeklyPlanVM.BarCode.Substring(item.WeeklyPlanVM.BarCode.Length - 1))
+                                                            {
+                                                                case "1":@item.m_BomVM.Material1 break;
+                                                                case "2":@item.m_BomVM.Material2 break;
+                                                            //default : "" break;
+                                                    }
+                                                }
+
+
+                                                    </div>
+
+
+                                                </div>
+
+
+
+                                                <div class="row">
+                                                    <div class="hColorLabel">
+                                                        <b>Color</b>
+                                                    </div>
+                                                    <div class="hColor">
+                                                        @item.m_resourceVM.Color
+                                                        &nbsp;
+                                                        <label>⊘@string.Format("{0:#0.00}", item.m_resourceVM.Dimension1)</label>
+                                                    </div>
+                                                    <div class="col10">&nbsp;<b>Date</b></div>
+                                                    <div class="col30 MyUnderline">&nbsp;</div>
+                                                </div>
+
+                                                <div class="row">
+                                                    <div class="hHeatNoLabel">
+                                                        <b>Heat No.</b>
+                                                    </div>
+                                                    <div class="hHeatNo">
+                                                        @item.m_resourceVM.HeatNo
+                                                        &nbsp;
+                                                    </div>
+                                                    &nbsp;&nbsp;
+                                                    <div class="col15"><b>Length</b></div>
+                                                    <div class="col20 MyUnderline">
+                                                        @item.m_resourceVM.LengthUom
+                                                        &nbsp;
+                                                    </div>mm.
+                                                </div>
+
+                                                <div class="row">
+                                                    <div class="hBatchLabel">
+                                                        <b>Batch(1)</b>
+                                                    </div>
+                                                    <div class="hBatch">
+                                                        @item.m_resourceVM.Batch1
+                                                        &nbsp;
+                                                    </div>
+                                                    &nbsp;&nbsp;
+                                                    <div class="col20"><b>Batch(2)</b></div>
+                                                    <div class="col25 MyUnderline">
+                                                        @item.m_resourceVM.Batch2
+                                                        &nbsp;
+                                                    </div>
+                                                </div>
+
+                                            </td>
+
+                                            <td class="tdBarcode">
+                                                <div class="boxBarcode">
+                                                    <label id="@item.WeeklyPlanVM.BarCode"></label>
+                                                    <script>document.getElementById('@item.WeeklyPlanVM.BarCode').innerHTML = getMonth();</script>
+                                                    <br />
+                                                    @item.WeeklyPlanVM.BarCode
+
+                                                    @*@item.WeeklyPlanVM.BarCode.Substring(@item.WeeklyPlanVM.BarCode.Length - 8)*@
+                                                    <br />
+                                                    <qrcode alt="QR Code" size="80" content=@item.WeeklyPlanVM.BarCode />
+                                                    <label style="font-size:16px;"><b>@item.WeeklyPlanVM.BarCode.Substring(9)</b></label>
+                                                </div>
+
+                                            </td>
+                                        </tr>
+                                    </table>
+                                </div>
+
+
+                                <div id="background">
+                                    <p id="bg-text">@item.m_resourceVM.Model</p>
+                                </div>
+                                //Detail aa
+                                <div class="content">
+                                    <table id="Detail" class="tableDetail">
+                                        <tr class="trDetailHead">
+                                            <td class="tdOperationNo"></td>
+                                            <td class="tdProcess">PROCESS</td>
+                                            <td class="tdMC showBorder">M/C</td>
+                                            <td class="tdOut showBorder">OUT<br />(pcs)</td>
+                                            <td class="tdDate showBorder">DATE</td>
+                                            <td class="tdNG showBorder">NG<br />(pcs)</td>
+                                            <td class="tdCheck showBorder">CHECKED</td>
+                                        </tr>
+
+                                        @foreach (var detail in @item.WoRoutingVM)
+                                        {
+                                            var classname = "trDetail";
+                                            if (@detail.OperationNo == 0) { classname = "trDetail0"; }
+                                            <tr class="@classname">
+                                                <td class="showBorder">
+                                                    @if (@detail.OperationNo != 0)
+                                                    {@detail.OperationNo}
+                                                </td>
+                                                <td class="showBorder">@detail.ProcessCode</td>
+                                                <td class="showBorder">@detail.MachineCode</td>
+                                                <td class="showBorder"></td>
+                                                <td class="showBorder"></td>
+                                                <td class="showBorder"></td>
+                                                <td class="showBorder"></td>
+                                            </tr>
+                                        }
+                                        @for (int k = 1; k <= 26 - @item.WoRoutingVM.Count(); k++)
+                                        {
+                                            <tr class="trDetail showBorder">
+                                                <td class="showBorder"></td>
+                                                <td class="showBorder"></td>
+                                                <td class="showBorder"></td>
+                                                <td class="showBorder"></td>
+                                                <td class="showBorder"></td>
+                                                <td class="showBorder"></td>
+                                                <td class="showBorder"></td>
+                                            </tr>
+                                        }
+                                    </table>
+
+                                    <table class="tableSign">
+                                        <tr class="trSign">
+                                            <td class="showBorder">CHECK (QC)<br /><br />...............</td>
+                                            <td class="showBorder">TO STOCK (PC)<br /><br />...............</td>
+                                        </tr>
+                                    </table>
+                                    <p id="BPAddress6">@item.BPAddress6</p>
+                                </div>
+                            }
+
+                            @*</td>*@
+                        </div>
+                    } @* end for 3 Report/Page *@
+
+                    @*</tr>*@
+                    @*</table>*@
+                </div>
+
+            </section>
+        } <!-- end for Page -->
+        @*<section class="sheet padding-10mm">
+                <article>This is an A4 document (landscape).</article>
+            </section>
+            <section class="sheet padding-10mm">
+                <p>222222222222</p>
+            </section>*@
+    </div>
+
+</body>
+</html>

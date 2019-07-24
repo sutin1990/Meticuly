@@ -1,0 +1,51 @@
+﻿@model MCP_WEB.Models.m_Jig
+
+@{
+    ViewData["Title"] = "Edit";
+}
+
+<h2>Edit</h2>
+
+<h4>m_Jig</h4>
+<hr />
+<div class="row">
+    <div class="col-md-4">
+        <form asp-action="Edit">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <input type="hidden" asp-for="JigID" />
+            <div class="form-group">
+                <label asp-for="JigNo" class="control-label"></label>
+                <input asp-for="JigNo" class="form-control" />
+                <span asp-validation-for="JigNo" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Column" class="control-label"></label>
+                <input asp-for="Column" class="form-control" />
+                <span asp-validation-for="Column" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Row" class="control-label"></label>
+                <input asp-for="Row" class="form-control" />
+                <span asp-validation-for="Row" class="text-danger"></span>
+            </div>
+            @*<div class="form-group">*@
+            <div>
+                <input type="submit" value="Save" class="btn btn-success" /> &nbsp;
+                <a asp-action="Index" class="btn btn-warning">Cancel</a> &nbsp;
+
+                @*<a asp-action="Delete" asp-route-id="JigID">Delete</a>*@
+
+            </div>
+        </form>
+
+        &nbsp;
+
+        @*<form asp-action="Delete">
+            <input type="hidden" asp-for="JigID" />
+            <input type="submit" value="Delete" class="btn btn-danger" /> |
+            <a asp-action="Index">Back to List</a>
+        </form>*@
+
+    </div>
+</div>
+

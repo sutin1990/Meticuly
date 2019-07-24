@@ -1,0 +1,156 @@
+﻿@{
+    ViewData["Title"] = "Index";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+@*<h4>Jig Master</h4>*@
+
+@(Html.DevExtreme().DataGrid<MCP_WEB.Models.m_Jig>()
+    .ID("grdJig")
+    .ShowBorders(true)
+    .DataSource(ds => ds.Mvc()
+        .Controller("m_JigDevX")
+        .LoadAction("Get")
+        .InsertAction("Post")
+        .UpdateAction("Put")
+        .DeleteAction("Delete")
+        .Key("JigID")
+    )
+    .ShowColumnLines(true)
+    .ShowRowLines(true)
+    .RowAlternationEnabled(true)
+    .HoverStateEnabled(true)
+    .RowAlternationEnabled(true)
+    .RemoteOperations(true)
+    .Export(e => e.Enabled(true).FileName("Jig-" + DateTime.Now).AllowExportSelectedData(true))
+    .GroupPanel(p => p.Visible(false))
+    .ColumnChooser(c => c.Enabled(true))
+    .AllowColumnResizing(true)
+    .Selection(s => {
+        s.Mode(SelectionMode.Multiple);
+       
+        })
+    .Paging(paging => {
+        paging.Enabled(true);
+        paging.PageSize(10);
+    })
+    .Pager(pager => {
+        pager.ShowPageSizeSelector(true);
+        pager.AllowedPageSizes(new List<int> { 10, 25,50,100 });
+        pager.ShowInfo(true);
+    })
+
+    .Columns(columns =>{
+        columns.AddFor(m => m.JigNo)
+            .Name("colJigNo")
+            .Caption("JigNo")
+            .DataType(GridColumnDataType.String)
+            .Alignment(HorizontalAlignment.Left);
+
+        columns.AddFor(m => m.Column)
+            .Caption("Column")
+            .DataType(GridColumnDataType.String)
+            .Alignment(HorizontalAlignment.Left);
+
+        columns.AddFor(m => m.Row)
+        .Caption("Row")
+        .DataType(GridColumnDataType.String)
+        .Alignment(HorizontalAlignment.Left);
+
+        columns.AddFor(m => m.JigUserDef1)
+        .Caption("JigUserDef1")
+        .DataType(GridColumnDataType.String)
+        .Alignment(HorizontalAlignment.Left)
+        .AllowEditing(true)
+        .Visible(false);
+
+        columns.AddFor(m => m.JigUserDef2)
+        .Caption("JigUserDef2")
+        .DataType(GridColumnDataType.String)
+        .Alignment(HorizontalAlignment.Left)
+        .AllowEditing(true)
+        .Visible(false);
+
+        columns.AddFor(m => m.TransDate)
+        .Caption("TransDate")
+        .DataType(GridColumnDataType.DateTime)
+        .Alignment(HorizontalAlignment.Left)
+        .AllowEditing(false)
+        .Visible(true)
+        .Format(ViewBag.GlobalDtFormat);
+
+        columns.AddFor(m => m.CreateDate)
+        .Caption("CreateDate")
+        .DataType(GridColumnDataType.DateTime)
+        .Alignment(HorizontalAlignment.Left)
+        .AllowEditing(false)
+        .Visible(false)
+        .Format(ViewBag.GlobalDtFormat);
+
+        columns.AddFor(m => m.ModifyBy)
+        .Caption("ModifyBy")
+        .DataType(GridColumnDataType.String)
+        .Alignment(HorizontalAlignment.Left)
+        .AllowEditing(false)
+        .Visible(false);
+
+    })
+
+    .Editing(e => e.Mode(GridEditMode.Popup)
+        .AllowAdding(true)
+        .AllowUpdating(true)
+        .AllowDeleting(true)
+        .UseIcons(true)
+        .Popup(p => p
+            .Title("Info")
+            .ShowTitle(true)
+            .MaxWidth(700)
+            .MaxHeight(345)
+            .Position(pos => pos
+                .My(HorizontalAlignment.Center, VerticalAlignment.Center)
+                .At(HorizontalAlignment.Center, VerticalAlignment.Center)
+                .Of(new JS("window"))
+                    )
+            )
+    )
+
+    .FilterRow(filterRow => filterRow
+        .Visible(true)
+        .ApplyFilter(GridApplyFilterMode.Auto)
+    )
+    .SearchPanel(searchPanel => searchPanel
+        .Visible(true)
+        .Width(240)
+        .Placeholder("Search...")
+    )
+    .OnContentReady(@<text>
+        function(e)
+        {moveEditColumnToLeft(e.component);}
+    </text>)
+
+)
+
+<script>
+    function moveEditColumnToLeft(dataGrid) {
+        dataGrid.columnOption("command:edit", {
+            visibleIndex: -1
+        });
+    }
+
+    $(function () {
+        $("#buttonContainer").dxButton({
+            text: "bulk load",
+            onClick: function () {
+                var grid = $("#dgMain").dxDataGrid("instance");
+                var keys = grid.getSelectedRowKeys();
+                var AllKeys = '';
+                keys.forEach(function (entry) {
+                    AllKeys = AllKeys + entry.ID + ',';
+                });
+                document.getElementById('textAreaSelectedKeys').value = AllKeys;
+                document.forms[0].submit();
+            }
+        });
+    });
+
+</script>

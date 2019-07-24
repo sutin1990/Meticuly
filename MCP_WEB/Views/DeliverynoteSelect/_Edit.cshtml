@@ -1,0 +1,153 @@
+﻿
+<div id="editscrollpop" class="scrollpop">
+    <div class="addcontentpop">
+        <form id="form1" name="form1" autocomplete=off>
+            <div class="form-group" autocomplete=off>
+
+                <label class="col-lg-2 ">Delivery Note :</label>
+                <div class="col-lg-2 " style="padding-bottom:10px;">
+                    @(Html.DevExtreme().TextBox().ID("edittxtDeliverynote").Name("Deliverynote").ReadOnly(true))
+                </div>
+
+                <label class="col-lg-1">Model :</label>
+                <div class="col-lg-3" style="padding-bottom:10px;">
+                    @(Html.DevExtreme().TextBox().ID("edittxtModel").Name("Model").ReadOnly(true)) 
+                  
+                </div>
+                <div class="col-lg-4" style="padding-bottom:10px;">
+                     @(Html.DevExtreme().Button()
+                    .Type(ButtonType.Normal).ID("CancelledDeliveryNote")
+                    .Text("Cancelled Delivery Note").Type(ButtonType.Success).Icon("clear")
+                    .OnClick("function (e) {if(e.validationGroup.validate().isValid){ CancelledDeliveryNote(e);} }"))
+                </div>
+                         
+                <div class="col-lg-12 " style="padding-bottom:10px;">
+                    @(Html.DevExtreme().DataGrid<MCP_WEB.Models.MoveTicket>()
+                    .ID("griddeliverly")
+                    .ShowBorders(true)
+                    //.ColumnChooser(c => c.Enabled(true))
+                    .AllowColumnResizing(true)
+                    .AllowColumnReordering(true)
+                    .RemoteOperations(true)
+                    .ShowRowLines(true)
+                    //.Selection(s => s.Mode(SelectionMode.Multiple)
+                    //    .ShowCheckBoxesMode(GridSelectionShowCheckBoxesMode.Always)
+                    //    .SelectAllMode(SelectAllMode.Page)
+                    //    )
+
+                    .HoverStateEnabled(true)
+                    //.RowAlternationEnabled(true)
+                    .Paging(paging => paging.PageSize(5))
+                    .Pager(p => p
+                    .AllowedPageSizes(new int[] { 5, 10, 25, 50 })
+                    .ShowInfo(true)
+                    .ShowNavigationButtons(true)
+                    .ShowPageSizeSelector(true)
+                    .Visible(true))
+
+                    //.DataSource(d => d.Mvc().Controller("DeliverynoteSelect").LoadAction("GetMoveticket")
+                    //.LoadParams(new { deliverynote = new JS("data.DeliveryNote") })
+                    //)
+
+                    //.FilterPanel(f => f.Visible(true))
+                    .HeaderFilter(h => h.Visible(true))
+                    //.FilterValue(filterValue)
+                    .FilterRow(filterRow => filterRow
+                            .Visible(true)
+                            .ApplyFilter(GridApplyFilterMode.Auto)
+                            )
+
+                    .SearchPanel(searchPanel => searchPanel
+                        .Visible(true)
+                        .Width(240)
+                        .Placeholder("Search...")
+                    )
+
+                    .Columns(columns =>
+                    {
+                        columns.Add().DataField("moveTicket");
+
+                        columns.Add().DataField("StatusMT").Width(120);
+
+                        columns.Add().DataField("BoxQty");
+
+                        columns.Add().DataField("MTQty");
+
+                        columns.Add().DataField("ExcessQty");
+                        columns.Add().Caption("Delete").Width(80).Alignment(HorizontalAlignment.Center)
+                          .CellTemplate(new JS("cellTemplategridpopup"));
+
+                    }) // end .Columns
+
+
+                    )
+                    </div>
+
+                 <div class="col-sm-offset-2 col-sm-10" style="text-align:right; padding-bottom:10px;"> 
+                            @(Html.DevExtreme().Button()
+                                .Type(ButtonType.Normal).ID("EditbtnCancel")
+                                .Text("Cancel")
+                                .OnClick("function (e) { editcanselButtonClick(); e.validationGroup.reset(); }"))
+                        </div>
+                </div>
+
+</form>
+        
+    </div>
+</div>
+
+<script>
+    function editcanselButtonClick() {
+        $('#EditPopup').dxPopup('instance').option('visible', false);
+    }
+
+function CancelledDeliveryNote() {       
+         var Model = $("#edittxtModel").dxTextBox("instance").option("value");
+         var Deliverynote = $("#edittxtDeliverynote").dxTextBox("instance").option("value");
+         var msg = "";
+        var status = "";
+    var confirmdeletedialog = DevExpress.ui.dialog.confirm("Are you sure cancelled delivery note:[" + Deliverynote + "] ?", "Confirm to cancelled");
+        confirmdeletedialog.done(function (dialogResult) {
+            $.ajax({
+                type: 'GET',
+                url: '@Url.Action("cancelleddeliverynote", "DeliverynoteSelect", new { httproute = true })',
+                data: {                                      
+                    "c_deliverynote": Deliverynote
+                    },
+                    async: false,
+                    beforeSend: function () {/*loading*/ },
+                    dataType: 'json',
+                    success: function (result) { 
+                        $.each(result, function (item, value) {
+                            msg = value.deliverynote;
+                            status = value.SqlStatus;  
+                            if (value.SqlStatus == "Success") {
+                                var customDialog = DevExpress.ui.dialog.custom({
+                                    title: 'Cancelled Delivery Note',
+                                    message: 'Cancelled Delivery Note: ' + msg + 'status:' + status,
+                                    toolbarItems: [
+                                        { text: "Close", onClick: function () { return "Ok" } },
+                                        //{ text: "Not Ok", onClick: function () { return "Not Ok" } }
+                                    ],
+                                    width: "500px"
+
+                                });
+                                customDialog.show().done(function (dialogResult) {                                   
+                                    editcanselButtonClick();
+                                });
+                            } else {
+                                DevExpress.ui.notify(msg, "Delivery Note "+Deliverynote+" cannot be cancelled, because material has been used!", 2000);
+                            }               
+                        });                                
+
+                    },
+                    error: function (ob, errStr) {                       
+                        DevExpress.ui.notify(errStr, "Delivery Note  " + Deliverynote +" cannot be cancelled, because material has been used!", 2000);
+                    }
+                });
+
+        });
+            
+    }
+   
+</script>

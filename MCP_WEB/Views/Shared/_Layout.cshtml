@@ -1,0 +1,464 @@
+﻿@inject MCP_WEB.Services.MenuMasterService menus
+
+<!DOCTYPE html>
+
+<html>
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="description" content="">
+    <meta name="author" content="">
+
+    <title>Meticuly Product</title>
+    <link href="~/favicon.ico" rel="shortcut icon" type="image/x-icon" />
+
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.css" />
+    <link rel="stylesheet" href="~/css/site.css" />
+    <link href="~/css/devextreme/dx.common.css" rel="stylesheet" />
+    <link href="~/css/devextreme/dx.light.css" rel="stylesheet" />
+
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    <script src="~/lib/bootstrap/dist/js/bootstrap.js"></script>
+
+    <script src="~/js/devextreme/cldr.js"></script>
+    <script src="~/js/devextreme/cldr/event.js"></script>
+    <script src="~/js/devextreme/cldr/supplemental.js"></script>
+    <script src="~/js/devextreme/cldr/unresolved.js"></script>
+
+    <script src="~/js/devextreme/globalize.js"></script>
+    <script src="~/js/devextreme/globalize/message.js"></script>
+    <script src="~/js/devextreme/globalize/number.js"></script>
+    <script src="~/js/devextreme/globalize/currency.js"></script>
+    <script src="~/js/devextreme/globalize/date.js"></script>
+
+    @* JSZip for client side export *@
+    <script src="~/js/devextreme/jszip.js"></script>
+
+    <script src="~/js/devextreme/dx.all.js"></script>
+    <script src="~/js/devextreme/vectormap-data/world.js"></script>
+    <script src="~/lib/devextreme-aspnet-data/js/dx.aspnet.data.js"></script>
+    <script src="~/js/devextreme/aspnet/dx.aspnet.mvc.js"></script>
+    <script src="~/js/devextreme/CutomsGrid.js"></script>
+
+
+    <meta content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" name="viewport">
+    <!-- Bootstrap 3.3.7 -->
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="~/AdminLTE/bower_components/font-awesome/css/font-awesome.min.css">
+    <!-- Ionicons -->
+    <link rel="stylesheet" href="~/AdminLTE/bower_components/Ionicons/css/ionicons.min.css">
+    <!-- Theme style -->
+    <link rel="stylesheet" href="~/AdminLTE/dist/css/AdminLTE.css">
+    <!-- AdminLTE Skins. Choose a skin from the css/skins
+         folder instead of downloading all of them to reduce the load. -->
+    <link rel="stylesheet" href="~/AdminLTE/dist/css/skins/_all-skins.min.css">
+    <!-- Morris chart -->
+    <link rel="stylesheet" href="~/AdminLTE/bower_components/morris.js/morris.css">
+    <!-- jvectormap -->
+    <link rel="stylesheet" href="~/AdminLTE/bower_components/jvectormap/jquery-jvectormap.css">
+    <!-- Date Picker -->
+    <link rel="stylesheet" href="~/AdminLTE/bower_components/bootstrap-datepicker/dist/css/bootstrap-datepicker.min.css">
+    <!-- Daterange picker -->
+    <link rel="stylesheet" href="~/AdminLTE/bower_components/bootstrap-daterangepicker/daterangepicker.css">
+    <!-- bootstrap wysihtml5 - text editor -->
+    <link rel="stylesheet" href="~/AdminLTE/plugins/bootstrap-wysihtml5/bootstrap3-wysihtml5.min.css">
+
+    <link rel="stylesheet" href="~/css/Site.css">
+
+    <style>
+        html, body {
+            height: 100%;
+        }
+        input:read-only {
+            background-color: #dedede;
+        }
+        h1, .h1, h2, .h2, h3, .h3 {
+            margin-top: 0px;
+            margin-bottom: 0px;
+        }
+        .content-header {
+            position: relative;
+            padding: 0.03px 3px 0px 0px;
+        }
+        .sidebar-mini:not(.sidebar-mini-expand-feature).sidebar-collapse .sidebar-menu > li:hover > a > span:not(.pull-right), .sidebar-mini:not(.sidebar-mini-expand-feature).sidebar-collapse .sidebar-menu > li:hover > .treeview-menu {
+            display: block !important;
+            position: absolute;
+            width: 220px;
+            left: 50px;
+        }
+        .sidebar-mini:not(.sidebar-mini-expand-feature).sidebar-collapse .sidebar-menu > li:hover > a > .pull-right-container {
+            position: relative !important;
+            float: right;
+            width: auto !important;
+            left: 220px !important;
+            top: -22px !important;
+            z-index: 900;
+        }
+        .content-wrapper {
+            min-height: 700px;
+        }
+
+        .content {
+            height: 100%;
+            display: block;
+           
+            bottom: 20px;
+            
+        }
+    </style>
+
+</head>
+
+<body class="hold-transition skin-blue sidebar-mini">
+
+    <div class="wrapper">
+
+        <header class="main-header">
+            <!-- Logo -->
+            <a href="https://meticuly.com/" class="logo">
+                <!-- mini logo for sidebar mini 50x50 pixels -->
+                <span class="logo-mini"><b>M</b>P</span>
+                <!-- logo for regular state and mobile devices -->
+                <span class="logo-lg"><b>Meticuly Production</b></span>
+            </a>
+            <!-- Header Navbar: style can be found in header.less -->
+            <nav class="navbar navbar-static-top">
+                <!-- Sidebar toggle button-->
+                <a href="#" class="sidebar-toggle" data-toggle="push-menu" role="button">
+                    <span class="sr-only">Toggle navigation</span>
+                </a>
+
+                <div class="navbar-custom-menu">
+                    <ul class="nav navbar-nav">
+
+                        <li class="dropdown user user-menu">
+                            <a asp-controller="ResetPassword" class="dropdown-toggle">
+                                <img src="~/AdminLTE/dist/img/avatar5.png" class="user-image" alt="User Image">
+                                <span class="hidden-xs">
+                                    @if (User.FindFirst("ContactName").Value != "")
+                                    {
+                                        @User.FindFirst("ContactName").Value
+                                    }
+
+                                </span>
+
+                            </a>
+                           
+                        </li>
+                        <li>
+                            <a asp-action="Logout" asp-controller="Login"><i class="glyphicon glyphicon-log-out"></i> Sign Out</a>
+                        </li>
+                        <!-- Control Sidebar Toggle Button -->
+                        <li>
+                            <a href="#" data-toggle="control-sidebar"><i class="fa fa-gears"></i></a>
+                        </li>
+                    </ul>
+                </div>
+            </nav>
+        </header>
+        <!-- Left side column. contains the logo and sidebar -->
+        @await Html.PartialAsync("_NavBar")
+
+        <!-- Content Wrapper. Contains page content -->
+        <div class="content-wrapper" style="min-height:700px">
+            @{
+                var controller = ViewContext.RouteData.Values["Controller"];
+                var action = ViewContext.RouteData.Values["Action"];
+                var id = ViewContext.RouteData.Values["id"];
+            }
+
+            <!-- Main content -->
+            <section class="content-header">
+                @if (@id == null)
+                {
+                    foreach (var menuNames in menus.GetMenuMaster(@User.FindFirst("ContactName").Value).Where(n => n.MenuURL == controller.ToString() && n.MenuFileName == action.ToString()))
+                    {
+                        <ol class="breadcrumb">
+                            <li><a href="#"><i class="fa fa-dashboard"></i>@menuNames.Parent_MenuID</a></li>
+                            <li class="active">@menuNames.MenuName</li>
+                        </ol>
+                    }
+
+                }
+                else
+                {
+                    foreach (var menuNames in menus.GetMenuMaster(@User.FindFirst("ContactName").Value).Where(n => n.MenuURL == controller.ToString() && n.MenuFileName == action.ToString()+"/"+id.ToString()))
+                    {
+                        <ol class="breadcrumb">
+                            <li><a href="#"><i class="fa fa-dashboard"></i>@menuNames.Parent_MenuID</a></li>
+                            <li class="active">@menuNames.MenuName</li>
+                        </ol>
+                    }
+                }
+
+            </section>
+            <section class="content">
+                @if (@id == null)
+                {
+                    foreach (var menuNames in menus.GetMenuMaster(@User.FindFirst("ContactName").Value).Where(n => n.MenuURL == controller.ToString() && n.MenuFileName == action.ToString()))
+                    {
+
+                        <div class="container my-5">
+                            <h3>@menuNames.MenuName</h3>
+                        </div>
+                    }
+
+                }
+                else
+                {
+                    <div class="container my-5">
+                        <h5 class="alert alert-info no-margin-bottom"> <strong>@id</strong></h5>
+                    </div>
+                }
+                @RenderBody()
+            </section>
+            <!-- /.content -->
+        </div>
+        <!-- /.content-wrapper -->
+        <footer class="main-footer">
+            <div class="pull-right hidden-xs">
+                <b>Version</b> 1.0.0.2
+            </div>
+            <strong>Copyright &copy; 2018 <a href="https://www.m-focus.co.th">M-Focus Co., Ltd.</a>.</strong> All rights
+            reserved.
+        </footer>
+
+        <!-- Control Sidebar -->
+        <aside class="control-sidebar control-sidebar-dark">
+            <!-- Create the tabs -->
+            <ul class="nav nav-tabs nav-justified control-sidebar-tabs">
+                @*<li><a href="#control-sidebar-home-tab" data-toggle="tab"><i class="fa fa-home"></i></a></li>*@
+                @*<li><a href="#control-sidebar-settings-tab" data-toggle="tab"><i class="fa fa-gears"></i></a></li>*@
+            </ul>
+            <!-- Tab panes -->
+            <div class="tab-content">
+                <!-- Home tab content -->
+                <div class="tab-pane" id="control-sidebar-home-tab">
+                    <h3 class="control-sidebar-heading">Recent Activity</h3>
+                    <ul class="control-sidebar-menu">
+                        <li>
+                            <a href="javascript:void(0)">
+                                <i class="menu-icon fa fa-birthday-cake bg-red"></i>
+
+                                <div class="menu-info">
+                                    <h4 class="control-sidebar-subheading">Langdon's Birthday</h4>
+
+                                    <p>Will be 23 on April 24th</p>
+                                </div>
+                            </a>
+                        </li>
+                        <li>
+                            <a href="javascript:void(0)">
+                                <i class="menu-icon fa fa-user bg-yellow"></i>
+
+                                <div class="menu-info">
+                                    <h4 class="control-sidebar-subheading">Frodo Updated His Profile</h4>
+
+                                    <p>New phone +1(800)555-1234</p>
+                                </div>
+                            </a>
+                        </li>
+                        <li>
+                            <a href="javascript:void(0)">
+                                <i class="menu-icon fa fa-envelope-o bg-light-blue"></i>
+
+                                <div class="menu-info">
+                                    <h4 class="control-sidebar-subheading">Nora Joined Mailing List</h4>
+
+                                    <p>nora@example.com</p>
+                                </div>
+                            </a>
+                        </li>
+                        <li>
+                            <a href="javascript:void(0)">
+                                <i class="menu-icon fa fa-file-code-o bg-green"></i>
+
+                                <div class="menu-info">
+                                    <h4 class="control-sidebar-subheading">Cron Job 254 Executed</h4>
+
+                                    <p>Execution time 5 seconds</p>
+                                </div>
+                            </a>
+                        </li>
+                    </ul>
+                    <!-- /.control-sidebar-menu -->
+
+                    <h3 class="control-sidebar-heading">Tasks Progress</h3>
+                    <ul class="control-sidebar-menu">
+                        <li>
+                            <a href="javascript:void(0)">
+                                <h4 class="control-sidebar-subheading">
+                                    Custom Template Design
+                                    <span class="label label-danger pull-right">70%</span>
+                                </h4>
+
+                                <div class="progress progress-xxs">
+                                    <div class="progress-bar progress-bar-danger" style="width: 70%"></div>
+                                </div>
+                            </a>
+                        </li>
+                        <li>
+                            <a href="javascript:void(0)">
+                                <h4 class="control-sidebar-subheading">
+                                    Update Resume
+                                    <span class="label label-success pull-right">95%</span>
+                                </h4>
+
+                                <div class="progress progress-xxs">
+                                    <div class="progress-bar progress-bar-success" style="width: 95%"></div>
+                                </div>
+                            </a>
+                        </li>
+                        <li>
+                            <a href="javascript:void(0)">
+                                <h4 class="control-sidebar-subheading">
+                                    Laravel Integration
+                                    <span class="label label-warning pull-right">50%</span>
+                                </h4>
+
+                                <div class="progress progress-xxs">
+                                    <div class="progress-bar progress-bar-warning" style="width: 50%"></div>
+                                </div>
+                            </a>
+                        </li>
+                        <li>
+                            <a href="javascript:void(0)">
+                                <h4 class="control-sidebar-subheading">
+                                    Back End Framework
+                                    <span class="label label-primary pull-right">68%</span>
+                                </h4>
+
+                                <div class="progress progress-xxs">
+                                    <div class="progress-bar progress-bar-primary" style="width: 68%"></div>
+                                </div>
+                            </a>
+                        </li>
+                    </ul>
+                    <!-- /.control-sidebar-menu -->
+
+                </div>
+                <!-- /.tab-pane -->
+                <!-- Stats tab content -->
+                <div class="tab-pane" id="control-sidebar-stats-tab">Stats Tab Content</div>
+                <!-- /.tab-pane -->
+                <!-- Settings tab content -->
+                <div class="tab-pane" id="control-sidebar-settings-tab">
+                    <form method="post">
+                        <h3 class="control-sidebar-heading">General Settings</h3>
+
+                        <div class="form-group">
+                            <label class="control-sidebar-subheading">
+                                Report panel usage
+                                <input type="checkbox" class="pull-right" checked>
+                            </label>
+
+                            <p>
+                                Some information about this general settings option
+                            </p>
+                        </div>
+                        <!-- /.form-group -->
+
+                        <div class="form-group">
+                            <label class="control-sidebar-subheading">
+                                Allow mail redirect
+                                <input type="checkbox" class="pull-right" checked>
+                            </label>
+
+                            <p>
+                                Other sets of options are available
+                            </p>
+                        </div>
+                        <!-- /.form-group -->
+
+                        <div class="form-group">
+                            <label class="control-sidebar-subheading">
+                                Expose author name in posts
+                                <input type="checkbox" class="pull-right" checked>
+                            </label>
+
+                            <p>
+                                Allow the user to show his name in blog posts
+                            </p>
+                        </div>
+                        <!-- /.form-group -->
+
+                        <h3 class="control-sidebar-heading">Chat Settings</h3>
+
+                        <div class="form-group">
+                            <label class="control-sidebar-subheading">
+                                Show me as online
+                                <input type="checkbox" class="pull-right" checked>
+                            </label>
+                        </div>
+                        <!-- /.form-group -->
+
+                        <div class="form-group">
+                            <label class="control-sidebar-subheading">
+                                Turn off notifications
+                                <input type="checkbox" class="pull-right">
+                            </label>
+                        </div>
+                        <!-- /.form-group -->
+
+                        <div class="form-group">
+                            <label class="control-sidebar-subheading">
+                                Delete chat history
+                                <a href="javascript:void(0)" class="text-red pull-right"><i class="fa fa-trash-o"></i></a>
+                            </label>
+                        </div>
+                        <!-- /.form-group -->
+                    </form>
+                </div>
+                <!-- /.tab-pane -->
+            </div>
+        </aside>
+        <!-- /.control-sidebar -->
+        <!-- Add the sidebar's background. This div must be placed
+        immediately after the control sidebar -->
+        <div class="control-sidebar-bg"></div>
+    </div>
+
+
+    <!-- jQuery UI 1.11.4 -->
+    <script src="~/AdminLTE/bower_components/jquery-ui/jquery-ui.min.js"></script>
+    <!-- Resolve conflict in jQuery UI tooltip with Bootstrap tooltip -->
+    <script>
+        $.widget.bridge('uibutton', $.ui.button);
+    </script>
+    <!-- Bootstrap 3.3.7 -->
+    <script src="~/AdminLTE/bower_components/bootstrap/dist/js/bootstrap.min.js"></script>
+    <!-- Morris.js charts -->
+    <script src="~/AdminLTE/bower_components/raphael/raphael.min.js"></script>
+    <script src="~/AdminLTE/bower_components/morris.js/morris.min.js"></script>
+    <!-- Sparkline -->
+    <script src="~/AdminLTE/bower_components/jquery-sparkline/dist/jquery.sparkline.min.js"></script>
+
+    <!-- jQuery Knob Chart -->
+    <script src="~/AdminLTE/bower_components/jquery-knob/dist/jquery.knob.min.js"></script>
+    <!-- daterangepicker -->
+    <script src="~/AdminLTE/bower_components/moment/min/moment.min.js"></script>
+    <script src="~/AdminLTE/bower_components/bootstrap-daterangepicker/daterangepicker.js"></script>
+    <!-- datepicker -->
+    <script src="~/AdminLTE/bower_components/bootstrap-datepicker/dist/js/bootstrap-datepicker.min.js"></script>
+    <!-- Bootstrap WYSIHTML5 -->
+    <script src="~/AdminLTE/plugins/bootstrap-wysihtml5/bootstrap3-wysihtml5.all.min.js"></script>
+    <!-- Slimscroll -->
+    <script src="~/AdminLTE/bower_components/jquery-slimscroll/jquery.slimscroll.min.js"></script>
+    <!-- FastClick -->
+    <script src="~/AdminLTE/bower_components/fastclick/lib/fastclick.js"></script>
+    <!-- AdminLTE App -->
+    <script src="~/AdminLTE/dist/js/adminlte.js"></script>
+    <!-- AdminLTE dashboard demo (This is only for demo purposes) -->
+
+    @*<script src="~/AdminLTE/dist/js/pages/dashboard.js"></script>*@
+
+    <!-- AdminLTE for demo purposes -->
+    <script src="~/AdminLTE/dist/js/demo.js"></script>
+
+    <!-- Get format datetime from table Global Parm -->
+    <script src="~/js/GetFormatDateTime.js"></script>
+
+</body>
+
+</html>

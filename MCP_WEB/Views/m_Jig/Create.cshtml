@@ -1,0 +1,39 @@
+﻿@model MCP_WEB.Models.m_Jig
+
+@{
+    ViewData["Title"] = "Create";
+}
+
+<h2>Create</h2>
+
+<h4>m_Jig</h4>
+<hr />
+<div class="row">
+    <div class="col-md-4">
+        <form asp-action="Create">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <div class="form-group">
+                <label asp-for="JigNo" class="control-label"></label>
+                <input asp-for="JigNo" class="form-control" />
+                <span asp-validation-for="JigNo" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Column" class="control-label"></label>
+                <input asp-for="Column" class="form-control" />
+                <span asp-validation-for="Column" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Row" class="control-label"></label>
+                <input asp-for="Row" class="form-control" />
+                <span asp-validation-for="Row" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <input type="submit" value="Save" class="btn btn-default" />
+                &nbsp;
+                <a asp-action="Index" class="btn btn-default">Cancel</a>
+                &nbsp;
+            </div>
+            
+        </form>
+    </div>
+</div>

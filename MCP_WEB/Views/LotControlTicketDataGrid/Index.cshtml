@@ -1,0 +1,124 @@
+﻿
+@{ ViewData["Title"] = "Index";
+}
+
+<script>
+    function PrintPreview(data) {
+        var grid = $('#gridContainer').dxDataGrid('instance');
+        var keys = grid.getSelectedRowKeys();
+        var text = "";
+        var s;
+        for (s in keys) {
+            if (text != "") {
+                text += "&";
+            }
+            text += 'id=' + keys[s].BarCode;
+        }
+        window.open('api/LotControlTicket/PrintLotControl?' + text); // 'LotControlTicket/PrintSelected?'
+        //window.location.href = 'LotControlTicket/PrintSelected?' + text;
+    }
+</script>
+
+@{
+    var filterValue = new object[] {
+                    new object[] { "WStatus", FilterBuilderFieldFilterOperations.Equal, "P" }
+    };
+}
+
+@(Html.DevExtreme().DataGrid<MCP_WEB.Models.WeeklyPlan>()
+            .ID("gridContainer")
+            .ShowBorders(true)
+            .Export(e => e.Enabled(true)
+                        .FileName("Jig-" + DateTime.Now)
+                        .AllowExportSelectedData(true)
+            )
+            .ColumnChooser(c => c.Enabled(true))
+            .AllowColumnResizing(true)
+            .RemoteOperations(true)
+            .ShowRowLines(true)
+            .Selection(s => s.Mode(SelectionMode.Multiple)
+                .ShowCheckBoxesMode(GridSelectionShowCheckBoxesMode.Always)
+                .SelectAllMode(SelectAllMode.Page)
+                )
+
+            .HoverStateEnabled(true)
+            .RowAlternationEnabled(true)
+            .Paging(paging => paging.PageSize(10))
+            .Pager(pager => {
+                pager.ShowPageSizeSelector(true);
+                pager.AllowedPageSizes(new List<int> { 10, 25, 50, 100 });
+                pager.ShowInfo(true);
+            })
+
+            .DataSource(d => d.Mvc().Controller("LotControlTicket").LoadAction("Get"))
+
+            .FilterPanel(f => f.Visible(true))
+            .HeaderFilter(h => h.Visible(true))
+            .FilterValue(filterValue)
+            .FilterRow(filterRow => filterRow
+                    .Visible(true)
+                    .ApplyFilter(GridApplyFilterMode.Auto)
+                    )
+
+            .SearchPanel(searchPanel => searchPanel
+                .Visible(true)
+                .Width(240)
+                .Placeholder("Search...")
+            )
+
+            .Columns(columns => {
+                columns.Add().DataField("BarCode").Width(150).SortOrder(SortOrder.Asc);
+
+                columns.AddFor(m => m.ItemCode);
+
+                columns.Add().DataField("Material1");
+
+                columns.Add().DataField("Material2");
+
+                columns.Add().DataField("QtyOrder").Format("#,##0");
+
+                columns.Add().DataField("Fcode");
+
+                columns.Add().DataField("Model");
+
+                columns.Add().DataField("WStatus");
+
+            }) // end .Columns
+            
+            .MasterDetail(md => {
+            md.Enabled(true);
+            md.Template(@<text>@(Html.DevExtreme().DataGrid<MCP_WEB.Models.WoRouting>()
+                                    .ColumnAutoWidth(true)
+                                    .ShowBorders(true)
+                                    .Columns(columns => {
+                                            columns.AddFor(m => m.OperationNo).Caption("Operation");
+
+                                            columns.AddFor(m => m.ProcessCode).Caption("Process Code");
+
+                                            columns.AddFor(m => m.PStatus).Caption("Process Status");
+                                            ;
+                                        })
+                                    .DataSource(d => d.Mvc()
+                                        .Controller("LotControlTicket")
+                                        .LoadAction("GetDetails")
+                                        .LoadParams(new { id = new JS("data.BarCode") })
+                                    )
+                )</text>);
+                
+            })
+
+                .Summary(s => s.TotalItems(items => {
+                    items.AddFor(m => m.QtyOrder)
+                        .SummaryType(SummaryType.Sum)
+                        .ValueFormat(Format.Decimal).ValueFormat("#,##0").DisplayFormat("Total: {0}")
+                    ;
+                }))
+
+)
+
+@(Html.DevExtreme().Button()
+            .ID("btnPrintPreview")
+            .Text("Print")
+            .Type(ButtonType.Default)
+            .OnClick("PrintPreview")
+)

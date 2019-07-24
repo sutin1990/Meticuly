@@ -1,0 +1,252 @@
+﻿
+@(Html.DevExtreme().DataGrid<MCP_WEB.Models.m_BOM>()
+                     .ID("grid-container")
+                     .DataSource(ds => ds.Mvc()
+                     .Controller("m_BOM")
+                     .LoadAction("Get")
+                     .UpdateAction("Put")
+                     .InsertAction("Post")
+                     .DeleteAction("Delete")
+                     .Key("ItemCode"))
+                     .RemoteOperations(true)
+                     .ShowColumnLines(true)
+                     .ShowRowLines(true)
+                     .RowAlternationEnabled(true)
+                     .ShowBorders(true)
+
+                     .SearchPanel(p => p.Visible(true))
+                     .Pager(p => p
+                     .AllowedPageSizes(new int[] { 10, 25, 50, 100 })
+                     .ShowInfo(true)
+                     .ShowNavigationButtons(true)
+                     .ShowPageSizeSelector(true)
+                     .Visible(true))
+                     .Paging(p => p.PageSize(10))
+                     .ColumnChooser(c => c
+                       .Enabled(true)
+                       .Mode(GridColumnChooserMode.DragAndDrop))
+                     .AllowColumnResizing(true)
+                     .ColumnMinWidth(100)
+                     .ColumnAutoWidth(true)
+                     .ColumnHidingEnabled(true)
+
+                     .Export(e => e.Enabled(true).FileName("Bom - " + DateTime.Now).AllowExportSelectedData(true))
+                     .Columns(columns =>
+                     {
+                         columns.AddFor(m => m.ItemCode).Caption("Part No")
+                         .AllowSearch(true)
+                         .EditorOptions(new { showClearButton = true, ToolbarItemShowTextMode = true })
+                         .Lookup(lookup => lookup
+                             .DataSource(d => d.Mvc().Controller("BomLookup").LoadAction("GetTypeF").Key("ItemCode"))
+                             .DisplayExpr("ItemCode")
+                             .ValueExpr("ItemCode")
+                             .AllowClearing(true)
+                         );
+
+                         columns.AddFor(m => m.Fcode).Caption("F-CODE");
+
+                         columns.AddFor(m => m.ItemName).Caption("Part Name");
+
+                         columns.AddFor(m => m.Model).Caption("Model");
+
+                         columns.AddFor(m => m.Material1).Caption("Material#1")
+                           .EditorOptions(new {showClearButton = true })
+                        .Lookup(lookup => lookup
+                                   .DataSource(d => d.Mvc().Controller("BomLookup").LoadAction("GetTypeR").Key("ItemCode"))
+                                   .DisplayExpr("ItemCode")
+                                   .ValueExpr("ItemCode")
+                                   .AllowClearing(true)
+                               );
+
+                         columns.AddFor(m => m.Material2).Caption("Material#2")
+                          .Lookup(lookup => lookup
+                              .DataSource(d => d.Mvc().Controller("BomLookup").LoadAction("GetTypeR").Key("ItemCode"))
+                              .DisplayExpr("ItemCode")
+                              .ValueExpr("ItemCode")
+                              .AllowClearing(true)
+                          );
+
+                         columns.AddFor(m => m.BOMUserDef1)
+                         .Caption("Bom User Def1")
+                         .Visible(false);
+
+                         columns.AddFor(m => m.BOMUserDef2)
+                         .Caption("Bom User Def2")
+                         .Visible(false);
+
+                         columns.AddFor(m => m.BOMUserDef3)
+                         .Caption("Bom User Def3")
+                         .Visible(false);
+
+                         columns.AddFor(m => m.BOMUserDef4)
+                        .Caption("Bom User Def4")
+                        .Visible(false);
+
+                         columns.AddFor(m => m.TransDate)
+                         .Caption("Transaction Date")
+                         .AllowEditing(false)
+                         .Visible(false)
+                         .DataType(GridColumnDataType.DateTime)
+                         .Format(@ViewBag.format);
+
+                         columns.AddFor(m => m.CreateDate)
+                         .Caption("Create Date")
+                         .Format(@ViewBag.format)
+                         .DataType(GridColumnDataType.DateTime);
+
+
+                         columns.AddFor(m => m.ModifyBy)
+                              .Caption("Modify By")
+                              .Visible(false);
+                     })
+                          .Editing(e => e.Mode(GridEditMode.Popup)
+                          .AllowAdding(true)
+                          .AllowDeleting(true)
+                          .AllowUpdating(true)
+                          .UseIcons(true)
+                          .Popup(p => p
+                                .Title("Bom Info")
+                                .ShowTitle(true)
+                                .Width(700)
+                                .Height(345)
+                                .Position(pos => pos
+                                .My(HorizontalAlignment.Center, VerticalAlignment.Center)
+                                .At(HorizontalAlignment.Center, VerticalAlignment.Center)
+                                .Of(new JS("window"))
+                               )
+                            )
+                          ).OnContentReady(@<text>
+                            function(e) {
+                                moveEditColumnToLeft(e.component);
+                            }
+                        </text>)
+
+                          .OnEditingStart(@<text>
+                              function(e) {
+                              e.component.columnOption("ItemCode", "allowEditing", false);
+                              e.component.columnOption("Fcode", "allowEditing", false);
+                              e.component.columnOption("ItemName", "allowEditing", false);
+                              e.component.columnOption("Model", "allowEditing", false);
+                              e.component.columnOption("CreateDate", "allowEditing", false);
+                              e.component.columnOption("ModifyBy", "allowEditing", false);
+                              }
+                          </text>)
+                          .OnEditorPreparing(@<text>
+                              function(e) {
+                                getSelectPartNo(e)
+                              }
+                    </text>)
+)
+
+<script>
+
+    function formatDate(options) {
+
+        $.ajax({
+            url: "/api/s_GlobalPams/GetPram?options=" + options,
+            type: "Get",
+            //data: options,
+            contentType: "application/json; charset=utf-8",
+            success: function (response) {
+                $.each(response, function (i, item) {
+                    alert(item.param_value);
+                    return item.param_value;
+                });
+            },
+            error: function () {
+                $("#StorageLocations").empty();
+            }
+        });
+    }
+
+    function moveEditColumnToLeft(dataGrid) {
+        dataGrid.columnOption("command:edit", {
+            visibleIndex: -1
+        });
+    }
+
+    function getDataGridInstance() {
+        return $("#grid-container").dxDataGrid("instance");
+    }
+
+    function getFcode(grid, index, options) {
+        var date = new Date();
+        $.ajax({
+            url: "api/BomLookup/getItemResult?options=" + options,
+            type: "Get",
+            //data: options,
+            contentType: "application/json; charset=utf-8",
+            success: function (response) {
+                $.each(response, function (i, item) {
+                    grid.cellValue(index, "Fcode", item.Fcode);
+                    grid.cellValue(index, "Model", item.Model);
+                    grid.cellValue(index, "ItemName", item.ItemName);
+
+                });
+            },
+            error: function () {
+                $("#StorageLocations").empty();
+            }
+        });
+    }
+
+    function getSelectPartNo(e) {
+        if (e.parentType === "dataRow") {
+            var grid = e.component;
+            var index = e.row.rowIndex;
+
+            if (e.dataField === "ItemCode") {
+                e.editorOptions.onValueChanged = function (args) {
+                    var value = args.value;
+                    e.setValue(value);
+                    getFcode(grid, index, value);
+                }
+            }
+        }
+    }
+
+    $(function () {
+        $("#grid-container").dxDataGrid({
+            selection: {
+                mode: "multiple",
+                selectAllMode: "page",
+                recursive: false,
+                showCheckBoxesInMultipleMode: 'none'
+            },
+            headerFilter: {
+                visible: true
+            },
+            filterRow: { visible: true },
+            onInitNewRow: function (e) {
+                var date = new Date();
+
+                e.component.columnOption("ItemCode", "allowEditing", true);
+                e.component.columnOption("Fcode", "allowEditing", false);
+                e.component.columnOption("ItemName", "allowEditing", false);
+                e.component.columnOption("Model", "allowEditing", false);
+                e.component.columnOption("TransDate", "allowEditing", false);
+                e.component.columnOption("CreateDate", "allowEditing", false);
+                e.component.columnOption("ModifyBy", "allowEditing", false);
+
+                e.data.TransDate = date;
+                e.data.CreateDate = date;
+                e.data.ModifyBy = "@User.FindFirst("ContactName").Value";
+            },
+            onEditingStart: function (e) {
+                var date = new Date();
+
+                e.component.columnOption("ItemCode", "allowEditing", false);
+                e.component.columnOption("Fcode", "allowEditing", false);
+                e.component.columnOption("ItemName", "allowEditing", false);
+                e.component.columnOption("Model", "allowEditing", false);
+                e.component.columnOption("TransDate", "allowEditing", false);
+                e.component.columnOption("CreateDate", "allowEditing", false);
+                e.component.columnOption("ModifyBy", "allowEditing", false);
+
+                e.data.TransDate = date;
+                e.data.ModifyBy = "@User.FindFirst("ContactName").Value";
+            }
+        });
+    });
+
+</script>

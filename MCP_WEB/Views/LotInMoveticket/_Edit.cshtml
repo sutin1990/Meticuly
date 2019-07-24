@@ -1,0 +1,156 @@
+﻿<head>
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="expires" content="-1">
+</head>
+<div id="editscrollpop" class="scrollpop">
+    <div class="addcontentpop">
+        @model MCP_WEB.Models.MoveTicket
+        @using (Html.BeginForm())
+        {
+            using (Html.DevExtreme().ValidationGroup())
+            {
+                @Html.AntiForgeryToken()
+                <form id="form1" name="form1" autocomplete=off>
+                    <div class="form-group" autocomplete=off>
+
+                        <label class="col-lg-2 col-sm-2 control-label" style="padding-right:0; margin-bottom:10px; margin-top:10px;">Move Ticket : </label>
+                        <div class="col-lg-4 " style="padding-left:0; margin-bottom:10px; margin-top:10px;">
+                            @(Html.DevExtreme().TextBox().ID("edittxtMoveTicket").Name("moveTicket").ReadOnly(true))
+                        </div>
+
+                        <label class="col-lg-2 col-sm-2 control-label" style="padding-right:0; margin-bottom:10px; margin-top:10px;">Model :</label>
+                        <div class="col-lg-4 " style="padding-left:0; margin-bottom:10px; margin-top:10px;">
+                            @(Html.DevExtreme().TextBox().ID("edittxtModel").Name("Model").ReadOnly(true))
+                        </div>
+
+
+                        <label class="col-lg-2 col-sm-1 control-label" style="padding-right:0; margin-bottom:10px; margin-top:10px;">Part No : </label>
+                        <div class="col-lg-4" style="padding-left:0; margin-bottom:10px; margin-top:10px;">
+                            @(Html.DevExtreme().TextBox().ID("edittxtPartNo").Name("ItemCode").ReadOnly(true))
+                        </div>
+
+                        <label class="col-lg-2 col-sm-2 control-label" style="padding-right:0; margin-bottom:10px; margin-top:10px;">Packing Std. ID : </label>
+                        <div class="col-lg-4" style="padding-left:0; margin-bottom:10px; margin-top:10px;">
+                            @*<div id="txtDepID"></div>*@
+                            @(Html.DevExtreme().SelectBox().ID("edittxtPackingID").Name("BoxType").ReadOnly(true)
+                            )
+                        </div>
+
+                        <label class="col-lg-2 col-sm-2 control-label" style="padding-right:0; margin-bottom:10px; margin-top:10px;">Part DesType : </label>
+                        <div class="col-lg-4" style="padding-left:0; margin-bottom:10px; margin-top:10px;">
+                            @*<div id="txtDepID"></div>*@
+                            @(Html.DevExtreme().SelectBox().ID("edittxtPartDesType").Name("TagType")
+                            )
+                        </div>
+
+                        <label class="col-lg-2 col-sm-2 control-label" style="padding-right:0; margin-bottom:10px; margin-top:10px;">WIPQTY : </label>
+                        <div class="col-lg-4" style="padding-left:0; margin-bottom:10px; margin-top:10px;">
+                            @Html.DevExtreme().TextBox().ID("edittxtWIPQTY").Name("QtyMT").ReadOnly(true)
+                        </div>
+
+                        <div class="col-sm-offset-2 col-sm-10" style="text-align:right;">
+                            @(Html.DevExtreme().Button().Type(ButtonType.Normal).ID("EditbtnVoid")
+                                                                .Text("Void").Type(ButtonType.Danger)
+                                                                .OnClick("function (e) {if(e.validationGroup.validate().isValid){ VoidMoveticket(e);} }"))
+                            @(Html.DevExtreme().Button().ID("editbtnSave")
+                                                                .Text("Save")                                                               
+                                                                .OnClick("function (e) {if(e.validationGroup.validate().isValid){SaveEdit(e);} }"))
+
+                            @(Html.DevExtreme().Button().Type(ButtonType.Normal).ID("EditbtnCancel")
+                                                                .Text("Cancel")
+                                                                .OnClick("function (e) { editcanselButtonClick(); e.validationGroup.reset(); }"))
+                        </div>
+                    </div>
+                </form>
+            }
+        }
+    </div>
+</div>
+<script>
+
+    function editcanselButtonClick() {       
+        $('#EditPopup').dxPopup('instance').option('visible', false);
+    }
+
+    function SaveEdit() {       
+        var PartDesType = $("#edittxtPartDesType").dxSelectBox("instance").option("value");
+        var moveticket = $("#edittxtMoveTicket").dxTextBox("instance").option("value");
+            $.ajax({
+                type: 'POST',
+                url: '@Url.Action("UpadateMoveticket", "GridLotinMoveticket", new { httproute = true })',
+                data: {
+                    "moveticket": moveticket,                   
+                    "PartDesType": PartDesType
+                    },
+                    async: false,
+                    beforeSend: function () {/*loading*/ },
+                    dataType: 'json',
+                    success: function (data) {
+                    if (data == "0") {
+                        DevExpress.ui.notify("Edit Moveticket: " + moveticket + " This Moveticket is not available in the database.", "error", 2000);
+                    } else {
+                        editcanselButtonClick();
+                        $('#gridContainer').dxDataGrid('instance').refresh();
+                    }
+
+                    //$.each(data, function (item, value) {
+                    //    DevExpress.ui.notify("Edit Username: " + value.UserName + " success.", "success", 1000);
+                    //});
+
+                    },
+                    error: function (ob, errStr) {
+                       
+                        DevExpress.ui.notify(errStr, "error", 2000);
+                    }
+                });
+
+
+    }
+
+     function VoidMoveticket() {       
+         var Model = $("#edittxtModel").dxTextBox("instance").option("value");
+         var moveticket = $("#edittxtMoveTicket").dxTextBox("instance").option("value");
+         var msg = "";
+         var status = "";
+            $.ajax({
+                type: 'GET',
+                url: '@Url.Action("VoidMoveticket", "GridLotinMoveticket", new { httproute = true })',
+                data: {
+                    "moveticket": moveticket,                   
+                    "Model": Model
+                    },
+                    async: false,
+                    beforeSend: function () {/*loading*/ },
+                    dataType: 'json',
+                    success: function (result) {                        
+                        msg = result.moveTicket;
+                        status = result.SqlStatus;                        
+                        if (status == "Success") {
+                            var customDialog = DevExpress.ui.dialog.custom({
+                                title: 'Void Moveticket',
+                                message: 'Void Moveticket: ' + msg + 'status:' + status,
+                                toolbarItems: [
+                                    { text: "Close", onClick: function () { return "Ok" } },
+                                    //{ text: "Not Ok", onClick: function () { return "Not Ok" } }
+                                ],
+                                width: "500px"
+
+                            });
+                            customDialog.show().done(function (dialogResult) {
+                                //$("#addtxtModel").dxTextBox("instance").focus();
+                                editcanselButtonClick();
+                            });
+                        } else {
+                            DevExpress.ui.notify(msg, "error", 2000);
+                        }                       
+
+                    },
+                    error: function (ob, errStr) {
+                       
+                        DevExpress.ui.notify(errStr, "error", 2000);
+                    }
+                });
+
+
+    }
+</script>

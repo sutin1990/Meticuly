@@ -1,0 +1,78 @@
+﻿
+@*@{
+    Layout = null;
+}*@
+
+<!DOCTYPE html>
+
+<html>
+<head>
+    <meta name="viewport" content="width=device-width" />
+    <title>Index</title>
+    <script>
+        function PrintPreviewT1(data) {
+            //var grid = $('#gridContainer').dxDataGrid('instance');
+            //var keys = grid.getSelectedRowKeys();
+            var text = "";
+            //var s;
+            //for (s in keys) {
+            //    if (text != "") {
+            //        text += "&";
+            //    }
+            //    text += 'id=' + keys[s].BarCode;
+            //}
+            //window.open('LotControlTicket/PrintLotControl?' + text);
+            window.open('TagCard5Type/T1');
+        }
+        function PrintPreviewT2(data) {
+            window.open('TagCard5Type/T2');
+        }
+        function PrintPreviewT3(data) {
+            window.open('TagCard5Type/T3');
+        }
+        function PrintPreviewT4(data) {
+            window.open('TagCard5Type/T4');
+        }
+        function PrintPreviewT5(data) {
+            window.open('TagCard5Type/T5');
+        }
+    </script>
+</head>
+<body>
+    <h3> Print Tag 5 Card </h3>
+    @(Html.DevExtreme().Button()
+        .ID("btnPrintPreviewT1")
+        .Text("T1")
+        .Type(ButtonType.Default)
+        .OnClick("PrintPreviewT1")
+    )
+
+    @(Html.DevExtreme().Button()
+        .ID("btnPrintPreviewT2")
+        .Text("T2")
+        .Type(ButtonType.Default)
+        .OnClick("PrintPreviewT2")
+    )
+
+    @(Html.DevExtreme().Button()
+        .ID("btnPrintPreviewT3")
+        .Text("T3")
+        .Type(ButtonType.Default)
+        .OnClick("PrintPreviewT3")
+    )
+
+    @(Html.DevExtreme().Button()
+        .ID("btnPrintPreviewT4")
+        .Text("T4")
+        .Type(ButtonType.Default)
+        .OnClick("PrintPreviewT4")
+    )
+
+    @(Html.DevExtreme().Button()
+        .ID("btnPrintPreviewT5")
+        .Text("T5")
+        .Type(ButtonType.Default)
+        .OnClick("PrintPreviewT5")
+    )
+</body>
+</html>

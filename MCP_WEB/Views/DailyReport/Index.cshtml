@@ -1,0 +1,1391 @@
+﻿<style>
+    div.relative {
+        position: relative;
+        width: 100%;
+        border: 1px solid lightgray;
+        height: 120px;
+        margin-top: 10px;
+        margin-bottom: 10px;
+    }
+
+    div.absolute1 {
+        position: absolute;
+        left: 20px;
+        width: 250px;
+        /*height: 100px;*/
+        /*border: 1px solid #73AD21;*/
+    }
+
+    div.absolute2 {
+        position: absolute;
+        /*top: 10px;*/
+        left: 300px;
+        width: 250px;
+        /*height: 100px;*/
+        /*border: 1px solid #73AD21;*/
+    }
+
+    div.absolute3 {
+        position: absolute;
+        top: 4%;
+        left: 30%;
+        /*height: 100px;*/
+    }
+
+    div.absolute4 {
+        position: absolute;
+        top: 60px;
+        left: 20px;
+        /*width: 400px;*/
+        /*height: 100px;*/
+    }
+</style>
+<div class="relative">
+    <div class="absolute1"><label style="padding-top:10px">Period:</label></div><div id="startdateBox" style="width:191px; height:34px; left:100px; bottom:78px; position: absolute; "></div>    
+   
+    <div class="absolute4"><label style="padding-top:10px">Process:</label><div id="select_ProcessMaster"style="left:80px; bottom:30px;"></div></div>
+    <div class="absolute3">
+        @(Html.DevExtreme().Button()
+                            .ID("OK")
+                            .Text("OK")
+                            .Type(ButtonType.Success)
+                            .OnClick("filter")
+        )
+
+       
+    </div>
+
+</div>
+<script>
+    var maxItems = 3;
+    var suspendValueChagned;
+    var itemprocess = null;
+     var source_m_Processmaster = DevExpress.data.AspNet.createStore({               
+        "loadUrl": "@Url.Action("GetProcess", "GridDaily_Report", new { httproute = true })",
+    });
+    var display = "";
+    var Process = "";
+    $("#select_ProcessMaster").dxSelectBox({
+        dataSource: source_m_Processmaster,
+        displayExpr: function (e) {
+            if (e) {
+                display = e.ProcessName;
+            }
+            return display;
+        },
+        //displayExpr: "DepDesc",
+        valueExpr: 'ProcessCode',
+        searchEnabled: true,
+        searchExpr: ["ProcessCode", "ProcessName"],
+
+        itemTemplate: function (itemData) {
+            return $("<div />").append(
+                $("<p />").text(itemData.ProcessName)
+                    .css("display", "inline-block")
+            );
+        },
+        onValueChanged: function (e) {
+            Process = e.value;
+        },
+    });
+
+    var startdateBox = new Date();
+    var month = startdateBox.getMonth() + 1;
+    var day = startdateBox.getDate();
+    if (month < 10) { month = "0" + month; }
+    if (day < 10) { day = "0" + day; }
+    //startdateBox = startdateBox.getFullYear() + "-" + month + "-" + day;
+    startdateBox = startdateBox.getFullYear() + month;
+    //console.log(startdateBox);
+    var Year = new Date();
+    Year = Year.getFullYear();
+    $("#startdateBox").dxTextBox({
+        placeholder: "YYYYMM",
+        onValueChanged: function (e) {
+            startdateBox = e.value
+        }
+    }).dxValidator({
+        validationRules: [{
+            type: "required",
+            message: "Period is required."
+        },
+        {
+            type: "custom",
+            message: "Please fill out the form correctly.",
+            validationCallback: function (e) {
+                var check = false;
+                var date = e.value;
+                var yyyy = date.substr(0, 4);
+                var MM = parseInt(date.substr(date.length - 2));
+                //console.log("date", "yyyy=>" + yyyy + "MM=>" + MM);
+                if (date.length == 6 && MM <= 12 && yyyy <= Year) {
+
+                    check = true;
+                }
+                //console.log(e.value.length);
+                return check;
+            }
+        }
+        ]
+    });
+
+    //    var startdateBox = new Date();
+    //    var month = startdateBox.getMonth() + 1;
+    //    var day = startdateBox.getDate();
+    //    if (month < 10) { month = "0" + month; }
+    //    if (day < 10) { day = "0" + day; }
+    //startdateBox = startdateBox.getFullYear() + "-" + month + "-" + day;
+
+    //    $("#startdateBox").dxDateBox({
+    //        min: new Date(2000, 0, 1),
+    //        max: new Date(2029, 11, 31),
+    //        value: new Date(),
+    //        displayFormat: "dd/MM/yyyy",
+    //        formatString: 'shortdate',
+    //        onValueChanged: function (e) {
+                
+    //            startdateBox = e.value;
+    //             month = startdateBox.getMonth() + 1;
+    //             day = startdateBox.getDate();
+    //            if (month < 10) { month = "0" + month; }
+    //            if (day < 10) { day = "0" + day; }
+    //            startdateBox = startdateBox.getFullYear() + "-" + month + "-" + day;
+                
+
+    //        },
+
+    //    }).dxValidator({
+    //        validationRules: [{
+    //            type: "required",
+    //            message: "From Date is required."
+    //        },
+            
+    //        ]
+    //    });       
+
+    
+
+
+</script>
+@*<div id="gridContainer"></div>*@
+@(Html.DevExtreme().DataGrid<MCP_WEB.Models.DailyReport>()
+                        .ID("gridContainer")
+                        .ShowBorders(true)
+                        .Export(e => e.Enabled(true).FileName("DailyReport-" + DateTime.Now).AllowExportSelectedData(true))
+                        //.ColumnChooser(c => c.Enabled(true))
+                        .AllowColumnResizing(true)
+                        .AllowColumnReordering(true)
+                        //.RemoteOperations(true)
+                        .ShowRowLines(true)
+                        .Selection(s => s.Mode(SelectionMode.Multiple)
+                            .ShowCheckBoxesMode(GridSelectionShowCheckBoxesMode.Always)
+                            .SelectAllMode(SelectAllMode.Page)
+                            )
+
+                        .HoverStateEnabled(true)
+                        .RowAlternationEnabled(true)
+                        .Paging(paging => paging.PageSize(10))
+                       .Pager(p => p
+                            .AllowedPageSizes(new int[] { 10, 25, 50, 100 })
+                            .ShowInfo(true)
+                            .ShowNavigationButtons(true)
+                            .ShowPageSizeSelector(true)
+                            .Visible(true))
+
+                        //.DataSource(d => d.Mvc().Controller("ProductionDailyReport1").LoadAction("Get"))
+
+                        //.FilterPanel(f => f.Visible(true))
+                        .HeaderFilter(h => h.Visible(true))
+                        .FilterRow(filterRow => filterRow
+                                .Visible(true)
+                                .ApplyFilter(GridApplyFilterMode.Auto))
+                        .SearchPanel(searchPanel => searchPanel
+                            .Visible(true)
+                            .Width(240)
+                            .Placeholder("Search..."))
+
+)
+<br />
+ @(Html.DevExtreme().Button()
+                    .ID("btnPrintPreviewT1")
+                    .Text("Print")
+                    .Type(ButtonType.Default)
+                    //.UseSubmitBehavior(true)
+                    .OnClick("PrintPreview")
+        )
+
+
+
+<script type="text/javascript">
+
+    var dt;
+    var get_columnname = [];
+    var uniq = [];
+    var MC_type = [];
+    const format = num => {
+        const n = String(num),
+            p = n.indexOf('.')
+        return n.replace(
+            /\d(?=(?:\d{3})+(?:\.|$))/g,
+            (m, i) => p < 0 || i < p ? `${m},` : m
+        )
+    }
+    
+
+    function filter() {
+        var fcode = [];
+        var unique_Fcode;
+        var jsonarray = [];
+           
+        var check_startdate = $("#startdateBox").dxTextBox("instance").option('isValid');
+        
+        if (Process !="") {
+
+        if (check_startdate == true) {
+                $.ajax({
+                    type: "POST",
+                    url: "@Url.Action("Get", "GridDaily_Report")",
+                    data: { "fromdate": startdateBox,"Process": Process },
+                    async: false,
+                    dataType: "json",
+                    success: function (result) {
+                        dt = result;
+                        var columnsIn = result[0];
+                        //console.log(dt);
+                        $.each(result, function (item,value) {
+                            fcode.push(value.FCode);
+
+                            jsonarray.push({ "FCode": value.FCode, "Model": value.Model });
+
+                            for (k in value) {//เลือกเอาเฉพาะKeyของข้อมูลมาก่อน
+                                get_columnname.push(k);
+                            }
+                        });
+
+                    }
+                });
+                //console.log(jsonarray);
+            const startsWithMC = get_columnname.filter((country) => country.startsWith("MC"));//กรองเอาเฉพาะitemที่ขึ้นต้นด้วย MC
+            const startsWith_D = get_columnname.filter((country) => country.startsWith("D"));//กรองเอาเฉพาะitemที่ขึ้นต้นด้วย MC
+            const startsWith_N = get_columnname.filter((country) => country.startsWith("N"));//กรองเอาเฉพาะitemที่ขึ้นต้นด้วย MC
+            //console.log(startsWith_D);
+
+                function onlyUnique(value, index, self) {//ตัดตัวซํ้า
+                    return self.indexOf(value) === index;
+                }
+
+
+                function compare(a, b) {//เรียงลำดับข้อมูลจากน้อยไปมาก
+                    if (parseInt(a.substring(2), 10) < parseInt(b.substring(2),10))
+                        return -1;
+                    if (parseInt(a.substring(2), 10) > parseInt(b.substring(2),10))
+                        return 1;
+                    return 0;
+                }
+               
+                const result = [];
+                const map = new Map();
+                for (const item of jsonarray) {
+                    if (!map.has(item.FCode)) {
+                        map.set(item.FCode, true);    // set any value to Map
+                        result.push({
+                            "FCode": item.FCode,
+                            "Model": item.Model
+                        });
+                    }
+                }                
+
+                var unique = startsWithMC.filter(onlyUnique);
+                fcode = fcode.filter(onlyUnique);
+                //var unique_jsonarray = jsonarray.filter(onlyUnique);
+
+                //console.log(unique);
+                var reMC = unique.sort(compare);
+                //console.log(startsWithMC);
+
+                
+            var sumtotal = [];
+            var jsonSummary = [];
+
+            var summaryD = [];
+            var summaryN = [];
+            
+            var sumD01 = [];
+            var sumD02 = [];
+            var sumD03 = [];
+            var sumD04 = [];
+            var sumD05 = [];
+            var sumD06 = [];
+            var sumD07 = [];
+            var sumD08 = [];
+            var sumD09 = [];
+            var sumD10 = [];
+            var sumD11 = [];
+            var sumD12 = [];
+            var sumD13 = [];
+            var sumD14 = [];
+            var sumD15 = [];
+            var sumD16 = [];
+            var sumD17 = [];
+            var sumD18 = [];
+            var sumD19 = [];
+            var sumD20 = [];
+            var sumD21 = [];
+            var sumD22 = [];
+            var sumD23 = [];
+            var sumD24 = [];
+            var sumD25 = [];
+            var sumD26 = [];
+            var sumD27 = [];
+            var sumD28 = [];
+            var sumD29 = [];
+            var sumD30 = [];
+            var sumD31 = [];
+
+            var sumN01 = [];
+            var sumN02 = [];
+            var sumN03 = [];
+            var sumN04 = [];
+            var sumN05 = [];
+            var sumN06 = [];
+            var sumN07 = [];
+            var sumN08 = [];
+            var sumN09 = [];
+            var sumN10 = [];
+            var sumN11 = [];
+            var sumN12 = [];
+            var sumN13 = [];
+            var sumN14 = [];
+            var sumN15 = [];
+            var sumN16 = [];
+            var sumN17 = [];
+            var sumN18 = [];
+            var sumN19 = [];
+            var sumN20 = [];
+            var sumN21 = [];
+            var sumN22 = [];
+            var sumN23 = [];
+            var sumN24 = [];
+            var sumN25 = [];
+            var sumN26 = [];
+            var sumN27 = [];
+            var sumN28 = [];
+            var sumN29 = [];
+            var sumN30 = [];
+            var sumN31 = [];
+
+            jsonSummary.push({
+                column: "Model",
+                alignment: "right",
+                customizeText: function (data) {
+                    return "Total:";
+                },
+            });
+            for (var x = 1; x <= 31; x++) {                
+                var sumN;
+                var day_no = "0" + x;
+                day_no = day_no.substr(day_no.length - 2);  
+               
+                jsonSummary.push(
+                    { showInColumn: "D" + day_no, name: "D" + day_no, summaryType: "custom", valueFormat: "#,##0", alignment: "right" },
+                    { showInColumn: "N" + day_no, name: "N" + day_no, summaryType: "custom", valueFormat: "#,##0", alignment: "right" },
+                );
+
+            }
+            jsonSummary.push(
+                { showInColumn: "total", name: "total", summaryType: "custom", valueFormat: "#,##0", alignment: "right" },                
+            );           
+            
+            $("#gridContainer").dxDataGrid({
+                dataSource: dt,
+                columnAutoWidth: true,
+                allowColumnReordering: true,
+                allowColumnResizing: true,
+                showRowLines: true,
+                //remoteOperations:true,
+                "export": {
+                    enabled: true,
+                    fileName: "DailyReport-" + Date(),
+                    allowExportSelectedData: true
+                },
+                searchPanel: {
+                    visible: true,
+                    width: 240,
+                    placeholder:"Search...",
+                },
+                headerFilter:{
+                    visible:true,
+                },
+                filterRow: {
+                    visible: true,
+                    applyFilter:"auto",
+                },
+                rowAlternationEnabled:true,
+                showBorders: true,
+                paging: {
+                    //enabled: false,
+                    pageSize:10,
+                },
+                pager: {
+                    showPageSizeSelector: true,
+                    allowedPageSizes: [10, 25, 50, 100],
+                    showInfo: true,
+                    showNavigationButtons: true,
+                    showPageSizeSelector: true,
+                    visible:true,
+                },
+                selection: {
+                    mode: "multiple",                    
+                    showCheckBoxesMode: "always",
+                    selectAllMode:"page",
+                },
+                onCellPrepared: function (e) {
+                    totals_D = 0;                    
+                    for (var a = 1; a <= 31; a++){                        
+                        var day_no = "0" + a;
+                        day_no = day_no.substr(day_no.length - 2);
+                        
+                        if (e.rowType === "data" && e.column.dataField == "D" + day_no && e.rowIndex != undefined) {
+                            if (summaryD[a]) {
+                                summaryD[a] += 0;
+                            } else { summaryD[a] = 0; }
+                            summaryD[a] = parseFloat(summaryD[a] + e.data["D" + day_no]);
+                                              
+                        }
+                        if (e.rowType === "data" && e.column.dataField == "N" + day_no && e.rowIndex != undefined) {
+                            if (summaryN[a]) {
+                                summaryN[a] += 0;
+                            } else { summaryN[a] = 0; }
+                            summaryN[a] = parseFloat(summaryN[a] + e.data["N" + day_no]);
+                        }   
+                        
+                    }
+                    
+                    function summ() {
+                        //if (e.rowType == "data" && e.column.dataField == "D01" && e.rowIndex != undefined) {
+                        //    sumD01.push(e.data["D01"]);
+                        //}
+                        //if (e.rowType == "data" && e.column.dataField == "D02" && e.rowIndex != undefined) {
+                        //    sumD02.push(e.data["D02"]);
+                        //}
+                        //if (e.rowType == "data" && e.column.dataField == "D03" && e.rowIndex != undefined) {
+                        //    sumD03.push(e.data["D03"]);
+                        //}
+                        //if (e.rowType == "data" && e.column.dataField == "D04" && e.rowIndex != undefined) {
+                        //    sumD04.push(e.data["D04"]);
+                        //}
+                        //if (e.rowType == "data" && e.column.dataField == "D05" && e.rowIndex != undefined) {
+                        //    sumD05.push(e.data["D05"]);
+                        //}
+                        //if (e.rowType == "data" && e.column.dataField == "D06" && e.rowIndex != undefined) {
+                        //    sumD06.push(e.data["D06"]);
+                        //}
+                        //if (e.rowType == "data" && e.column.dataField == "D07" && e.rowIndex != undefined) {
+                        //    sumD07.push(e.data["D07"]);
+                        //}
+                        //if (e.rowType == "data" && e.column.dataField == "D08" && e.rowIndex != undefined) {
+                        //    sumD08.push(e.data["D08"]);
+                        //}
+                        //if (e.rowType == "data" && e.column.dataField == "D09" && e.rowIndex != undefined) {
+                        //    sumD09.push(e.data["D09"]);
+                        //}
+                        //if (e.rowType == "data" && e.column.dataField == "D10" && e.rowIndex != undefined) {
+                        //    sumD10.push(e.data["D10"]);
+                        //}
+                        //if (e.rowType == "data" && e.column.dataField == "D11" && e.rowIndex != undefined) {
+                        //    sumD11.push(e.data["D11"]);
+                        //}
+                        //if (e.rowType == "data" && e.column.dataField == "D12" && e.rowIndex != undefined) {
+                        //    sumD12.push(e.data["D12"]);
+                        //}
+                        //if (e.rowType == "data" && e.column.dataField == "D13" && e.rowIndex != undefined) {
+                        //    sumD13.push(e.data["D13"]);
+                        //}
+                        //if (e.rowType == "data" && e.column.dataField == "D14" && e.rowIndex != undefined) {
+                        //    sumD14.push(e.data["D14"]);
+                        //}
+                        //if (e.rowType == "data" && e.column.dataField == "D15" && e.rowIndex != undefined) {
+                        //    sumD15.push(e.data["D15"]);
+                        //}
+                        //if (e.rowType == "data" && e.column.dataField == "D16" && e.rowIndex != undefined) {
+                        //    sumD16.push(e.data["D16"]);
+                        //}
+                        //if (e.rowType == "data" && e.column.dataField == "D17" && e.rowIndex != undefined) {
+                        //    sumD17.push(e.data["D17"]);
+                        //}
+                        //if (e.rowType == "data" && e.column.dataField == "D18" && e.rowIndex != undefined) {
+                        //    sumD18.push(e.data["D18"]);
+                        //}
+                        //if (e.rowType == "data" && e.column.dataField == "D19" && e.rowIndex != undefined) {
+                        //    sumD19.push(e.data["D19"]);
+                        //}
+                        //if (e.rowType == "data" && e.column.dataField == "D20" && e.rowIndex != undefined) {
+                        //    sumD20.push(e.data["D20"]);
+                        //}
+                        //if (e.rowType == "data" && e.column.dataField == "D21" && e.rowIndex != undefined) {
+                        //    sumD21.push(e.data["D21"]);
+                        //}
+                        //if (e.rowType == "data" && e.column.dataField == "D22" && e.rowIndex != undefined) {
+                        //    sumD22.push(e.data["D22"]);
+                        //}
+                        //if (e.rowType == "data" && e.column.dataField == "D23" && e.rowIndex != undefined) {
+                        //    sumD23.push(e.data["D23"]);
+                        //}
+                        //if (e.rowType == "data" && e.column.dataField == "D24" && e.rowIndex != undefined) {
+                        //    sumD24.push(e.data["D24"]);
+                        //}
+                        //if (e.rowType == "data" && e.column.dataField == "D25" && e.rowIndex != undefined) {
+                        //    sumD25.push(e.data["D25"]);
+                        //}
+                        //if (e.rowType == "data" && e.column.dataField == "D26" && e.rowIndex != undefined) {
+                        //    sumD26.push(e.data["D26"]);
+                        //}
+                        //if (e.rowType == "data" && e.column.dataField == "D27" && e.rowIndex != undefined) {
+                        //    sumD27.push(e.data["D27"]);
+                        //}
+                        //if (e.rowType == "data" && e.column.dataField == "D28" && e.rowIndex != undefined) {
+                        //    sumD28.push(e.data["D28"]);
+                        //}
+                        //if (e.rowType == "data" && e.column.dataField == "D29" && e.rowIndex != undefined) {
+                        //    sumD29.push(e.data["D29"]);
+                        //}
+                        //if (e.rowType == "data" && e.column.dataField == "D30" && e.rowIndex != undefined) {
+                        //    sumD30.push(e.data["D30"]);
+                        //}
+                        //if (e.rowType == "data" && e.column.dataField == "D31" && e.rowIndex != undefined) {
+                        //    sumD31.push(e.data["D31"]);
+                        //}
+                        //if (e.rowType == "data" && e.column.dataField == "N01" && e.rowIndex != undefined) {
+                        //    sumN01.push(e.data["N01"]);
+                        //}
+                        //if (e.rowType == "data" && e.column.dataField == "N02" && e.rowIndex != undefined) {
+                        //    sumN02.push(e.data["N02"]);
+                        //}
+                        //if (e.rowType == "data" && e.column.dataField == "N03" && e.rowIndex != undefined) {
+                        //    sumN03.push(e.data["N03"]);
+                        //}
+                        //if (e.rowType == "data" && e.column.dataField == "N04" && e.rowIndex != undefined) {
+                        //    sumN04.push(e.data["N04"]);
+                        //}
+                        //if (e.rowType == "data" && e.column.dataField == "N05" && e.rowIndex != undefined) {
+                        //    sumN05.push(e.data["N05"]);
+                        //}
+                        //if (e.rowType == "data" && e.column.dataField == "N06" && e.rowIndex != undefined) {
+                        //    sumN06.push(e.data["N06"]);
+                        //}
+                        //if (e.rowType == "data" && e.column.dataField == "N07" && e.rowIndex != undefined) {
+                        //    sumN07.push(e.data["N07"]);
+                        //}
+                        //if (e.rowType == "data" && e.column.dataField == "N08" && e.rowIndex != undefined) {
+                        //    sumN08.push(e.data["N08"]);
+                        //}
+                        //if (e.rowType == "data" && e.column.dataField == "N09" && e.rowIndex != undefined) {
+                        //    sumN09.push(e.data["N09"]);
+                        //}
+                        //if (e.rowType == "data" && e.column.dataField == "N10" && e.rowIndex != undefined) {
+                        //    sumN10.push(e.data["N10"]);
+                        //}
+                        //if (e.rowType == "data" && e.column.dataField == "N11" && e.rowIndex != undefined) {
+                        //    sumN11.push(e.data["N11"]);
+                        //}
+                        //if (e.rowType == "data" && e.column.dataField == "N12" && e.rowIndex != undefined) {
+                        //    sumN12.push(e.data["N12"]);
+                        //}
+                        //if (e.rowType == "data" && e.column.dataField == "N13" && e.rowIndex != undefined) {
+                        //    sumN13.push(e.data["N13"]);
+                        //}
+                        //if (e.rowType == "data" && e.column.dataField == "N14" && e.rowIndex != undefined) {
+                        //    sumN14.push(e.data["N14"]);
+                        //}
+                        //if (e.rowType == "data" && e.column.dataField == "N15" && e.rowIndex != undefined) {
+                        //    sumN15.push(e.data["N15"]);
+                        //}
+                        //if (e.rowType == "data" && e.column.dataField == "N16" && e.rowIndex != undefined) {
+                        //    sumN16.push(e.data["N16"]);
+                        //}
+                        //if (e.rowType == "data" && e.column.dataField == "N17" && e.rowIndex != undefined) {
+                        //    sumN17.push(e.data["N17"]);
+                        //}
+                        //if (e.rowType == "data" && e.column.dataField == "N18" && e.rowIndex != undefined) {
+                        //    sumN18.push(e.data["N18"]);
+                        //}
+                        //if (e.rowType == "data" && e.column.dataField == "N19" && e.rowIndex != undefined) {
+                        //    sumN19.push(e.data["N19"]);
+                        //}
+                        //if (e.rowType == "data" && e.column.dataField == "N20" && e.rowIndex != undefined) {
+                        //    sumN20.push(e.data["N20"]);
+                        //}
+                        //if (e.rowType == "data" && e.column.dataField == "N21" && e.rowIndex != undefined) {
+                        //    sumN21.push(e.data["N21"]);
+                        //}
+                        //if (e.rowType == "data" && e.column.dataField == "N22" && e.rowIndex != undefined) {
+                        //    sumN22.push(e.data["N22"]);
+                        //}
+                        //if (e.rowType == "data" && e.column.dataField == "N23" && e.rowIndex != undefined) {
+                        //    sumN23.push(e.data["N23"]);
+                        //}
+                        //if (e.rowType == "data" && e.column.dataField == "N24" && e.rowIndex != undefined) {
+                        //    sumN24.push(e.data["N24"]);
+                        //}
+                        //if (e.rowType == "data" && e.column.dataField == "N25" && e.rowIndex != undefined) {
+                        //    sumN25.push(e.data["N25"]);
+                        //}
+                        //if (e.rowType == "data" && e.column.dataField == "N26" && e.rowIndex != undefined) {
+                        //    sumN26.push(e.data["N26"]);
+                        //}
+                        //if (e.rowType == "data" && e.column.dataField == "N27" && e.rowIndex != undefined) {
+                        //    sumN27.push(e.data["N27"]);
+                        //}
+                        //if (e.rowType == "data" && e.column.dataField == "N28" && e.rowIndex != undefined) {
+                        //    sumN28.push(e.data["N28"]);
+                        //}
+                        //if (e.rowType == "data" && e.column.dataField == "N29" && e.rowIndex != undefined) {
+                        //    sumN29.push(e.data["N29"]);
+                        //}
+                        //if (e.rowType == "data" && e.column.dataField == "N30" && e.rowIndex != undefined) {
+                        //    sumN30.push(e.data["N30"]);
+                        //}
+                        //if (e.rowType == "data" && e.column.dataField == "N31" && e.rowIndex != undefined) {
+                        //    sumN31.push(e.data["N31"]);
+                        //}
+                    }
+                    
+                    if (e.rowType === "data" && e.column.dataField === "total" && e.rowIndex != undefined) {
+                        //console.log(e.data["D01"]);
+                        sumtotal.push(e.data["total"]);
+                        }
+                    
+                },
+                onContentReady: function (e) {
+                    var gridItems = $("#gridContainer").dxDataGrid('instance');                   
+                    var summaryCells = e.component.getController('data').footerItems()[0].summaryCells;
+                    var Total = sumtotal.reduce((a, b) => parseFloat(a) + parseFloat(b), 0);
+                    //console.log(summaryD);
+                    $.each(summaryCells, function (item, value) {
+                        if (value.length > 0) {
+                            //console.log(item + "=>" + value[0].name);
+                            var name = value[0].name;
+
+                            for (var x = 1; x <= 31; x++) {
+                                var day_no = "0" + x;
+                                day_no = day_no.substr(day_no.length - 2);
+
+                                if (name == "D" + day_no) {
+                                    gridItems.getController('data').footerItems()[0].summaryCells[item][0].value = summaryD[x];
+                                }
+                                if (name == "N" + day_no) {
+                                    gridItems.getController('data').footerItems()[0].summaryCells[item][0].value = summaryN[x];
+                                }
+                                
+                            }
+                            if (name == "total") {
+                                gridItems.getController('data').footerItems()[0].summaryCells[item][0].value = format(parseFloat(Total).toFixed(2)).toString();
+                            }
+                            gridItems.getView('footerView').render();
+                        }
+                    });
+                    sumtotal = [];
+                    summaryD = [];
+                    summaryN = [];
+                    NotSelection(gridItems);
+                    
+                    function clear() {
+                        //sumD01 = [];
+                        //sumD02 = [];
+                        //sumD03 = [];
+                        //sumD04 = [];
+                        //sumD05 = [];
+                        //sumD06 = [];
+                        //sumD07 = [];
+                        //sumD08 = [];
+                        //sumD09 = [];
+                        //sumD10 = [];
+                        //sumD11 = [];
+                        //sumD12 = [];
+                        //sumD13 = [];
+                        //sumD14 = [];
+                        //sumD15 = [];
+                        //sumD16 = [];
+                        //sumD17 = [];
+                        //sumD18 = [];
+                        //sumD19 = [];
+                        //sumD20 = [];
+                        //sumD21 = [];
+                        //sumD22 = [];
+                        //sumD23 = [];
+                        //sumD24 = [];
+                        //sumD25 = [];
+                        //sumD26 = [];
+                        //sumD27 = [];
+                        //sumD28 = [];
+                        //sumD29 = [];
+                        //sumD30 = [];
+                        //sumD31 = [];
+
+                        //sumN01 = [];
+                        //sumN02 = [];
+                        //sumN03 = [];
+                        //sumN04 = [];
+                        //sumN05 = [];
+                        //sumN06 = [];
+                        //sumN07 = [];
+                        //sumN08 = [];
+                        //sumN09 = [];
+                        //sumN10 = [];
+                        //sumN11 = [];
+                        //sumN12 = [];
+                        //sumN13 = [];
+                        //sumN14 = [];
+                        //sumN15 = [];
+                        //sumN16 = [];
+                        //sumN17 = [];
+                        //sumN18 = [];
+                        //sumN19 = [];
+                        //sumN20 = [];
+                        //sumN21 = [];
+                        //sumN22 = [];
+                        //sumN23 = [];
+                        //sumN24 = [];
+                        //sumN25 = [];
+                        //sumN26 = [];
+                        //sumN27 = [];
+                        //sumN28 = [];
+                        //sumN29 = [];
+                        //sumN30 = [];
+                        //sumN31 = [];
+                    }
+                    
+                },
+                summary: {
+                    calculateCustomSummary: function (options) {
+                        for (var a = 1; a <= 31; a++) {
+                            var day_no = "0" + a;
+                            day_no = day_no.substr(day_no.length - 2);
+                            var Day = "D" + day_no;
+                            var Night = "N" + day_no;
+                            if (options.name == Day) {
+                                if (options.summaryProcess == "start") {
+                                    options.totalValue = 0;
+                                }
+                                if (options.summaryProcess == "calculate") {
+                                    if (options.value) {                                       
+                                        options.totalValue += options.value["D" + day_no];
+                                    }
+                                }
+                            }
+                            if (options.name == Night) {
+                                if (options.summaryProcess == "start") {
+                                    options.totalValue = 0;
+                                }
+                                if (options.summaryProcess == "calculate") {
+                                    if (options.value) {                                        
+                                        options.totalValue += options.value["N" + day_no];
+                                    }
+                                }
+                            }
+                        }
+                        if (options.name == "total") {
+                            if (options.summaryProcess == "start") {
+                                options.totalValue = 0;
+                            }
+                            if (options.summaryProcess == "calculate") {
+                                if (options.value) {                                    
+                                    options.totalValue += options.value["total"];
+                                }
+                            }
+                        }
+                    },
+                    totalItems: jsonSummary
+                    //totalItems: [{
+                    //    column: "Model",
+                    //    alignment: "right",
+                    //    customizeText: function (data) {
+                    //        return "Total:";
+                    //    }
+                    //},{
+                    //    column: "D01", summaryType: "sum", displayFormat: "{0}", customizeText: function (data) {
+                    //        var sum = sumD01.reduce((a, b) => parseFloat(a) + parseFloat(b), 0);
+                    //        return format(sum).toString();
+                    //    }
+                    //}, {
+                    //    column: "D02", summaryType: "sum", displayFormat: "{0}", customizeText: function (data) {
+                    //        var sum = sumD02.reduce((a, b) => parseFloat(a) + parseFloat(b), 0);
+                    //        return format(sum).toString();
+                    //    }
+                    //},{
+                    //     column: "D03", summaryType: "sum", displayFormat: "{0}", customizeText: function (data) {
+                    //            var sum = sumD03.reduce((a, b) => parseFloat(a) + parseFloat(b), 0);
+                    //            return format(sum).toString();
+                    //        }
+                    //},{
+                    //    column: "D04", summaryType: "sum", displayFormat: "{0}", customizeText: function (data) {
+                    //        var sum = sumD04.reduce((a, b) => parseFloat(a) + parseFloat(b), 0);
+                    //        return format(sum).toString();
+                    //    }
+                    //},{
+                    //    column: "D05", summaryType: "sum", displayFormat: "{0}", customizeText: function (data) {
+                    //        var sum = sumD05.reduce((a, b) => parseFloat(a) + parseFloat(b), 0);
+                    //        return format(sum).toString();
+                    //    }
+                    //}, {
+                    //    column: "D06", summaryType: "sum", displayFormat: "{0}", customizeText: function (data) {
+                    //        var sum = sumD06.reduce((a, b) => parseFloat(a) + parseFloat(b), 0);
+                    //        return format(sum).toString();
+                    //    }
+                    //}, {
+                    //    column: "D07", summaryType: "sum", displayFormat: "{0}", customizeText: function (data) {
+                    //        var sum = sumD07.reduce((a, b) => parseFloat(a) + parseFloat(b), 0);
+                    //        return format(sum).toString();
+                    //    }
+                    //}, {
+                    //    column: "D08", summaryType: "sum", displayFormat: "{0}", customizeText: function (data) {
+                    //        var sum = sumD08.reduce((a, b) => parseFloat(a) + parseFloat(b), 0);
+                    //        return format(sum).toString();
+                    //    }
+                    //}, {
+                    //    column: "D09", summaryType: "sum", displayFormat: "{0}", customizeText: function (data) {
+                    //        var sum = sumD09.reduce((a, b) => parseFloat(a) + parseFloat(b), 0);
+                    //        return format(sum).toString();
+                    //    }
+                    //}, {
+                    //    column: "D10", summaryType: "sum", displayFormat: "{0}", customizeText: function (data) {
+                    //        var sum = sumD10.reduce((a, b) => parseFloat(a) + parseFloat(b), 0);
+                    //        return format(sum).toString();
+                    //    }
+                    //}, {
+                    //    column: "D11", summaryType: "sum", displayFormat: "{0}", customizeText: function (data) {
+                    //        var sum = sumD11.reduce((a, b) => parseFloat(a) + parseFloat(b), 0);
+                    //        return format(sum).toString();
+                    //    }
+                    //}, {
+                    //    column: "D12", summaryType: "sum", displayFormat: "{0}", customizeText: function (data) {
+                    //        var sum = sumD12.reduce((a, b) => parseFloat(a) + parseFloat(b), 0);
+                    //        return format(sum).toString();
+                    //    }
+                    //}, {
+                    //    column: "D13", summaryType: "sum", displayFormat: "{0}", customizeText: function (data) {
+                    //        var sum = sumD13.reduce((a, b) => parseFloat(a) + parseFloat(b), 0);
+                    //        return format(sum).toString();
+                    //    }
+                    //}, {
+                    //    column: "D14", summaryType: "sum", displayFormat: "{0}", customizeText: function (data) {
+                    //        var sum = sumD14.reduce((a, b) => parseFloat(a) + parseFloat(b), 0);
+                    //        return format(sum).toString();
+                    //    }
+                    //}, {
+                    //    column: "D15", summaryType: "sum", displayFormat: "{0}", customizeText: function (data) {
+                    //        var sum = sumD15.reduce((a, b) => parseFloat(a) + parseFloat(b), 0);
+                    //        return format(sum).toString();
+                    //    }
+                    //}, {
+                    //    column: "D16", summaryType: "sum", displayFormat: "{0}", customizeText: function (data) {
+                    //        var sum = sumD16.reduce((a, b) => parseFloat(a) + parseFloat(b), 0);
+                    //        return format(sum).toString();
+                    //    }
+                    //}, {
+                    //    column: "D17", summaryType: "sum", displayFormat: "{0}", customizeText: function (data) {
+                    //        var sum = sumD17.reduce((a, b) => parseFloat(a) + parseFloat(b), 0);
+                    //        return format(sum).toString();
+                    //    }
+                    //}, {
+                    //    column: "D18", summaryType: "sum", displayFormat: "{0}", customizeText: function (data) {
+                    //        var sum = sumD18.reduce((a, b) => parseFloat(a) + parseFloat(b), 0);
+                    //        return format(sum).toString();
+                    //    }
+                    //}, {
+                    //    column: "D19", summaryType: "sum", displayFormat: "{0}", customizeText: function (data) {
+                    //        var sum = sumD19.reduce((a, b) => parseFloat(a) + parseFloat(b), 0);
+                    //        return format(sum).toString();
+                    //    }
+                    //}, {
+                    //    column: "D20", summaryType: "sum", displayFormat: "{0}", customizeText: function (data) {
+                    //        var sum = sumD20.reduce((a, b) => parseFloat(a) + parseFloat(b), 0);
+                    //        return format(sum).toString();
+                    //    }
+                    //}, {
+                    //    column: "D21", summaryType: "sum", displayFormat: "{0}", customizeText: function (data) {
+                    //        var sum = sumD21.reduce((a, b) => parseFloat(a) + parseFloat(b), 0);
+                    //        return format(sum).toString();
+                    //    }
+                    //}, {
+                    //    column: "D22", summaryType: "sum", displayFormat: "{0}", customizeText: function (data) {
+                    //        var sum = sumD22.reduce((a, b) => parseFloat(a) + parseFloat(b), 0);
+                    //        return format(sum).toString();
+                    //    }
+                    //}, {
+                    //    column: "D23", summaryType: "sum", displayFormat: "{0}", customizeText: function (data) {
+                    //        var sum = sumD23.reduce((a, b) => parseFloat(a) + parseFloat(b), 0);
+                    //        return format(sum).toString();
+                    //    }
+                    //}, {
+                    //    column: "D24", summaryType: "sum", displayFormat: "{0}", customizeText: function (data) {
+                    //        var sum = sumD24.reduce((a, b) => parseFloat(a) + parseFloat(b), 0);
+                    //        return format(sum).toString();
+                    //    }
+                    //}, {
+                    //    column: "D25", summaryType: "sum", displayFormat: "{0}", customizeText: function (data) {
+                    //        var sum = sumD25.reduce((a, b) => parseFloat(a) + parseFloat(b), 0);
+                    //        return format(sum).toString();
+                    //    }
+                    //}, {
+                    //    column: "D26", summaryType: "sum", displayFormat: "{0}", customizeText: function (data) {
+                    //        var sum = sumD26.reduce((a, b) => parseFloat(a) + parseFloat(b), 0);
+                    //        return format(sum).toString();
+                    //    }
+                    //}, {
+                    //    column: "D27", summaryType: "sum", displayFormat: "{0}", customizeText: function (data) {
+                    //        var sum = sumD27.reduce((a, b) => parseFloat(a) + parseFloat(b), 0);
+                    //        return format(sum).toString();
+                    //    }
+                    //}, {
+                    //    column: "D28", summaryType: "sum", displayFormat: "{0}", customizeText: function (data) {
+                    //        var sum = sumD28.reduce((a, b) => parseFloat(a) + parseFloat(b), 0);
+                    //        return format(sum).toString();
+                    //    }
+                    //}, {
+                    //    column: "D29", summaryType: "sum", displayFormat: "{0}", customizeText: function (data) {
+                    //        var sum = sumD29.reduce((a, b) => parseFloat(a) + parseFloat(b), 0);
+                    //        return format(sum).toString();
+                    //    }
+                    //}, {
+                    //    column: "D30", summaryType: "sum", displayFormat: "{0}", customizeText: function (data) {
+                    //        var sum = sumD30.reduce((a, b) => parseFloat(a) + parseFloat(b), 0);
+                    //        return format(sum).toString();
+                    //    }
+                    //}, {
+                    //column: "D31", summaryType: "sum", displayFormat: "{0}", customizeText: function (data) {
+                    //    var sum = sumD31.reduce((a, b) => parseFloat(a) + parseFloat(b), 0);
+                    //    return format(sum).toString();
+                    //}
+                    //}, {
+                    //    column: "N01", summaryType: "sum", displayFormat: "{0}", customizeText: function (data) {
+                    //        var sum = sumN01.reduce((a, b) => parseFloat(a) + parseFloat(b), 0);
+                    //        return format(sum).toString();
+                    //    }
+                    //}, {
+                    //    column: "N02", summaryType: "sum", displayFormat: "{0}", customizeText: function (data) {
+                    //        var sum = sumN02.reduce((a, b) => parseFloat(a) + parseFloat(b), 0);
+                    //        return format(sum).toString();
+                    //    }
+                    //}, {
+                    //    column: "N03", summaryType: "sum", displayFormat: "{0}", customizeText: function (data) {
+                    //        var sum = sumN03.reduce((a, b) => parseFloat(a) + parseFloat(b), 0);
+                    //        return format(sum).toString();
+                    //    }
+                    //}, {
+                    //    column: "N04", summaryType: "sum", displayFormat: "{0}", customizeText: function (data) {
+                    //        var sum = sumN04.reduce((a, b) => parseFloat(a) + parseFloat(b), 0);
+                    //        return format(sum).toString();
+                    //    }
+                    //}, {
+                    //    column: "N05", summaryType: "sum", displayFormat: "{0}", customizeText: function (data) {
+                    //        var sum = sumN05.reduce((a, b) => parseFloat(a) + parseFloat(b), 0);
+                    //        return format(sum).toString();
+                    //    }
+                    //}, {
+                    //    column: "N06", summaryType: "sum", displayFormat: "{0}", customizeText: function (data) {
+                    //        var sum = sumN06.reduce((a, b) => parseFloat(a) + parseFloat(b), 0);
+                    //        return format(sum).toString();
+                    //    }
+                    //}, {
+                    //    column: "N07", summaryType: "sum", displayFormat: "{0}", customizeText: function (data) {
+                    //        var sum = sumN07.reduce((a, b) => parseFloat(a) + parseFloat(b), 0);
+                    //        return format(sum).toString();
+                    //    }
+                    //}, {
+                    //    column: "N08", summaryType: "sum", displayFormat: "{0}", customizeText: function (data) {
+                    //        var sum = sumN08.reduce((a, b) => parseFloat(a) + parseFloat(b), 0);
+                    //        return format(sum).toString();
+                    //    }
+                    //}, {
+                    //    column: "N09", summaryType: "sum", displayFormat: "{0}", customizeText: function (data) {
+                    //        var sum = sumN09.reduce((a, b) => parseFloat(a) + parseFloat(b), 0);
+                    //        return format(sum).toString();
+                    //    }
+                    //}, {
+                    //    column: "N10", summaryType: "sum", displayFormat: "{0}", customizeText: function (data) {
+                    //        var sum = sumN10.reduce((a, b) => parseFloat(a) + parseFloat(b), 0);
+                    //        return format(sum).toString();
+                    //    }
+                    //}, {
+                    //    column: "N11", summaryType: "sum", displayFormat: "{0}", customizeText: function (data) {
+                    //        var sum = sumN11.reduce((a, b) => parseFloat(a) + parseFloat(b), 0);
+                    //        return format(sum).toString();
+                    //    }
+                    //}, {
+                    //    column: "N12", summaryType: "sum", displayFormat: "{0}", customizeText: function (data) {
+                    //        var sum = sumN12.reduce((a, b) => parseFloat(a) + parseFloat(b), 0);
+                    //        return format(sum).toString();
+                    //    }
+                    //}, {
+                    //    column: "N13", summaryType: "sum", displayFormat: "{0}", customizeText: function (data) {
+                    //        var sum = sumN13.reduce((a, b) => parseFloat(a) + parseFloat(b), 0);
+                    //        return format(sum).toString();
+                    //    }
+                    //}, {
+                    //    column: "N14", summaryType: "sum", displayFormat: "{0}", customizeText: function (data) {
+                    //        var sum = sumN14.reduce((a, b) => parseFloat(a) + parseFloat(b), 0);
+                    //        return format(sum).toString();
+                    //    }
+                    //}, {
+                    //    column: "N15", summaryType: "sum", displayFormat: "{0}", customizeText: function (data) {
+                    //        var sum = sumN15.reduce((a, b) => parseFloat(a) + parseFloat(b), 0);
+                    //        return format(sum).toString();
+                    //    }
+                    //}, {
+                    //    column: "N16", summaryType: "sum", displayFormat: "{0}", customizeText: function (data) {
+                    //        var sum = sumN16.reduce((a, b) => parseFloat(a) + parseFloat(b), 0);
+                    //        return format(sum).toString();
+                    //    }
+                    //}, {
+                    //    column: "N17", summaryType: "sum", displayFormat: "{0}", customizeText: function (data) {
+                    //        var sum = sumN17.reduce((a, b) => parseFloat(a) + parseFloat(b), 0);
+                    //        return format(sum).toString();
+                    //    }
+                    //}, {
+                    //    column: "N18", summaryType: "sum", displayFormat: "{0}", customizeText: function (data) {
+                    //        var sum = sumN18.reduce((a, b) => parseFloat(a) + parseFloat(b), 0);
+                    //        return format(sum).toString();
+                    //    }
+                    //}, {
+                    //    column: "N19", summaryType: "sum", displayFormat: "{0}", customizeText: function (data) {
+                    //        var sum = sumN19.reduce((a, b) => parseFloat(a) + parseFloat(b), 0);
+                    //        return format(sum).toString();
+                    //    }
+                    //}, {
+                    //    column: "N20", summaryType: "sum", displayFormat: "{0}", customizeText: function (data) {
+                    //        var sum = sumN20.reduce((a, b) => parseFloat(a) + parseFloat(b), 0);
+                    //        return format(sum).toString();
+                    //    }
+                    //}, {
+                    //    column: "N21", summaryType: "sum", displayFormat: "{0}", customizeText: function (data) {
+                    //        var sum = sumN21.reduce((a, b) => parseFloat(a) + parseFloat(b), 0);
+                    //        return format(sum).toString();
+                    //    }
+                    //}, {
+                    //    column: "N22", summaryType: "sum", displayFormat: "{0}", customizeText: function (data) {
+                    //        var sum = sumN22.reduce((a, b) => parseFloat(a) + parseFloat(b), 0);
+                    //        return format(sum).toString();
+                    //    }
+                    //}, {
+                    //    column: "N23", summaryType: "sum", displayFormat: "{0}", customizeText: function (data) {
+                    //        var sum = sumN23.reduce((a, b) => parseFloat(a) + parseFloat(b), 0);
+                    //        return format(sum).toString();
+                    //    }
+                    //}, {
+                    //    column: "N24", summaryType: "sum", displayFormat: "{0}", customizeText: function (data) {
+                    //        var sum = sumN24.reduce((a, b) => parseFloat(a) + parseFloat(b), 0);
+                    //        return format(sum).toString();
+                    //    }
+                    //}, {
+                    //    column: "N25", summaryType: "sum", displayFormat: "{0}", customizeText: function (data) {
+                    //        var sum = sumN25.reduce((a, b) => parseFloat(a) + parseFloat(b), 0);
+                    //        return format(sum).toString();
+                    //    }
+                    //}, {
+                    //    column: "N26", summaryType: "sum", displayFormat: "{0}", customizeText: function (data) {
+                    //        var sum = sumN26.reduce((a, b) => parseFloat(a) + parseFloat(b), 0);
+                    //        return format(sum).toString();
+                    //    }
+                    //}, {
+                    //    column: "N27", summaryType: "sum", displayFormat: "{0}", customizeText: function (data) {
+                    //        var sum = sumN27.reduce((a, b) => parseFloat(a) + parseFloat(b), 0);
+                    //        return format(sum).toString();
+                    //    }
+                    //}, {
+                    //    column: "N28", summaryType: "sum", displayFormat: "{0}", customizeText: function (data) {
+                    //        var sum = sumN28.reduce((a, b) => parseFloat(a) + parseFloat(b), 0);
+                    //        return format(sum).toString();
+                    //    }
+                    //}, {
+                    //    column: "N29", summaryType: "sum", displayFormat: "{0}", customizeText: function (data) {
+                    //        var sum = sumN29.reduce((a, b) => parseFloat(a) + parseFloat(b), 0);
+                    //        return format(sum).toString();
+                    //    }
+                    //}, {
+                    //    column: "N30", summaryType: "sum", displayFormat: "{0}", customizeText: function (data) {
+                    //        var sum = sumN30.reduce((a, b) => parseFloat(a) + parseFloat(b), 0);
+                    //        return format(sum).toString();
+                    //    }
+                    //}, {
+                    //    column: "N31", summaryType: "sum", displayFormat: "{0}", customizeText: function (data) {
+                    //        var sum = sumN31.reduce((a, b) => parseFloat(a) + parseFloat(b), 0);
+                    //        return format(sum).toString();
+                    //    }
+                    //},{
+                    //    column: "total", summaryType: "sum", displayFormat: "{0}", customizeText: function (data) {
+                    //        var sum = sumtotal.reduce((a, b) => parseFloat(a) + parseFloat(b), 0);
+                    //        return format(sum).toString();
+                    //    }
+                    //}]  
+                        
+                },
+                groupPanel: {
+                    visible: true
+                },
+                columns: [{ dataField: "RowNumber", visible: false },
+                { dataField: "MachineCode", caption: "M/C line" },
+                { dataField: "FCode", caption: "F-Code" },
+                {
+                    headerCellTemplate: function (container) {
+                        container.append($("<div>Model</div>"));
+                    },
+                    dataField: "Model"
+                    }, 
+                ],
+                customizeColumns: function (columns) {
+                    //console.log(columns);
+                    //console.log(unique_Fcode[f]);
+                    //columns.push({
+                    //    caption: "FCodex",
+                    //    calculateDisplayValue: function (e) {
+                    //        for (var f = 0; f < unique_Fcode.length; f++) {
+                    //            return unique_Fcode[f];
+                    //        }
+                    //    }
+
+                    //})
+                    var qty2 = [];
+                    //var contactsFields = ["MC1", "MC2", "MC3"];
+                    //Object.keys(dt).forEach(function (k) {
+                    //    $.each(dt[k], function (item, value) {
+                    //        console.log(item + "=>" + value);
+                    //    });
+                    //    //console.log(k + ' - ' + dt[k]);
+                    //});
+
+                    for (var z = 0; z < 31; z++) {
+                        var jsoncol = [];
+                        var day_no = "0" + (z + 1);
+                        var month = dt[0].period;
+                        month = month.substr(0, month.length-4);
+                        day_no = day_no.substr(day_no.length - 2);
+                            if (startsWith_D[z] == "D"+day_no && startsWith_N[z] == "N"+day_no) {
+                                var find_D;
+                                var find_N;
+                                jsoncol.push({ "dataField": "D" + day_no, format: "#,##0" }, { "dataField": "N" + day_no, format: "#,##0" });
+                                //jsoncol.push({//push column ย่อย
+                                //    "dataField": startsWith_D[z], "calculateDisplayValue": function (rowData) {
+                                //        find_D = dt.filter(function (item) {
+                                //            if (item.RowNumber === undefined || item.RowNumber != rowData.RowNumber) {
+                                //                return false;
+                                //            } else {
+                                //                return true;
+                                //            }
+
+                                //        });
+                                //        if (find_D.length > 0) {
+                                //            //var D = find_D[0];
+                                //            //return find_D[0].D01;
+                                //            //return D.GetType().GetProperty("D" + day_no).GetValue(D, null);
+                                //            return find_D[0]["D" + day_no] + " (D" + day_no + ") " + find_D[0].RowNumber;
+
+                                //        } else { return "undefined"; }
+                                //    },
+                                //}, {
+                                //        "dataField": startsWith_N[z], "calculateDisplayValue": function (rowData) {
+                                //            find_N = dt.filter(function (item) {
+                                //                if (item.RowNumber === undefined || item.RowNumber != rowData.RowNumber) {
+                                //                    return false;
+                                //                } else {
+                                //                    return true;
+                                //                }
+
+                                //            });
+                                //            if (find_N.length > 0) {
+                                //                //return find_N[0].N01;
+                                //                //var N = find_N[0];
+                                //                //return N.GetType().GetProperty("N" + day_no).GetValue(N, null);
+                                //                return find_N[0]["N" + day_no];
+                                //            } else { return "undefined"; }
+                                //        },
+                                //    });
+                            }
+                            //======================================
+                            //if (startsWith_D[z] == "D01" && startsWith_N[z] == "N01") {
+                            //    var find_D;
+                            //    var find_N;
+                            //    jsoncol.push({//push column ย่อย
+                            //        "dataField": startsWith_D[z], "calculateDisplayValue": function (rowData) {
+                            //            find_D = dt.filter(function (item) {                                            
+                            //                if (item.RowNumber === undefined || item.RowNumber != rowData.RowNumber) {
+                            //                    return false;
+                            //                } else {                                               
+                            //                    return true;
+                            //                }
+
+                            //            });                                        
+                            //            if (find_D.length > 0) {
+                            //                return find_D[0].D01;
+                            //            } else { return "undefined";}                                        
+                            //        },
+                            //    }, {
+                            //            "dataField": startsWith_N[z], "calculateDisplayValue": function (rowData) {
+                            //                find_N = dt.filter(function (item) {
+                            //                    if (item.RowNumber === undefined || item.RowNumber != rowData.RowNumber) {
+                            //                        return false;
+                            //                    } else {                                                    
+                            //                        return true;
+                            //                    }
+
+                            //                });
+                            //                if (find_N.length > 0) {
+                            //                    return find_N[0].N01;
+                            //                } else { return "undefined"; }
+                            //            },
+                            //        });
+                            //}
+
+                            //if (startsWith_D[z] == "D02" && startsWith_N[z] == "N02") {
+                            //    var find_D;
+                            //    var find_N;
+                            //    jsoncol.push({//push column ย่อย
+                            //        "dataField": startsWith_D[z], "calculateDisplayValue": function (rowData) {
+                            //            find_D = dt.filter(function (item) {
+                            //                if (item.RowNumber === undefined || item.RowNumber != rowData.RowNumber) {
+                            //                    return false;
+                            //                } else {
+                            //                    return true;
+                            //                }
+
+                            //            });
+                            //            if (find_D.length > 0) {
+                            //                return find_D[0].D02;
+                            //            } else { return "undefined"; }
+                            //        },
+                            //    }, {
+                            //            "dataField": startsWith_N[z], "calculateDisplayValue": function (rowData) {
+                            //                find_N = dt.filter(function (item) {
+                            //                    if (item.RowNumber === undefined || item.RowNumber != rowData.RowNumber) {
+                            //                        return false;
+                            //                    } else {
+                            //                        return true;
+                            //                    }
+
+                            //                });
+                            //                if (find_N.length > 0) {
+                            //                    return find_N[0].N02;
+                            //                } else { return "undefined"; }
+                            //            },
+                            //        });
+                            //}
+
+
+                            
+
+                            columns.push({
+                                caption: day_no + "/" + month,
+                                alignment:"center",
+                                //customizeColumns: function (columns) {
+                                //    console.log(columns);
+                                //    columns.push({
+                                //        caption:"MC1",
+                                //        dataField: "MC1"
+                                //    });
+                                //                                       //var tex = "";
+                                //    //for (var i = 0; i < contactsFields.length; i++) {
+                                //    //    tex = "{dataField:" + contactsFields[i] + "},";
+                                //    //    console.log(tex);
+                                //    //}
+                                //    //return "["+tex+"]";
+                                //}
+                                //columns: [{ dataField: "MC1", calculateDisplayValue: function (cellInfo) { return "xxxxx"; } }]
+                                columns: jsoncol
+                                //columns: [{
+                                //    dataField: "MC1",
+                                //    calculateDisplayValue: function (e) {
+                                //        return "xxxxyyysss";
+                                //    }
+                                //}]
+                            },
+                                //{ dataField: "total", caption: "Total" },
+                            );
+
+                    }
+                    columns.push({ dataField: "total", caption: "Total", format: "#,##0" });
+
+                },               
+                
+
+               }).dxDataGrid("instance");
+
+
+            //console.log(jsonSummary);
+
+            }
+        } else {
+            var errorcustomDialog = DevExpress.ui.dialog.custom({
+                title: 'Can not View Data  ! ',
+                message: 'Please select ProcessCode.',
+                toolbarItems: [
+                    { text: "Close", onClick: function () { return "Ok" } },
+                    //{ text: "Not Ok", onClick: function () { return "Not Ok" } }
+                ],
+                width: "500px"
+
+            });
+            errorcustomDialog.show().done(function (dialogResult) {
+                //focus something
+            });
+        }       
+
+    }
+
+        function PrintPreview(data) {
+        var grid = $('#gridContainer').dxDataGrid('instance');
+        var keys = grid.getSelectedRowKeys();
+        var text = "";
+        var s;
+        var comma = 0;
+        var checkslectDN = false;
+        if (keys.length > 0) {
+            for (s in keys) {
+                comma = parseInt(s) + 1;
+                if (comma == keys.length) {
+                    text += keys[s].RowNumber;
+                }
+                else {
+                    text += keys[s].RowNumber + ",";
+                }
+            }
+            
+            $.ajax({
+                type: 'POST',
+                url: "api/GridDaily_Report/Print",
+                data: { "RowNumber": text,"fromdate": startdateBox,"Process":Process},
+                //contentType: "application/json; charset=utf-8",
+                //dataType: "html",
+                //async: false,
+                //dataType: 'json',
+                success: function (e) {
+                    //alert("xxx");
+                    //$(element).closest("form").submit();
+                    window.open('@Url.Action("Index", "PrintDailyReport")?Process='+Process+'&fromdate='+startdateBox, '_blank').focus();
+
+                }
+            });
+          
+
+        } else {
+            var errorcustomDialog = DevExpress.ui.dialog.custom({
+                title: 'print WIPStatus incorrect ! ',
+                message: 'Please Select Row Data.',
+                toolbarItems: [
+                    { text: "Close", onClick: function () { return "Ok" } },
+                    //{ text: "Not Ok", onClick: function () { return "Not Ok" } }
+                ],
+                width: "500px"
+
+            });
+            errorcustomDialog.show().done(function (dialogResult) {
+                //focus something
+            });
+        }
+             @*window.open('@Url.Action("Index", "PrintProduction1")', '_blank').focus();*@
+
+    }
+
+
+
+</script>
+

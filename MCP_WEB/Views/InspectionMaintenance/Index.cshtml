@@ -1,0 +1,1380 @@
+﻿@model MCP_WEB.Models.VW_MFC_ROUTEINSPECT
+<style>
+
+    a {
+        text-decoration: none !important;
+    }
+
+    .dx-link-edit-4x {
+        /*padding-right: 2px;*/
+        font-size: 1.2em;
+        width: auto;
+        height: auto;
+    }
+
+    /*.dx-datagrid-revert-tooltip {
+        display: none;
+    }*/
+
+    .dx-datagrid-rowsview .dx-data-row .dx-cell-modified .dx-highlight-outline::after {
+        border-color: transparent;
+    }
+   
+    /*.dx-checkbox-icon {
+        border: 1px solid green;
+    }*/
+
+    /*.dx-overlay-content.dx-popup-normal.dx-resizable .dx-popup-content {
+        background-color: yellow;
+        color: blue;
+        font-weight: bold;
+    }*/
+</style>
+<div id="addscrollpop" class="scrollpop">
+    <div class="addcontentpop">
+
+        @using (Html.BeginForm())
+        {
+            using (Html.DevExtreme().ValidationGroup())
+            {
+                @Html.AntiForgeryToken()
+                <form id="form1" name="form1">
+                    <div class="form-group">
+                        
+                        <div class="col-lg-12" style="padding-bottom:10px;">                           
+
+                            @(Html.DevExtreme().DataGrid<MCP_WEB.Models.VW_MFC_ROUTEINSPECT>()
+                                                    .ID("gridInspectionMaintenance")
+                                                    .DataSource(ds => ds.Mvc()
+                                                    .Controller("GirdInspectionMaintenance")
+                                                    .LoadAction("Get")
+
+                                                    //.LoadParams(new { DocEntry = "117" })
+                                                    //.Key("U_AbsEntry")
+                                                    )
+                                                    .Editing(editing =>
+                                                    {
+                                                        editing.Mode(GridEditMode.Batch);
+                                                        editing.AllowUpdating(true);
+                                                        editing.AllowAdding(true);
+                                                        //editing.AllowDeleting(true);
+                                                        //editing.AllowUpdating(true);
+
+                                                    })
+                                                    .OnToolbarPreparing("ontoolbarItem")
+                                                    .OnCellPrepared("onCellPrepared")
+                                                    .OnContentReady("onContentReady")
+                                                    .RowAlternationEnabled(true)
+                                                    .Selection(s => s.Mode(SelectionMode.Multiple)
+                                                    .ShowCheckBoxesMode(GridSelectionShowCheckBoxesMode.Always)
+                                                    .SelectAllMode(SelectAllMode.Page))
+                                                    .Paging(paging => paging.Enabled(true))
+                                                    //.RemoteOperations(true)
+                                                    .AllowColumnReordering(true)
+                                                    .AllowColumnResizing(true)
+
+                                                    .HeaderFilter(headerFilter => headerFilter.Visible(true))
+
+                                                    .Export(e => e.Enabled(true).FileName("InspectionMaintenance" + DateTime.Now).AllowExportSelectedData(true))
+
+                                                    // .ColumnChooser(c => c.Enabled(true))
+                                                    .ShowBorders(true)
+                                                    .ShowRowLines(true)
+                                                    //.Grouping(grouping => grouping.AutoExpandAll(true))
+                                                    //.GroupPanel(groupPanel => groupPanel.Visible(true))
+                                                    //.OnRowPrepared("rowcolor")
+                                                    //.OnToolbarPreparing("toolbar_preparing")
+                                                    .ColumnMinWidth(100)
+                                                    .ColumnAutoWidth(true)
+                                                    //.ColumnHidingEnabled(true)
+                                                    .OnRowValidating("onRowValidating")
+                                                    //.OnRowValidating("")
+                                                    .Sorting(sorting => sorting.Mode(GridSortingMode.Multiple))
+                                                    .Columns(columns =>
+                                                    {
+                                                        //columns.Add().Caption("Edit or Delete").Width(125).Alignment(HorizontalAlignment.Center)
+                                                        //.CellTemplate(new JS("cellTemplate")).AllowExporting(false);
+
+                                                        //columns.Add().DataField("UserId").Caption("User Id").ShowInColumnChooser(false).Visible(false);
+
+                                                        //columns.Add().DataField("U_AbsEntry").Caption("DocEntry IN");
+                                                        columns.Add().DataField("DocEntry").Visible(false);
+                                                        columns.Add().DataField("U_RouteCode").Caption("Route Code").Width(350)//.AllowSorting(false)
+                                                                                                                    //.CellTemplate("cellTemplate")
+                                                                                                                    //.SetCellValue("setStateValue")
+
+                                                            .Lookup(lookup => lookup
+                                                               .DataSource(d => d.Mvc().Controller("GirdInspectionMaintenance").LoadAction("Get_OSRN").Key("AbsEntry"))
+                                                               .DisplayExpr("Code")
+                                                               .ValueExpr("Code"))
+                                                            //.CellTemplate("cellTemplate")
+                                                            .ValidationRules(r => r.AddCustom().ValidationCallback("validationCallback_U_RouteCode").Message("Route Code is required.")).SortOrder(SortOrder.Asc);
+                                                        columns.Add().DataField("Desc").Caption("Route Description");//.AllowSorting(false);
+                                                        columns.Add().DataField("U_MethodDesc").Caption("Inspection Method Description").SortOrder(SortOrder.Asc)//.AllowSorting(false)
+                                                        .ValidationRules(m => m.AddCustom().ValidationCallback("validationCallback_U_MethodDesc").Message("Inspection Method Description is required."));
+
+                                                        columns.Add().DataField("U_RptOrder").Caption("Report Ordering").SortOrder(SortOrder.Asc)//.AllowSorting(false)
+                                                        .ValidationRules(r => r.AddCustom().ValidationCallback("validationCallback_U_RptOrder"));
+                                                        columns.Add().DataField("U_ActiveFlag").Caption("Active").ValidationRules(m => m.AddCustom()
+                                                        .ValidationCallback("validationCallback_U_ActiveFlag").Message("Active is required.")).DataType(GridColumnDataType.Boolean)//.AllowSorting(false)//.DataType(GridColumnDataType.Boolean)
+                                                        ;
+                                                        columns.Add().DataField("U_Lastupdateby").Caption("Updated By");
+                                                        columns.Add().DataField("U_Lastupdatedate").Caption("Updated Date").DataType(GridColumnDataType.DateTime).Format("dd/MM/yyyy H:m:s");
+
+                                                        //.GroupIndex(0);
+
+                                                        //columns.Add().DataField("CreateDate").Caption("Create Date").DataType(GridColumnDataType.Date).Format(ViewBag.GlobalDtFormat).AllowSearch(true)
+
+                                                        //.Visible(false);
+                                                        //columns.Add().DataField("UserCreated").Caption("User Created").Visible(false);
+                                                        //columns.Add().DataField("TransDate").Caption("Trans Date")
+                                                        //.DataType(GridColumnDataType.Date).Format(ViewBag.GlobalDtFormat).AllowSearch(true)
+
+                                                        //.Visible(false);
+
+                                                        //columns.Add()
+                                                        //.DataField("LastSignedin").Caption("Last Signed in")
+                                                        //.AllowSearch(true)
+                                                        //.DataType(GridColumnDataType.DateTime)
+                                                        //.Format(ViewBag.GlobalDtFormat);
+                                                        //columns.Add().DataField("ModifyBy").Caption("Modify By").Visible(false);
+
+                                                    })
+
+
+                                                        .Paging(paging => paging.PageSize(10))
+
+                                                        .Pager(p => p
+                                                        .AllowedPageSizes(new int[] { 10, 25, 50, 100 })
+                                                        .ShowInfo(true)
+                                                        .ShowNavigationButtons(true)
+                                                        .ShowPageSizeSelector(true)
+                                                        .Visible(true))
+
+                                                        //.HeaderFilter(h => h.Visible(true))
+                                                        //.FilterPanel(f => f.Visible(true))
+                                                        //.FilterValue(filterValue)
+                                                        .FilterRow(filterRow => filterRow
+                                                        //.Visible(true)
+                                                        .ApplyFilter(GridApplyFilterMode.Auto)
+                                                        )
+                                                        .SearchPanel(searchPanel => searchPanel
+                                                        .Visible(true)
+                                                        .Width(185)
+                                                        .Placeholder("Search...")
+                                                        )
+                                                        .OnEditorPrepared("onEditorPrepared")
+                                                        .OnEditorPreparing("onEditorPreparing")
+                                                        .OnInitNewRow("onInitNewRow")
+                                                        .OnContextMenuPreparing("onContextMenuPreparing")
+                                                        .OnRowPrepared("onRowPrepared")
+                                                        .OnSelectionChanged("onSelectionChanged")
+                            //.OnRowRemoving()
+                            //.OnRowInserting("onRowInserting")
+                            //.OnRowUpdating("onRowUpdating")
+                            )
+                        </div>
+
+                        <div class="col-sm-offset-2 col-sm-10" style="text-align:right; padding-bottom:10px;">
+
+                            @(Html.DevExtreme().Button().ID("addbtnSave").Type(ButtonType.Success)
+                                                                                .Text("Save")
+                                                                                .Disabled(true)
+                                                                                .FocusStateEnabled(true)
+                                                                                .OnClick("SaveInspection"))
+                            @*<div style="text-align:left;">*@
+                                @(Html.DevExtreme().Button().ID("deletebtnSave").Type(ButtonType.Danger)
+                                                                                .Text("Delete")
+                                                                                .Disabled(true)
+                                                                                .FocusStateEnabled(true)
+                                                                                .OnClick("delete_selected"))
+
+                            @*</div>*@
+                        </div>
+          
+                    </div>
+                </form>
+            }
+        }
+    </div>
+</div>
+
+<script>
+    var arrdata = [];
+    var arr_add = [];
+    var currentStatus;
+    var inout_count = [];
+    var datarow = [];
+    var stagenew = "";
+    var statusinsert = "";
+    var getdata_on_flag = [];
+    //$("#gridInspectionMaintenance").dxDataGrid({                
+    //    onEditorPreparing: function (e) {
+    //        if (e.parentType === "dataRow") {
+    //            //console.log(e.row.data);
+               
+    //            //if (e.dataField === "U_Comment") {
+    //            //    e.editorName = "dxTextArea";
+    //            //}
+    //            var oldOnValueChanged = e.editorOptions.onValueChanged;
+    //            e.editorOptions.onValueChanged = function (args) {
+    //                oldOnValueChanged.apply(this, arguments);
+    //                //console.log(this);
+    //                //oldOnValueChanged = () => console.log('change value');
+    //            }
+
+    //        }
+            
+    //    },
+
+    //});
+    function displayExpr(data) {
+        //if (data)
+            return data.Code + " - " + data.Desc;
+    }
+
+    function cellTemplate(container, options) {
+        source_Routestage = DevExpress.data.AspNet.createStore({
+                //"key": "ID",
+            "loadUrl": "@Url.Action("Get_OSRN", "GirdInspectionMaintenance", new { httproute = true })",
+            //"loadParams": { "DocEntry": "117"}
+        });
+        container.append(
+                    $("<div>").dxDropDownBox({
+                        //value: 3,
+                        valueExpr: "Code",
+                        placeholder: "Select a value...",
+                        displayExpr: "Code",
+                        showClearButton: true,
+                        dataSource: source_Routestage,
+                        contentTemplate: function (e) {
+
+                            var value = e.component.option("value"),
+                                $dataGrid = $("<div>").dxDataGrid({
+                                    dataSource: e.component.option("dataSource"),
+                                    columns: [{ dataField: "Code", caption: "Route code." }, { dataField: "Desc", caption: "Description" }],
+                                    hoverStateEnabled: true,
+                                    scrolling: { mode: "infinite" },
+                                    height: 265,
+                                    selection: { mode: "single" },
+                                    //selectedRowKeys: [value],
+                                    onSelectionChanged: function (selectedItems) {
+                                        var keys = selectedItems.selectedRowKeys,
+                                            hasSelection = keys.length;
+
+                                        e.component.option("value", hasSelection ? keys[0] : null);
+                                    }
+                                });
+
+                            dataGrid = $dataGrid.dxDataGrid("instance");
+
+                            e.component.on("valueChanged", function (args) {
+                                dataGrid.selectRows(args.value, false);
+                            });
+
+                            return $dataGrid;
+                        }
+                    })
+                );
+
+        @*$.ajax({
+            type: 'GET',
+            url: '@Url.Action("Get_OSRN", "GirdInspectionMaintenance")',
+            //data: { "AbsEntry": keys[0].AbsEntry },
+            dataType: 'json',
+            success: function (result) {
+                console.log(result);
+                
+            }
+        });*@
+        
+    }
+
+
+    function validationCallback(er,e, el,ea,vgroup,type) {
+        //console.log("e=>" + e + "el=>" + el);
+        //if(type == "insert")
+        if (e != "") {
+            if (typeof e.value != 'undefined') {
+                if (e.value != "") {
+                    if (vgroup == true) {
+                        $("#addbtnSave").dxButton({
+                            disabled: false
+                        });
+                    } else {
+                        $("#addbtnSave").dxButton({
+                            disabled: true
+                        });
+                    }
+                } else {
+                    $("#addbtnSave").dxButton({
+                        disabled: true
+                    });
+                }
+            } else {
+                $("#addbtnSave").dxButton({
+                    disabled: true
+                });
+            }
+
+        } else if (el != "") {
+            if (el.value != null || el.value != undefined) {
+                if (vgroup == true) {
+                    $("#addbtnSave").dxButton({
+                        disabled: false
+                    });
+                } else {
+                    $("#addbtnSave").dxButton({
+                        disabled: true
+                    });
+                }
+
+            } else {
+                $("#addbtnSave").dxButton({
+                    disabled: true
+                });
+            }
+        } else if (er !="") {
+            if (typeof er.value != 'undefined') {
+                console.log(vgroup);
+                if (vgroup == true) {
+                    $("#addbtnSave").dxButton({
+                        disabled: false
+                    });
+                } else {
+                    $("#addbtnSave").dxButton({
+                        disabled: true
+                    });
+                }
+            } else {
+                $("#addbtnSave").dxButton({
+                    disabled: true
+                });
+            }
+        } else if (ea != "") {
+            if (typeof ea.value != 'undefined') {
+                console.log(vgroup);
+                if (vgroup == true) {
+                    $("#addbtnSave").dxButton({
+                        disabled: false
+                    });
+                } else {
+                    $("#addbtnSave").dxButton({
+                        disabled: true
+                    });
+                }
+            } else {
+                $("#addbtnSave").dxButton({
+                    disabled: true
+                });
+            }
+        }
+
+        //console.log(arr_add);
+        //console.log(vgroup);
+        
+    }
+    function validationCallback_U_ActiveFlag(ea) {
+        var type = ea.rule.validator._validationGroup.type;
+        statusinsert = type;
+        var Vgroup3 = ea.rule.validator._validationGroup.isValid;
+        validationCallback("", "", "",ea, Vgroup3, type);
+        //console.log(el);
+        var flag = false;
+
+        if (typeof ea.value != 'undefined') {
+            flag = true;
+            //console.log("notundefined=>" + er.value);
+        } else {
+            //console.log("undefined=>" + er.value);
+            //flag = true;
+        }
+
+        return flag;
+    }
+
+    function validationCallback_U_RouteCode(er) {
+        var Vgroup0 = er.rule.validator._validationGroup.isValid;
+        var type = er.rule.validator._validationGroup.type;
+        statusinsert = type;
+        validationCallback(er,"", "","", Vgroup0,type);
+        //console.log(e);
+        //console.log("U_MethodDesc", e.rule);
+       
+        var flag = false;
+        //if (type != undefined && type == "insert") {
+        
+        //console.log(type);
+
+        //console.log("Vgroup0", Vgroup0);
+        if (typeof er.value != 'undefined') {
+            flag = true; 
+            //console.log("notundefined=>" + er.value);
+        } else {
+            //console.log("undefined=>" + er.value);
+            //flag = true;
+        }
+
+        return flag;
+    }
+
+    function onRowValidating(e) {
+        console.log(e);
+    }
+
+    function validationCallback_U_RptOrder(el) {
+        var type = el.rule.validator._validationGroup.type;
+        statusinsert = type;
+        var Vgroup2 = el.rule.validator._validationGroup.isValid;
+        validationCallback("","", el,"", Vgroup2,type);
+        //console.log(el);
+        var flag = false;
+        
+        //console.log("U_RptOrder",el.validator.option("validationGroup").isValid);
+        //if (type != undefined && type == "insert") {
+            //console.log(validationCallback_U_MethodDesc(el));
+       
+        //console.log("Vgroup2", Vgroup2);
+        //var rowOptions = el.validator.element().parent().data('options');
+        //console.log(rowOptions);
+        if (el.value != null || el.value != undefined) {
+            var regex = /^[0-9]{1,5}$/;
+            
+            if (regex.test(el.value)) {
+                flag = true;               
+            } else {
+                flag = false;
+                el.rule.message = "Out of length number.";
+            }
+            
+            //console.log(el);     
+        } 
+
+        //} 
+        
+        return flag;
+    }
+
+    function validationCallback_U_MethodDesc(e) {
+        var type = e.rule.validator._validationGroup.type;
+        statusinsert = type;     
+        var Vgroup1 = e.rule.validator._validationGroup.isValid;
+        validationCallback("", e,"","", Vgroup1,type);
+        //console.log(e);
+        //console.log("U_MethodDesc", e.rule);
+            
+        var flag = false;       
+            
+            
+            //console.log("Vgroup1", Vgroup1);
+            if (typeof e.value != 'undefined') {
+                if (e.value != "" ) {
+                    flag = true;
+                }
+            }            
+         
+        return flag;
+    }
+
+    function onContextMenuPreparing(e) {
+        var gridInstance = $('#gridInspectionMaintenance').dxDataGrid('instance');
+        var keys = gridInstance.getSelectedRowKeys();
+        //console.log(e);
+        if (e.row != undefined) {
+            if (e.row.rowType == "data") {
+                //console.log(e.row.data.__KEY__);
+
+                if (e.target == "content") {
+                    // e.items can be undefined
+                    if (!e.items) e.items = [];
+
+                    // Add a custom menu item
+                    if (e.row.data.__KEY__ != undefined) {// ถ้าเป็น row ที่มาจากการ click new row ให้ right click ได้
+                        e.items.push({
+                            text: "Remove Row",
+                            onItemClick: function () {
+                                //console.log(e.column.caption);
+                                gridInstance.deleteRow(e.row.rowIndex);
+                                //console.log(e.row.rowIndex);
+                                //if (e.row.data.__KEY__ == undefined) {
+                                //    gridInstance.option('editing.allowUpdating', true);
+                                //    gridInstance.refresh();
+                                //}
+
+                                arr_add = arr_add.filter((el) => { // remove ตัวที่คลิกขวาออกไป
+                                    return el.__KEY__ !== e.row.data.__KEY__;
+                                });
+                                console.log(arr_add);
+                                if (arr_add.length == 0) { // ถ้า removeจนหมดให้เข้าสู่หมดedit ได้
+                                    gridInstance.option('editing.allowUpdating', true);
+                                    stagenew = "";
+                                }
+                                $("#addbtnSave").dxButton({
+                                    disabled: false
+                                });
+                            }
+                        });
+                    } 
+
+                }
+            }
+        }       
+        
+        console.log(e.target);
+        
+    }
+
+    function setStateValue(rowData,value) {
+        console.log(rowData);
+        //rowData.AbsEntry = value;
+        //rowData.CityID = null;
+        return value;
+    }
+
+    function onRowPrepared(e){
+        if (e.rowType == "data" && e.modifiedValues && e.modifiedValues.length > 0) {
+            e.cells.forEach((c, index) => {
+                if (index == 0) // first cell 
+                    console.log(c.cellElement);
+                    //c.cellElement.prepend("<span>*</span>");
+                //c.cellElement && c.cellElement.css("background-color", "lightgreen");
+            })
+        }
+    }
+    function onInitNewRow(e) {
+        //if (e.rowType === "data" && e.dataField == "U_ActiveFlag") {
+
+        //}
+        arr_add.push(e.data);
+        //e.element.find(".dx-checkbox").dxCheckBox('instance').option("value", true);
+        $("#addbtnSave").dxButton({
+            disabled: true
+        });
+        e.data.U_ActiveFlag = true;// default value on new row
+        e.data.U_RptOrder = 1;// default value on new row
+
+        //e.component.option('data.U_ActiveFlag', true);
+        stagenew = "new";
+        var gridInstance = $('#gridInspectionMaintenance').dxDataGrid('instance');
+        gridInstance.getController("validating").validate(true);
+        e.component.option('editing.allowUpdating', false);
+        
+        //e.component.option('onContextMenuPreparing', false);
+        var item = e.component._options;
+        //console.log(item.columns);
+        gridInstance.option("allowColumnReordering", false);
+        //gridInstance.option("headerFilter", false);
+        //e.data["#"] = e.component.getDataSource().items().length;
+        //console.log(e.data["#"]);
+
+    }
+
+    function onRowUpdating(e) {
+        var sel = e.component.getSelectedRowsData();
+
+        if (sel && sel.length > 0)
+            window.console.log(sel[0].U_RouteCode);
+    }
+
+    function ShowConfirmDialog(message, title) {
+        return DevExpress.ui.dialog.confirm(message, title);
+    }
+
+    function onSelectionChanged(e) {
+        //e.component.refresh(true);
+
+        var gridInstance = $('#gridInspectionMaintenance').dxDataGrid('instance');
+        var keys = gridInstance.getSelectedRowKeys();
+        if (keys.length > 0) {
+            $("#deletebtnSave").dxButton({
+                disabled: false
+            });
+
+            $("#addbtnSave").dxButton({
+                disabled: true
+            });
+        } else {
+
+            $("#deletebtnSave").dxButton({
+                disabled: true
+            });      
+
+            //$("#addbtnSave").dxButton({
+            //    disabled: false
+            //});
+        }
+       
+       
+        
+    }
+
+    function delete_selected(e) {
+        var arrdelete = [];
+        var gridInstance = $('#gridInspectionMaintenance').dxDataGrid('instance');
+        var keys = gridInstance.getSelectedRowKeys();
+        if (keys.length > 0) {
+            var result = ShowConfirmDialog('Are you sure you want to Delete this record ?', 'Delete Inspection Method');
+            for (var i = 0; i < keys.length; i++) {
+                //console.log(keys[i])
+                arrdelete.push(keys[i]);
+            }
+            result.done(function (dialogResult) {
+                if (dialogResult) {
+                    $.ajax({
+                        type: 'POST',
+                        //contentType: 'application/json',
+                        url: 'api/GirdInspectionMaintenance/DeleteData',
+                        data: { values: JSON.stringify(arrdelete) },
+                        dataType: 'json',
+                        success: function (result) {
+                            console.log(result);
+                            gridInstance.refresh();
+                        }
+                    });
+                }
+            });
+        } else {
+            DevExpress.ui.notify("Pleace select row data to delete.", "warning", 2000);
+        }
+        
+
+       // gridInstance.refresh();
+    }
+    
+
+    function onEditorPreparing(e) {        
+        
+        if (stagenew != "new") {
+            if (e.parentType === "dataRow") {
+                if (e.dataField === "U_RouteCode" || e.dataField === "Desc" || e.dataField === "U_Lastupdatedate" || e.dataField === "U_Lastupdateby") {
+                    e.editorOptions.disabled = true;
+                }
+                
+            }
+        } else {
+            if (e.parentType === "dataRow") { 
+                //console.log(e.row.cells);
+                if (e.dataField === "U_RouteCode") {
+                    e.editorOptions.disabled = false;
+                    //stagenew = "";
+                }
+
+                if (e.dataField === "Desc") {
+                    e.editorOptions.disabled = true;
+                }
+
+                if (e.dataField === "U_Lastupdateby") {
+                    e.editorOptions.disabled = true;
+                }
+
+                if (e.dataField === "U_Lastupdatedate") {
+                    e.editorOptions.disabled = true;
+                }
+            }
+            
+        }
+
+        if (e.parentType === "dataRow") {
+            var oldOnValueChanged = e.editorOptions.onValueChanged;
+            e.editorOptions.onValueChanged = function (args) {
+                oldOnValueChanged.apply(this, arguments);
+                console.log(this);
+                //oldOnValueChanged = () => console.log('change value');                                                                                
+
+            }
+        }
+    }
+    
+    function onEditorPrepared(e) {
+        
+        var editorsValue = e.value;
+        if (e.parentType === "dataRow" ) {           
+            if (e.dataField == "U_ActiveFlag") {
+                e.editorElement.dxCheckBox('instance').option('onValueChanged', args => {
+                    e.setValue(args.value);
+
+                    if (stagenew != "new") {
+                        arrdata.push(e.row.data);
+                        arrdata = arrdata.filter((el) => {
+                            return el.DocEntry !== e.row.data.DocEntry;
+                        });
+                        arrdata.push(e.row.data)
+                        console.log(arrdata);
+                    } else {
+                        arr_add.push(e.row.data);
+                        arr_add = arr_add.filter((el) => {
+                            return el.__KEY__ !== e.row.data.__KEY__;
+                        });
+                        arr_add.push(e.row.data)
+                        console.log(arr_add);
+
+                    }
+                    //if (e.row.data.__KEY__ != undefined) {
+                    //    getdata_on_flag.push(e.row.data);
+                    //    getdata_on_flag = getdata_on_flag.filter((el) => {
+                    //        return el.__KEY__ !== e.row.data.__KEY__;
+                    //    });
+                    //    getdata_on_flag.push(e.row.data)
+                    //} else {
+                    //    getdata_on_flag.push(e.row.data);
+                    //    getdata_on_flag = getdata_on_flag.filter((el) => {
+                    //        return el.DocEntry !== e.row.data.DocEntry;
+                    //    });
+                    //    getdata_on_flag.push(e.row.data)
+                    //}
+
+                    //console.log("getdata_on_flag", getdata_on_flag);
+
+                });
+            }
+            
+
+            if (e.dataField == "U_RptOrder") {
+                if (stagenew != "new") {
+                    e.editorElement.dxNumberBox('instance').option('onValueChanged', args => {
+                        e.setValue(args.value);
+                            //update
+                        arrdata.push(e.row.data);
+                        arrdata = arrdata.filter((el) => {
+                            return el.DocEntry !== e.row.data.DocEntry;
+                        });
+                        arrdata.push(e.row.data)                        
+                        console.log(arrdata);
+                    });
+                } else {
+                    e.editorElement.dxNumberBox('instance').option('onValueChanged', args => {
+                        e.setValue(args.value);
+                            //insert
+                        arr_add.push(e.row.data);
+                        arr_add = arr_add.filter((el) => {
+                            return el.__KEY__ !== e.row.data.__KEY__;
+                        });
+                        arr_add.push(e.row.data)                        
+                        console.log(arr_add);
+                    });
+                }
+                
+            }
+
+            if (e.dataField == "U_MethodDesc") {
+                if (stagenew != "new") {
+                    e.editorElement.dxTextBox('instance').option('onValueChanged', args => {
+                        e.setValue(args.value);
+                        //update
+                        arrdata.push(e.row.data);
+                        arrdata = arrdata.filter((el) => {
+                            return el.DocEntry !== e.row.data.DocEntry;
+                        });
+                        arrdata.push(e.row.data)                        
+                        console.log(arrdata);
+                    });
+                } else {
+                    e.editorElement.dxTextBox('instance').option('onValueChanged', args => {
+                        e.setValue(args.value);
+                       //insert
+                        arr_add.push(e.row.data);
+                        arr_add = arr_add.filter((el) => {
+                            return el.__KEY__ !== e.row.data.__KEY__;
+                        });
+                        arr_add.push(e.row.data)                         
+                        console.log(arr_add);
+                    });
+                }
+                
+            }
+
+            if (e.dataField == "U_RouteCode") {
+                var lookup = e.editorElement.dxSelectBox('instance');
+                lookup.option("itemTemplate", function (data) {
+                    //var color = (data.AbsEntry % 2 == 0 ? "red" : "blue");
+                    //return "<div style='color: " + color + "'>" +
+                    return "<div>" + data.Code + "-" + data.Desc + "</div>";
+                });
+
+                $(e.editorElement).dxSelectBox("instance").on("valueChanged", function (args) {
+                    //args.component.option("hint", args.selectedItem.value);
+                    var item = args.component.option('selectedItem');
+                    console.log(item);
+                    var grid = $("#gridInspectionMaintenance").dxDataGrid("instance");
+                    var index = e.row.rowIndex;
+                    var arritems = args.component.option("items");
+
+                    var result = args.value;
+                    var Desc;
+                    //for (var i = 0; i < arritems.length; i++) {
+                    //    if (arritems[i].Code == result) {
+                    //        Desc = arritems[i].Desc;
+                    //    }
+                    //}
+                    //console.log(arritems);
+
+                    //console.log(Desc);
+                    grid.cellValue(index, "Desc", item.Desc);
+
+                    grid.cellValue(index, "U_RouteCode", item.Code);
+                    if (stagenew != "new") {//edit
+                        arrdata.push(e.row.data);
+                        arrdata = arrdata.filter((el) => {
+                            return el.DocEntry !== e.row.data.DocEntry;
+                        });
+                        arrdata.push(e.row.data)
+                        console.log(arrdata);
+                    } else {//add
+                        arr_add.push(e.row.data);
+                        arr_add = arr_add.filter((el) => {
+                            return el.__KEY__ !== e.row.data.__KEY__;
+                        });
+                        arr_add.push(e.row.data)
+                        console.log(arr_add);
+                    }                   
+                    
+                });
+            }            
+            
+        }
+        
+        
+
+        if (e.parentType === "dataRow") {
+            
+            datarow = [];
+            datarow.push(e.row.data)
+
+           
+        }
+        //console.log(e.editorElement.focusin);
+        e.editorElement.focusout(function (o) {
+            var gridInstance = $('#gridInspectionMaintenance').dxDataGrid('instance');
+            if (stagenew != "new") {//edit
+                console.log(arrdata);
+                if (arrdata.length == 0) {                    
+                    e.element
+                        .find(".dx-datagrid-addrow-button") 
+                        .dxButton("instance") 
+                        .option("disabled", false);
+
+                } else {                    
+                    e.element
+                        .find(".dx-datagrid-addrow-button") 
+                        .dxButton("instance") 
+                        .option("disabled", true);
+                }
+
+            }            
+            
+            var keys = gridInstance.getSelectedRowKeys();
+            if (keys.length > 0) {
+                $("#deletebtnSave").dxButton({
+                    disabled: false
+                });
+
+                $("#addbtnSave").dxButton({
+                    disabled: true
+                });
+            } else {
+                $("#addbtnSave").dxButton({
+                    disabled: false
+                });
+            }
+
+            
+            
+            //inout_count = 2 - inout_count;
+            var newValue = $(this).find('input').val();
+            //if (editorsValue != newValue) {
+            //    //console.log(editorsValue + "=>" + newValue)
+            //    $("#addbtnSave").dxButton({
+            //        disabled: false                    
+            //    });
+            //} else{
+            //    $("#addbtnSave").dxButton({
+            //        disabled: true                    
+            //    });
+            //}
+
+            
+        });
+
+        e.editorElement.focusin(function (i) { 
+            inout_count = [];
+            inout_count.push("i");
+            //inout_count = inout_count + 1;
+            $("#addbtnSave").dxButton({
+                disabled: true
+            });
+
+            if (stagenew != "new") {//edit
+                e.element
+                    .find(".dx-datagrid-addrow-button") //find the "+" button container
+                    .dxButton("instance") //get the button instance
+                    .option("disabled", true);  
+
+            }
+           
+           // console.log("in",i);
+        });
+
+        
+    }
+
+    function SaveInspection(data) {
+        
+        var grid = $("#gridInspectionMaintenance").dxDataGrid('instance');
+         //$("#gridInspectionMaintenance").dxDataGrid("saveEditData");
+        grid.option("allowColumnReordering", true);
+        //grid.option("headerFilter",true);
+        //grid.option("allowSorting", true);
+        //grid._options.columns[3].option("allowSorting",true);
+        if (grid._options.columns.dataField == "U_MethodDesc") {
+            console.log(grid._options.columns.dataField.allowSorting);
+        }
+        console.log("getdata_on_flag",getdata_on_flag);
+        
+        arrdata = arrdata.filter((el) => {
+            return typeof el.DocEntry != 'undefined';
+        });
+        //console.log(stagenew);
+        console.log(arrdata);
+       
+        if (arr_add.length > 0) {//add
+
+            var RouteCode_ERROR = arr_add.filter((el) => {//remove ตัวที่
+                return el.U_RouteCode == undefined;
+            });
+            console.log(RouteCode_ERROR);
+            //$.each(arr_add, function (i, v) {
+            //    if (v["U_RouteCode"] != undefined) {
+            //        RouteCode.push(v["U_RouteCode"]);
+            //    }
+            //});
+            if (RouteCode_ERROR.length == 0) { //ถ้าใส่ข้อมูลครบสมบูรณ์
+                //for (var x = 0; x < arr_add.length; x++) { //update ค่า flag ก่อน save อีกครั้ง
+                //    for (var i = 0; i < getdata_on_flag.length; i++) {
+                //        if (arr_add[x].__KEY__ == getdata_on_flag[i].__KEY__) {
+                //            arr_add[x].U_ActiveFlag = getdata_on_flag[i].U_ActiveFlag;
+                //        }
+                //    }
+                //}
+                console.log(arr_add);
+                $.ajax({
+                    type: 'POST',
+                    //contentType: 'application/json',
+                    url: 'api/GirdInspectionMaintenance/UpdateData',
+                    data: { values: JSON.stringify(arr_add), status: "A" },
+                    dataType: 'json',
+                    success: function (result) {
+                        console.log(result);
+                        var status_ERROR = result;
+                        status_ERROR = status_ERROR.filter((el) => {
+                            return el.SqlStatus == "E";
+                        });
+
+                        if (status_ERROR.length > 0) {
+                            var routecodeerror = [];      
+                            $.each(status_ERROR, function (item, value) {   
+                                var code_str_error = "["+value["DocEntry"].toString() + "->" + value["SqlErrtext"].toString()+"]";
+                                routecodeerror.push(code_str_error);                                
+                            });
+                            console.log(routecodeerror);
+                            var customDialog = DevExpress.ui.dialog.custom({
+                                title: 'add data Error',
+                                message: "Can not add data [ " + routecodeerror.join(",") + " ]",
+                                toolbarItems: [
+                                    { text: "Close", onClick: function () { return "Ok" } },
+                                ],
+                                width: "500px"
+                            });
+                            customDialog.show().done(function (dialogResult) {
+                                grid.option("editing.allowUpdating", false);
+                                grid.refresh();
+                                stagenew = "";
+                                arrdata = [];
+                                arr_add = [];
+                                getdata_on_flag = [];
+
+                            });
+                        } else {
+                            grid.option('editing.allowUpdating', true);
+                            DevExpress.ui.notify("Add data success.", "success", 1500);
+                            grid.refresh();
+                            stagenew = "";
+                            arrdata = [];
+                            arr_add = [];
+                            getdata_on_flag = [];
+                            setTimeout(function () { location.reload(); }, 1000);
+                        }                       
+                        //DevExpress.ui.notify("Can not add data Error[ " + result[0].SqlErrtext + " ]", "error", 2000);  
+                    },
+                    error: function (er, msg) {
+                        console.log(er);
+                    }
+                });
+            } else {
+                var customDialog = DevExpress.ui.dialog.custom({
+                    title: 'add data Error',
+                    message: "Can not add data please complete the information.",
+                    toolbarItems: [
+                        { text: "Close", onClick: function () { return "Ok" } },
+                    ],
+                    width: "500px"
+                });
+                customDialog.show().done(function (dialogResult) {
+                });
+            }
+            
+            
+        } else { //edit
+
+            //for (var x = 0; x < arrdata.length; x++) { //update ค่า flag ก่อน save อีกครั้ง
+            //    for (var i = 0; i < getdata_on_flag.length; i++) {
+            //        if (arrdata[x].DocEntry == getdata_on_flag[i].DocEntry) {
+            //            arrdata[x].U_ActiveFlag = getdata_on_flag[i].U_ActiveFlag;
+            //        }                    
+            //    }
+            //}
+            console.log(arrdata);
+            $.ajax({
+                type: 'POST',
+                //contentType: 'application/json',
+                url: 'api/GirdInspectionMaintenance/UpdateData',
+                data: { values: JSON.stringify(arrdata),status:"U" },
+                dataType: 'json',
+                success: function (result) {
+                    console.log(result);
+
+                    var status_ERROR = result;
+                    status_ERROR = status_ERROR.filter((el) => {
+                        return el.SqlStatus == "E";
+                    });
+
+                    if (status_ERROR.length > 0) {
+                        var routecodeerror = [];
+                        var sqlmsg = "";
+                        $.each(status_ERROR, function (item, value) {
+                            routecodeerror.push(value["DocEntry"]);                            
+                        });
+                        console.log(routecodeerror);
+                        if (result.length > 1) { //error หลาย row
+                            var customDialog = DevExpress.ui.dialog.custom({
+                                title: 'Edit data Error',
+                                message: "Can not edit data [ " + routecodeerror.join(",") + " ]",
+                                toolbarItems: [
+                                    { text: "Close", onClick: function () { return "Ok" } },
+                                ],
+                                width: "500px"
+                            });
+                            customDialog.show().done(function (dialogResult) {
+                                grid.option("editing.allowUpdating", true);
+                                grid.refresh();
+                                stagenew = "";
+                                arrdata = [];
+                                getdata_on_flag = [];
+
+                            });
+                        } else {
+                            sqlmsg = result[0]["SqlErrtext"];
+                            var customDialog = DevExpress.ui.dialog.custom({
+                                title: 'Edit data Error',
+                                message: sqlmsg,
+                                toolbarItems: [
+                                    { text: "Close", onClick: function () { return "Ok" } },
+                                ],
+                                width: "500px"
+                            });
+                            customDialog.show().done(function (dialogResult) {
+                                grid.option("editing.allowUpdating", true);
+                                grid.refresh();
+                                stagenew = "";
+                                arrdata = [];
+                                getdata_on_flag = [];
+
+                            });
+                        }
+                        
+                    } else {
+                        grid.option('editing.allowUpdating', true);
+                        DevExpress.ui.notify("Edit data success.", "success", 1500);
+                        grid.refresh();
+                        stagenew = "";
+                        arrdata = [];                        
+                        getdata_on_flag = [];  
+                        //console.log(grid._options);
+                        $("#gridInspectionMaintenance").dxDataGrid({
+                            onToolbarPreparing: function (e) {
+                                var toolbarItems = e.toolbarOptions.items;
+                                $.each(toolbarItems, function (_, item) {
+                                    //|| item.name == "revertButton"
+                                    if (item.name == "saveButton") {
+                                        item.visible = false;
+                                    }
+                                    if (item.name == 'revertButton') {
+                                        item.options.onClick = function (arg) {
+                                            e.component.cancelEditData();
+                                            e.component.option('editing.allowUpdating', true);
+                                            var gridInstance = $('#gridInspectionMaintenance').dxDataGrid('instance');
+                                            gridInstance.option("allowColumnReordering", true);
+                                            //gridInstance.option("headerFilter", true);
+                                            e.component.refresh();
+                                            stagenew = "";
+                                            arrdata = [];
+                                            arr_add = [];
+
+                                            e.element
+                                                .find(".dx-datagrid-addrow-button") 
+                                                .dxButton("instance")
+                                                .option("disabled", false);
+
+                                        }
+                                    }
+
+                                });
+                                e.element
+                                    .find(".dx-datagrid-addrow-button") 
+                                    .dxButton("instance") 
+                                    .option("disabled", false);
+                                
+                            }
+                        });                    
+
+                        //setTimeout(function () { location.reload(); },1000);
+                    }                   
+                }
+            });
+        }                
+        
+    }
+
+        function ontoolbarItem(e) {
+            var toolbarItems = e.toolbarOptions.items;
+            $.each(toolbarItems, function (_, item) {
+                //|| item.name == "revertButton"
+                if (item.name == "saveButton") {
+                    item.visible =false;
+                }
+                
+                if (item.name == 'revertButton') {
+                    item.options.onClick = function (arg) {                        
+                        e.component.cancelEditData();
+                        e.component.option('editing.allowUpdating', true);
+                        var gridInstance = $('#gridInspectionMaintenance').dxDataGrid('instance');
+                        gridInstance.option("allowColumnReordering", true);
+                        //gridInstance.option("headerFilter", true);
+                        e.component.refresh();
+                        stagenew = "";
+                        arrdata = [];
+                        arr_add = [];
+
+                        e.element
+                            .find(".dx-datagrid-addrow-button") //find the "+" button container
+                            .dxButton("instance") //get the button instance
+                            .option("disabled", false);
+                        
+                    }
+                }
+                
+            });
+    }
+
+    function onContentReady(e) {
+        e.component.option("loadPanel.enabled", false);
+        //e.element
+        //    .find(".dx-datagrid-addrow-button") //find the "+" button container
+        //    .dxButton("instance") //get the button instance
+        //    .option("disabled", e.element.find(".dx-datagrid-rowsview .dx-row-inserted").length > 0);
+            //set dxButton.disabled to true/false if ".dx-row-inserted" is (not)rendered
+    }
+
+    //function editstart(e) {
+    //    $("#addbtnSave").dxButton({
+    //        disabled: false
+    //        //elementAttr: {
+    //        //    id: "elementId",
+    //        //    class: "class-name"
+    //        //}
+    //    });
+    //}
+
+    function onCellPrepared(e) {
+       
+        if (e.rowType == "data") {
+            if (currentStatus == "needRefresh" && e.row.isEditing) {
+                currentStatus = "Editing";
+                console.log(e.row.isEditing);
+            }
+            
+            //if (e.data.__KEY__ === undefined) {
+            //    e.component.option('onContextMenuPreparing', false);
+            //} else {
+            //    e.component.option('onContextMenuPreparing', true);
+            //} 
+        }
+
+        if (e.rowType === "data" && e.column.dataField === "U_ActiveFlag") {
+            //e.column.dataType = e.data.StepParameter.StepParameterType;
+        }
+
+        if (e.rowType === 'data' && e.rowIndex != undefined) {
+            //console.log(e.data);
+            //e.cellElement.css("background-color", "lightblue");
+           
+            //arrdata.push(e.data);
+            //arrdata = arrdata.filter((el) => {
+            //    return el.DocEntry !== e.data.DocEntry;
+            //});
+            //arrdata.push(e.data);
+
+            //if (e.data.__KEY__) {
+            //    arr_add.push(e.data);
+            //    arr_add = arr_add.filter((el) => {
+            //        return el.__KEY__ !== e.data.__KEY__;
+            //    });
+            //    arr_add.push(e.data);
+            //}
+            //else { arr_add = [];}
+            //console.log(arr_add);
+            //if (arr_add.length>0) {
+            //    e.component.option('editing.allowUpdating', true);
+            //}  
+
+            //var RouteCode_ERROR = arr_add.filter((el) => {
+            //    return el.U_RouteCode == undefined;
+            //});
+            //console.log(RouteCode_ERROR);
+         
+            //console.log(e.column.command);
+            //console.log(arrdata);
+        }
+    }
+
+    //window.onbeforeunload = function (event) {
+    //    var s = "You have unsaved changes. Really leave?";
+
+    //    event = event || window.event;
+    //    if (event) {
+    //        // This is for IE
+    //        event.returnValue = s;
+    //    }
+
+    //    // This is for all other browsers
+    //    return s;
+    //}
+
+    //window.addEventListener('beforeunload', function (e) {
+    //    // Cancel the event
+    //    e.preventDefault();
+    //    // Chrome requires returnValue to be set
+    //    e.returnValue = 'xxxxx';
+    //});
+    //MutationObserver = window.MutationObserver || window.WebKitMutationObserver;
+
+    //var observer = new MutationObserver(function (mutations, observer) {
+    //    // fired when a mutation occurs
+    //    alert('hi');
+    //    //console.log(mutations, observer);
+
+    //    // ...
+    //});
+
+    // define what element should be observed by the observer
+    // and what types of mutations trigger the callback
+    //observer.observe(document, {
+    //    subtree: true,
+    //    attributes: true
+    //    //...
+    //});
+  
+
+    //function myfun() {
+    //    // Write your business logic here
+    //    alert('hello');
+    //    console.log('hello');
+    //};
+    //window.onbeforeunload = function () {
+    //    myfun();
+    //    return 'Are you sure you want to leave?';
+    //};
+
+    /*
+    window.onbeforeunload = null;
+    window.addEventListener("beforeunload", function (e) {
+        alert('hi');
+        return true;
+        
+    var confirmationMessage = 'It looks like you have been editing something. '
+                            + 'If you leave before saving, your changes will be lost.';
+
+        (e || window.event).returnValue = confirmationMessage; //Gecko + IE
+        
+        return confirmationMessage; //Gecko + Webkit, Safari, Chrome etc.
+        
+});
+    */
+    window.onbeforeunload = function (e) {
+        console.log(e);
+        if (arrdata.length > 0 || arr_add.length > 0) {
+           //return alert("xxxxx");
+            return "Leaving this page will reset the wizard";
+           
+        } else {
+            window.onbeforeunload = null;
+        }
+    };
+    //const pendingOps = new Set();
+
+    //let formChanged = false;
+    //var myForm = document.getElementById("form1");
+   // myForm.addEventListener('change', () => formChanged = true);
+    //window.addEventListener('beforeunload', (event) => {
+    //    //if (formChanged) {
+    //        event.returnValue = 'You have unfinished changes!';
+    //    //}
+    //});
+
+    //window.addEventListener('beforeunload', function (e) {
+    //    // Cancel the event
+    //    e.preventDefault();
+    //    // Chrome requires returnValue to be set
+    //    e.returnValue = '';
+    //});
+   
+
+    //function addToPendingWork(promise) {
+    //    pendingOps.add(promise);
+    //    const cleanup = () => pendingOps.delete(promise);
+    //    promise.then(cleanup).catch(cleanup);
+    //}
+    
+    //$(window).bind("DOMSubtreeModified", function (e) {
+    //    //console.log(e);
+    //    //alert("tree changed");
+    //});
+
+    
+
+    //$(window).bind('beforeunload', function (e) {
+    //    // do something, preferably ajax request etc
+    //    if (arrdata.length > 0 || arr_add.length > 0) {
+    //        var customDialog = DevExpress.ui.dialog.custom({
+    //            title: 'Edit data Error',
+    //            message: sqlmsg,
+    //            toolbarItems: [
+    //                { text: "Close", onClick: function () { return "Ok" } },
+    //            ],
+    //            width: "500px"
+    //        });
+    //        customDialog.show().done(function (dialogResult) {              
+
+    //        });
+    //    }
+    //    return true ;
+    //});
+
+    //let link = document.querySelector("a");
+    //link.addEventListener("click", event => {
+    //    console.log("Nope.");
+    //    event.preventDefault();
+    //});
+    
+</script>
+
+

@@ -1,0 +1,487 @@
+﻿@model IEnumerable<MCP_WEB.Models.VW_MFC_T3_ZR>
+@{
+    Layout = null;
+}
+
+<!DOCTYPE html>
+
+<html>
+<head>
+    <meta name="viewport" content="width=device-width" />
+    <title>T3</title>
+    <link href="~/css/paperB.css" rel="stylesheet" />
+    <script>
+        function printContent(el) {
+            var restorepage = document.body.innerHTML;
+            var printcontent = document.getElementById(el).innerHTML;
+            document.body.innerHTML = printcontent;
+            window.print();
+            document.body.innerHTML = restorepage;
+        }
+    </script>
+    <style type="text/css">
+        .stayVisible {
+            position: fixed;
+            top: 1em;
+            left: 1em;
+            width: 8.5em;
+            right: auto;
+        }
+
+        .page {
+            position: relative;
+            clear: both;
+            width: 120mm;
+            height: 86mm;
+            margin-left: auto;
+            margin-right: auto;
+            padding: 0;
+            border: 1px solid black;
+            font-family: Calibri;
+            border-bottom:none;
+            
+        }
+
+        b {
+            font-size: 16px;
+        }
+
+        text {
+            font-size: 16px;
+        }
+        /* Layout */
+        * {
+            box-sizing: border-box;
+        }
+
+        .wrapper > div {
+            /*border-radius: 5px;*/
+            /*background-color: rgb(207,232,220);*/
+            /*padding: 1em;*/
+        }
+
+        .wrapper {
+            display: grid;
+            grid-template-columns: 48mm 36mm 36mm;
+            grid-template-rows: 14mm 19mm 12mm 16mm 12mm 12mm;
+            /*grid-gap: 1px;*/
+        }
+
+        .box1 {
+            grid-column: 1 / 4;
+            grid-row: 1;
+            padding-left: 5px;
+            border: 1px solid black;
+            z-index: 2;
+        }
+
+        .box2 {
+            grid-column: 1;
+            grid-row: 2 / 4;
+            padding-left: 5px;
+            border: 1px solid black;
+            z-index: 2;
+        }
+
+        .box3 {
+            grid-column: 2 / 4;
+            grid-row: 2;
+            padding-left: 5px;
+            border: 1px solid black;
+            z-index: 2;
+        }
+        /*.box4 {
+            grid-column: 1;
+            grid-row: 3;
+            padding-left: 5px;
+            z-index: 2;
+        }*/
+        .box4 {
+            grid-column: 2 / 4;
+            grid-row: 3;
+            padding-left: 5px;
+            border: 1px solid black;
+            z-index: 2;
+        }
+
+        .box5 {
+            grid-column: 1;
+            grid-row: 4;
+            padding-left: 5px;
+            border: 1px solid black;
+            z-index: 2;
+        }
+
+        .box6 {
+            grid-column: 2 / 4;
+            grid-row: 4;
+            padding-left: 5px;
+            border: 1px solid black;            
+            z-index: 2;
+        }
+
+        .box7 {
+            grid-column: 3 / 4;
+            grid-row: 4;
+            padding-left: 5px;
+            border: 1px solid black;
+            z-index: 2;
+        }
+
+        .box8 {
+            grid-column: 1;
+            grid-row: 5;
+            padding-left: 5px;
+            border: 1px solid black;
+            z-index: 2;
+        }
+
+        .box9 {
+            grid-column: 2 / 4;
+            grid-row: 5;
+            padding-left: 5px;
+            border: 1px solid black;
+            z-index: 2;
+        }
+
+        .box10 {
+            grid-column: 1;
+            grid-row: 6;
+            padding-left: 5px;
+            border: 1px solid black;
+            z-index: 2;
+            border-bottom: none;
+        }
+
+        .box11 {
+            grid-column: 2 / 3;
+            grid-row: 6;
+            padding-left: 5px;
+            border: 1px solid black;
+            z-index: 2;
+            border-bottom:none;
+        }
+
+        .box12 {
+            grid-column: 3 / 4;
+            grid-row: 6;
+            padding-left: 5px;
+            border: 1px solid black;
+            z-index: 2;
+            border-bottom:none;
+        }
+
+        /* */
+        .row {
+            clear: both;
+            width: 100%;
+            height: 15px;
+            margin-top: 0;
+        }
+
+        .col5 {
+            float: left;
+            width: 10%;
+        }
+
+        .col10 {
+            float: left;
+            width: 10%;
+        }
+
+        .col15 {
+            float: left;
+            width: 15%;
+        }
+
+        .col20 {
+            float: left;
+            width: 20%;
+        }
+
+        .col25 {
+            float: left;
+            width: 25%;
+        }
+
+        .col30 {
+            float: right;
+            padding-left: 5px;
+            width: 35%;
+            border-bottom: none;
+            border-top: none;
+            border-right: none;
+            border-left: 2px solid black;
+            clear: both;
+        }
+
+        .col35 {
+            float: left;
+            width: 30%;
+        }
+
+        .col40 {
+            float: left;
+            width: 40%;
+        }
+
+        .col45 {
+            float: left;
+            width: 60%;
+        }
+
+        .col50 {
+            float: left;
+            width: 50%;
+        }
+
+        .col55 {
+            float: left;
+            width: 50%;
+        }
+
+        .col60 {
+            float: left;
+            width: 60%;
+        }
+
+        .col65 {
+            float: left;
+            width: 60%;
+        }
+
+        .col70 {
+            float: left;
+            width: 70%;
+        }
+
+        .col75 {
+            float: left;
+            width: 70%;
+        }
+
+        .col80 {
+            float: left;
+            width: 80%;
+        }
+
+        .col85 {
+            float: left;
+            width: 80%;
+        }
+
+        .col100 {
+            float: left;
+            width: 80%;
+        }
+
+        .row2 {
+            clear: both;
+            width: 100%;
+            height: 10px;
+            /*margin-top: 0;*/
+            margin: 0px;
+            padding: 0px;
+        }
+
+        .rowQR {
+            clear: both;
+            width: 100%;
+            height: 15px;
+            margin-top: 0;
+        }
+
+        .colQR {
+            float: right;
+            width: 40px;
+            margin-right: 5px;
+        }
+
+        .colQRtext {
+            float: right;
+            width: 35px;
+            margin-right: 1px;
+        }
+
+
+        /* Water Mark */
+        #background {
+            position: absolute;
+            z-index: 1;
+            background: transparent;
+            display: block;
+            min-height: 50%;
+            min-width: 99%;
+            color: yellow;
+            margin-top: 40px;
+            margin-left: 10px;
+        }
+
+        #bg-text {
+            color: lightgray;
+            font-size: 80px;
+            font-weight: bold;
+            /*transform: rotate(90deg);*/
+            /*-webkit-transform: rotate(90deg);*/
+        }
+    </style>
+</head>
+<body class="A6">
+
+    &nbsp;&nbsp;&nbsp;
+    <div class="stayVisible">
+        <button class="btnPrint" onclick="printContent('print-content')">Print</button>
+    </div>
+    <div id="print-content">
+        @foreach (var item in Model)
+        {
+            <section class="sheet padding-10mm">
+                <div class="page">
+                    <div class="wrapper">
+
+                        <div class="box1">
+                            <div class="row">
+                                <div class="col80">
+                                    <img class="Logo" src="~/images/LogoPartTag234.png" />
+                                </div>
+                                <div class="colQRtext">
+
+                                    <b style="font-size:12px;">@item.QR</b>
+                                </div>
+                                <div class="colQR">
+
+                                    @if (@item.QR != null)
+                                    {
+                                        <qrcode alt="@item.QR" size="43" content="@item.QR" />
+                                    }
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="box2">
+                            <b>PART NUMBER</b>
+                            <br />
+                            <text style="padding-left:0px; font-size:25px;">@item.PartNo</text>
+                        </div>
+
+                        <div class="box3">
+                            <text>SUPPLIER NAME</text>
+                            <br />
+                            <b>@ViewBag.BP.BPName</b>
+                            @*<text>@item.SuppilerName</text>*@
+                        </div>
+
+                        <div class="box4">
+                            <text>PART NAME</text>
+                            <br />
+                            <text>@item.PartName</text>
+                        </div>
+
+                        @*<div id="background">
+            <p id="bg-text">@item.Model</p>
+        </div>*@
+
+                        <div class="box5">
+                            <text>MODEL</text>
+                            <br />
+                            <div style="text-align:center;">
+                                <text style="font-size:22px; font-weight: bold;">@item.Model</text>
+                            </div>
+                        </div>
+
+                        <div class="box6">
+                            <div class="row2">
+                                <div class="col45">
+                                    <text>LOT CONTROL</text>
+                                </div>
+                                <div class="col45">
+                                    <div style="margin-left:0px; margin-top:0; font-size:11px;margin-bottom:5px;">@item.LotNoShow</div>
+                                </div>
+
+                            </div>
+
+                        </div>
+                        <div class="box6">
+                            <div class="row2">
+                                <div class="col30" style="height:59px;">
+                                    <text>CHECKED BY</text>
+                                    <text>@item.CheckBy</text>
+                                </div>
+                            </div>
+                        </div>
+
+                        @*<div class="box6">
+            <div class="row2">
+                <div class="col45">
+                    <b>LOT CONTROL</b>
+                </div>
+                <div class="col30">
+                    <b>CHECKED BY</b>
+                </div>
+                <div class="col25">
+                    <text>@item.CheckBy</text>
+                </div>
+            </div>
+
+            <div class="row2">
+                <div class="col100">
+                    <text>@item.LotNoShow</text>
+                </div>
+            </div>
+
+        </div>*@
+
+                        @*<div class="box6">
+            <b>LOT CONTROL</b>
+            <br />
+            <text>@item.LotControl</text>
+        </div>
+
+        <div class="box7">
+            <b>CHECKED BY</b>
+            <br />
+            <text>@item.CheckBy</text>
+        </div>*@
+
+
+
+                        <div class="box8">
+                            <b>DELIVERY DATE</b>
+                            <br />
+                            <div style="text-align:center;"><text style="font-size:18px;">@Convert.ToDateTime(item.DeliveryDate).ToString("dd/MM/yyyy")</text></div>
+                        </div>
+
+                        <div class="box9">
+                            <u><text>SUPPLIER APPROVED</text></u>
+                            <br />
+                            <text>@item.SupplierApproved</text>
+                        </div>
+
+                        <div class="box10">
+                            <b>QUANTITY</b>
+                            <br />
+                            <div style="text-align:center;"><text style="font-size:22px; font-weight: bold;">@item.Quantity PCS.</text></div>
+                        </div>
+
+                        <div class="box11">
+                            <b>STRORED BY</b>
+                            <br />
+                            <text>@item.StoredBy</text>
+                        </div>
+
+                        <div class="box12">
+                            <b>RECEIVED NO.</b>
+                            <br />
+                            <text>@item.ReceivedNo</text>
+                        </div>
+                        <div style="grid-column:1/4; margin-top:-1px; margin-left: -1px; border: 1.5px solid black; ">
+                            <span style="padding-left:10px; font-size:11px;">ต้นฉบับลูกค้า</span> <span style="padding-left:110px; font-size:11px;">สีฟ้า สำเนาบัญชี</span><span style="padding-left:130px; font-size:11px;">F-PC-021-00</span>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        }
+
+    </div>
+</body>
+</html>

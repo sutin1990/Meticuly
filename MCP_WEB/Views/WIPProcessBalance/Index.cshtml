@@ -1,0 +1,449 @@
+﻿<meta http-equiv='cache-control' content='no-cache'>
+<meta http-equiv='expires' content='0'>
+<meta http-equiv='pragma' content='no-cache'>
+@{
+    ViewData["Title"] = "Index";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+<style>
+    div.relative {
+        position: relative;
+        width: 100%;
+        border: 1px solid lightgray;
+        height: 100px;
+    }
+
+    div.absolute1 {
+        position: absolute;
+        left: 2%;
+        width: 10%;
+        /*height: 100px;*/
+        /*border: 1px solid #73AD21;*/
+    }
+
+    div.absolute2 {
+        position: absolute;
+        top: 4.5%;
+        left: 32%;
+        width: 20%;
+        /*height: 100px;*/
+        /*border: 1px solid #73AD21;*/
+    }
+
+    div.absolute3 {
+        position: absolute;
+        top: 8%;
+        left: 62%;
+        /*right: 30px;*/
+        /*height: 100px;*/
+    }
+
+    div.absolute4 {
+        position: absolute;
+        top: 60px;
+        left: 2%;
+        /*height: 100px;*/
+    }
+    div.absolute5 {
+        position: absolute;
+        /*top: 10px;*/
+        left: 570px;
+        width: 250px;
+        /*height: 100px;*/
+        /*border: 1px solid #73AD21;*/
+    }
+</style>
+<form>
+    <br /><div class="relative">
+    <div class="absolute1"><label style="padding-top:10px;  width:100%;">Period:</label></div><div id="startdateBox" style="width:20%; left:9%; bottom:54px; position: absolute; "></div>    
+    <div class="absolute2"><label style="padding-top:10px">Process:</label><div id="select_ProcessMaster" style="left:40%; bottom:30px;"></div></div>
+    <div class="absolute4"><label>M/C Line:</label><div id="select_MachineMaste" style="left:40%; bottom:30px;"></div></div>
+    <div class="absolute3">
+        @(Html.DevExtreme().Button()
+                        .ID("btnOK")
+                        .Text("Ok")
+                        .Type(ButtonType.Success)
+                        .OnClick("filter")
+        )
+    </div>
+</div>
+
+    <br />
+
+    @(Html.DevExtreme().DataGrid<MCP_WEB.Models.WIPProcessBalance>()
+                            .ID("gridContainer")
+                            .ShowBorders(true)
+                            .Export(e => e.Enabled(true).FileName("WIPProcessBalance-" + DateTime.Now).AllowExportSelectedData(true))
+                            .ColumnChooser(c => c.Enabled(true))
+                            .AllowColumnResizing(true)
+                            .AllowColumnReordering(true)
+                            //.RemoteOperations(true)
+                            .ShowRowLines(true)
+                            .ColumnHidingEnabled(true)
+                            .ColumnAutoWidth(true)
+                            .ColumnMinWidth(100)
+                            .Selection(s => s.Mode(SelectionMode.Multiple)
+                                .ShowCheckBoxesMode(GridSelectionShowCheckBoxesMode.Always)
+                                .SelectAllMode(SelectAllMode.Page)
+                                )
+
+                            .HoverStateEnabled(true)
+                            .RowAlternationEnabled(true)
+                            .Paging(paging => paging.PageSize(10))
+                            .Pager(p => p
+                                    .AllowedPageSizes(new int[] { 10, 25, 50, 100 })
+                                    .ShowInfo(true)
+                                    .ShowNavigationButtons(true)
+                                    .ShowPageSizeSelector(true)
+                                    .Visible(true))
+
+                            //.DataSource(d => d.Mvc().Controller("ProductionDailyReport1").LoadAction("Get"))
+
+                            //.FilterPanel(f => f.Visible(true))
+                            .HeaderFilter(h => h.Visible(true))
+                            .FilterRow(filterRow => filterRow
+                                    .Visible(true)
+                                    .ApplyFilter(GridApplyFilterMode.Auto))
+                            .SearchPanel(searchPanel => searchPanel
+                                .Visible(true)
+                                .Width(240)
+                                .Placeholder("Search..."))
+
+                            .Columns(columns =>
+                            {
+                                columns.Add().DataField("Asof").Caption("Asof").DataType(GridColumnDataType.DateTime).Format(ViewBag.GlobalDtFormat).Visible(false);
+                                columns.Add().DataField("FCode").Caption("Part No.");
+                                columns.Add().DataField("Model").Caption("FG Model");
+                                columns.Add().DataField("Material1").Caption("Raw Material");
+                                columns.Add().DataField("ItemName").Caption("ItemName").Visible(false);
+                                columns.Add().DataField("BarCode").Caption("BarCode");
+                                columns.Add().DataField("MachineCode").Caption("M/C Line");
+                                columns.Add().DataField("QtyMove").Caption("Q'TY(pcs.)").Format("#,##0");
+                                columns.Add().DataField("ProcessCode").Caption("Process");
+
+                            }) // end .Columns
+
+
+    )
+    <br />
+
+    @(Html.DevExtreme().Button()
+                    .ID("btnPrintPreviewT1")
+                    .Text("Print")
+                    .Type(ButtonType.Default)
+                    //.UseSubmitBehavior(true)
+                    .OnClick("PrintPreview")
+    )
+
+    <script>
+    var sumQtyMove = [];
+    var source_m_Processmaster = DevExpress.data.AspNet.createStore({
+                //"key": "ID",
+                "loadUrl": "@Url.Action("Get_m_Processmaster", "GridWIPProcessBalance", new { httproute = true })",
+    });
+    var display = "";
+    var Process = "";
+    $("#select_ProcessMaster").dxSelectBox({
+        dataSource: source_m_Processmaster,
+        displayExpr: function (e) {
+            if (e) {
+                display = e.ProcessName;
+            }
+            return display;
+        },
+        //displayExpr: "DepDesc",
+        valueExpr: 'ProcessCode',
+        searchEnabled: true,
+        searchExpr: ["ProcessCode", "ProcessName"],
+
+        itemTemplate: function (itemData) {
+            return $("<div />").append(
+                $("<p />").text(itemData.ProcessName)
+                    .css("display", "inline-block")
+            );
+        },
+        onValueChanged: function (e) {
+            Process = e.value;
+        },
+    });
+
+    var source_m_MachineMaster = DevExpress.data.AspNet.createStore({
+                //"key": "ID",
+                "loadUrl": "@Url.Action("Get_m_MachineMaster", "GridWIPProcessBalance", new { httproute = true })",
+    });
+    var display = "";
+    var machinemaste = null;
+    $("#select_MachineMaste").dxSelectBox({
+        dataSource: source_m_MachineMaster,
+        displayExpr: function (e) {
+            if (e) {
+                display = e.MachineCode + " - " + e.MachineName;
+            }
+            return display;
+        },
+        //displayExpr: "DepDesc",
+        valueExpr: 'MachineCode',
+        searchEnabled: true,
+        searchExpr: ["MachineCode", "MachineName"],
+
+        itemTemplate: function (itemData) {
+            return $("<div />").append(
+                $("<p />").text(itemData.MachineCode + " - " + itemData.MachineName)
+                    .css("display", "inline-block")
+            );
+        },
+        onValueChanged: function (e) {
+            machinemaste = e.value;
+        },
+    });
+
+        var startdateBox = new Date();
+        var month = startdateBox.getMonth() + 1;
+        var day = startdateBox.getDate();
+        if (month < 10) { month = "0" + month; }
+        if (day < 10) { day = "0" + day; }
+        //startdateBox = startdateBox.getFullYear() + "-" + month + "-" + day;
+        startdateBox = startdateBox.getFullYear() + month;
+        var Year = new Date();
+        Year = Year.getFullYear();
+        //console.log(Year);
+        $("#startdateBox").dxTextBox({
+            placeholder: "YYYYMM",            
+            onValueChanged: function (e) {
+                startdateBox = e.value
+            }
+        }).dxValidator({
+        validationRules: [{
+            type: "required",
+            message: "Period is required."
+        },
+        {
+            type: "custom",
+            message: "Please fill out the form correctly.",
+            validationCallback: function (e) {
+                var check = false;
+                var date = e.value;
+                var yyyy = date.substr(0, 4);
+                var MM = parseInt(date.substr(date.length - 2));
+                //console.log("date","yyyy=>" + yyyy + "MM=>" + MM);
+                if (date.length == 6 && MM <= 12 && yyyy <= Year) {   
+                    
+                    check = true;
+                }
+                //console.log(e.value.length);
+                return check;
+            }
+        }
+        ]
+    });
+    
+
+    //$("#startdateBox").dxDateBox({
+    //    min: new Date(2000, 0, 1),
+    //    max: new Date(2029, 11, 31),
+    //    value: new Date(),
+    //    displayFormat: "dd/MM/yyyy",
+    //    formatString: 'shortdate',
+    //    onValueChanged: function (e) {
+    //        //var ed = $("#enddateBox").dxDateBox('instance').option('value');
+    //        //if (e.value.getTime() >= ed.getTime()) {
+    //        //    $("#enddateBox").dxDateBox("instance").option("isValid", true);//clear validate dateBox
+    //        //}
+    //        startdateBox = e.value;
+    //         month = startdateBox.getMonth() + 1;
+    //         day = startdateBox.getDate();
+    //        if (month < 10) { month = "0" + month;}
+    //        if (day < 10) { day = "0" + day;}
+    //        startdateBox = startdateBox.getFullYear() + "-" + month + "-" + day;
+
+    //    },
+
+    //}).dxValidator({
+    //    validationRules: [{
+    //        type: "required",
+    //        message: "From Date is required."
+    //    },
+    //    //{
+    //    //    type: "custom",
+    //    //    message: "please select again From Date Must not be over To Date.",
+    //    //    validationCallback: function (e) {
+    //    //        var ed = $("#enddateBox").dxDateBox('instance').option('value');
+    //    //        var sd = e.value;
+    //    //        return sd && ed && sd.getTime() <= ed.getTime();
+    //    //    }
+    //    //}
+    //    ]
+    //});
+
+    
+
+
+    function filter() {
+        //var check_enddate = $("#enddateBox").dxDateBox("instance").option('isValid');
+        var check_startdate = $("#startdateBox").dxTextBox("instance").option('isValid');
+
+        if (check_startdate == true) {
+
+            //console.log("start:", startdateBox);
+            //console.log("end:", enddateBox);
+            $.ajax({
+                type: 'POST',
+                url: "api/GridWIPProcessBalance/Filter",
+                data: { "fromdate": startdateBox, "Process": Process, "machinemaste": machinemaste },
+                async: false,
+                dataType: 'json',
+                success: function (result) {
+                    //console.log(result);
+                    $.each(result, function (item, value) {
+
+                        source = value;
+                    });
+
+                    $("#gridContainer").dxDataGrid({
+                        dataSource: result,
+                        onCellPrepared: function (e) {                          
+                            if (e.rowType === "data" && e.column.dataField === "QtyMove" && e.rowIndex != undefined) {
+                                sumQtyMove.push(e.data.QtyMove);
+                            }
+                        },
+                        onContentReady: function (e) {
+                            var gridItems = $("#gridContainer").dxDataGrid('instance');
+
+                            var total1 = sumQtyMove.reduce((a, b) => parseFloat(a) + parseFloat(b), 0);
+                            //console.log(sumQtyMove);
+                            var summaryCells = e.component.getController('data').footerItems()[0].summaryCells;
+                            $.each(summaryCells, function (item, value) {
+                                if (value.length > 0) {
+                                    //console.log(item + "=>" + value[0].name);
+                                    var name = value[0].name;
+                                    if (name == "QtyMove") {
+                                        gridItems.getController('data').footerItems()[0].summaryCells[item][0].value = total1;
+                                    }
+                                    gridItems.getView('footerView').render();
+                                }
+                            });
+                            sumQtyMove = [];
+                            //const reg = new CustomGrid($("#gridContainer").dxDataGrid('instance'));
+                            NotSelection(gridItems);
+                            
+                            //gridItems.clearSelection();
+                        },
+                        summary: {
+                            calculateCustomSummary: function (options) {
+                                if (options.name == "QtyMove") {
+                                    if (options.summaryProcess == "start") {
+                                        options.totalValue = 0;
+                                    }
+                                    if (options.summaryProcess == "calculate") {
+                                        if (options.value) {
+                                            options.totalValue += options.value["QtyMove"];
+                                        }
+                                    }
+                                }
+                            },
+                            totalItems: [
+                                {
+                                column: "MachineCode",
+                                alignment: "right",
+                                customizeText: function (data) {
+                                    return "Total:";
+                                }
+                            },{
+                                showInColumn:"QtyMove",
+                                name: "QtyMove",
+                                summaryType: "custom",
+                                alignment: "right",
+                                valueFormat: "#,##0",
+                                //customizeText: function (data) {
+                                //    //console.log(sumQtyMove.join(''));
+                                //    //var sum = sumDigits(sumQtyMove.join(''));
+                                //    var sum = sumQtyMove.reduce((a, b) => parseFloat(a) + parseFloat(b), 0);
+                                //    var total = sum.toLocaleString(
+                                //        undefined, // leave undefined to use the browser's locale,
+                                //        // or use a string like 'en-US' to override it.
+                                //        { minimumFractionDigits: 0 }
+                                //    );
+                                //    return "Total: " + total;
+                                //}
+                            }]
+                        }
+                    });
+                    $("#gridContainer").dxDataGrid("instance").refresh();
+
+                },
+                error: function (ob, errStr) {
+                    DevExpress.ui.notify(errStr, "This MachineCode OR Rang TransDate is not available in the database", 2000);
+                }
+            });
+        }
+
+    }
+    </script>
+
+    <script> 
+function PrintPreview(data) {
+        var grid = $('#gridContainer').dxDataGrid('instance');
+        var keys = grid.getSelectedRowKeys();
+        var text = "";
+        var s;
+        var comma = 0;
+        //var checkslectDN = false;
+        if (keys.length > 0) {
+            for (s in keys) {
+                comma = parseInt(s) + 1;
+                if (comma == keys.length) {
+                    text += keys[s].RowNumber;
+                }
+                else {
+                    text += keys[s].RowNumber + ",";
+                }
+            }
+            if (startdateBox == null) {
+                startdateBox = "";
+            }
+            if (machinemaste == null) {
+                machinemaste = "";
+            }
+            if (Process == null) {
+                Process = "";
+            }
+            $.ajax({
+                type: 'POST',
+                url: "api/GridWIPProcessBalance/Print",
+                data: { "RowNumber": text, "fromdate": startdateBox },
+                //contentType: "application/json; charset=utf-8",
+                //dataType: "html",
+                //async: false,
+                //dataType: 'json',
+                success: function (e) {                    
+                    
+                    if (e) {
+                        window.open('@Url.Action("Index", "PrintWIPProcessBalance")?machinemaste=' + machinemaste + '&process=' + Process + '&fromdate=' + startdateBox, '_blank').focus();
+                        //window.open('PrintWipMovement/Index?fromdate=' + startdateBox + '&todate=' + enddateBox + '&process=' + Process + '&FCode=' + FCode + '&ItemCode=' + ItemCode + '&Model=' + Model);
+                    }
+                   
+                }
+            });
+
+
+        } else {
+            var errorcustomDialog = DevExpress.ui.dialog.custom({
+                title: 'print WIPProcessBalance incorrect ! ',
+                message: 'Please select Row Data.',
+                toolbarItems: [
+                    { text: "Close", onClick: function () { return "Ok" } },
+                    //{ text: "Not Ok", onClick: function () { return "Not Ok" } }
+                ],
+                width: "500px"
+
+            });
+            errorcustomDialog.show().done(function (dialogResult) {
+                //focus something
+            });
+        }
+
+
+    }
+    </script>
+   
+</form>

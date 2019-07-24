@@ -1,0 +1,147 @@
+﻿<div id="scrollpopadd" class="scrollpopadd">
+    <div class="contentpopadd">
+        @model MCP_WEB.Models.m_Dep
+        @using (Html.BeginForm())
+        {
+            using (Html.DevExtreme().ValidationGroup())
+            {
+                @Html.AntiForgeryToken()
+                <form id="form_add" name="form_add">
+                    <div class="form-group">
+
+                        <label class="col-lg-2">DepID : <span style="color:red;">*</span></label>
+                        <div class="col-lg-4">
+                            @(Html.DevExtreme().TextBox().ID("addtxtDepID").Name("DepID")
+                                    //.OnValueChanged("txtDepIDchanged")
+                            )
+                        </div>
+
+                        <label class="col-lg-2">DepDesc : <span style="color:red;">*</span></label>
+                        <div class="col-lg-4" style="padding-bottom:10px;">
+                            @Html.DevExtreme().TextBox().ID("addtxtDepDesc").Name("DepDesc")
+                        </div>
+                        @*<label class="col-lg-2 col-sm-2 control-label">CreateDate : </label>
+                            <div class="col-lg-4">
+                            @Html.DevExtreme().DateBox().ID("txtCreateDate").Name("CreateDate").InvalidDateMessage("The date must have the following format: MM/dd/yyyy")
+                            </div>*@
+
+                        <label class="col-lg-2">MenuIdentity : </label>
+                        <div class="col-lg-4">
+                            <div id="scrolllist" class="dxlist-scroll">
+                                @*<div class="contentpop">*@
+                                    <div id="treemenu"></div>
+                                    @(Html.DevExtreme().List().ID("addlistMenuIdentity")
+                                        .SelectionMode(ListSelectionMode.All)
+                                        //.ShowScrollbar(ShowScrollbarMode.Always)
+                                        //.ScrollingEnabled(true)
+                                        //.ScrollByContent(true)
+                                        
+                                        .ShowSelectionControls(true)
+                                        .Visible(true)
+                                        //.AllowItemReordering(true)
+
+                                        //.SearchEnabled(true).SearchExpr(new string[] { "MenuName", "MenuIdentity" }))
+                                        .SearchEnabled(true).SearchExpr(new string[] { "MenuName" }))
+                                @*</div>*@
+
+                            </div>
+
+
+                        </div>
+
+                        <div class="col-sm-offset-2 col-sm-10" style="text-align:right;">
+                            <div id="selection-treeview"></div>
+                            <div class="selected-data">
+
+                                <div id="checked-items"></div>
+                            </div>
+                            @(Html.DevExtreme().Button().ID("addbtnSave")
+                                                //.Icon("glyphicon glyphicon-floppy-disk")
+                                                .Text("Save")
+
+                                                //.Type(ButtonType.Success)
+                                                //.UseSubmitBehavior(true)
+                                                .OnClick("function (e) {e.validationGroup.validate(); if(e.validationGroup.validate().isValid){ SaveInsert(); e.validationGroup.reset();} else{e.stopPropagation();} }"))
+                            @*.OnClick("function (e) {if(mode=='add'){SaveInsert();} if(mode=='edit'){SaveEdit();} }"))*@
+
+                            @(Html.DevExtreme().Button().Type(ButtonType.Normal).ID("addbtnCancel")
+                                                //.Icon("glyphicon glyphicon-remove")
+                                                .Text("Cancel")
+                                                .OnClick("function (e) { addcanselButtonClick();  e.validationGroup.reset();}"))
+                        </div>
+                    </div>
+                </form>
+            }
+        }
+    </div>
+</div>
+
+<script>
+
+    function addcanselButtonClick() {        
+        $('#AddPopup').dxPopup('instance').option('visible', false);
+
+    }
+    function SaveInsert() {  
+        var depidadd = $("#addtxtDepID").dxTextBox("instance").option("value");
+        var depdescadd = $("#addtxtDepDesc").dxTextBox("instance").option("value");
+                $.ajax({
+                type: 'GET',
+                url: '@Url.Action("Check_Have_DepID", "m_Dep", new { httproute = true })',
+                data: { "DepID": $("#addtxtDepID").dxTextBox("instance").option("value")},
+                //data: { "getitem": JSON.stringify(arrgetitem) },
+                cache: false,
+                async: false,
+                beforeSend: function () {/*loading*/ },
+                dataType: 'json',
+                    success: function (data) {
+                        //console.log(data);
+                    $.each(data, function (key, value) {
+                        if (depidadd != "") {
+                            if (value.length > 0) {//ถ้า DepID ซํ้ากัน
+                                
+                                var customDialog = DevExpress.ui.dialog.custom({
+                                    title: 'DepID error',
+                                    message: 'DepID: ' + depidadd +' have already',
+                                    toolbarItems: [
+                                        { text: "Close", onClick: function () { return "Ok" } },
+                                    ]
+                                });
+                                customDialog.show().done(function (dialogResult) {
+                                    $("#addtxtDepID").dxTextBox("instance").focus();
+                                });
+                            } else {
+                                $.ajax({
+                                    type: 'POST',
+                                    url: '@Url.Action("insert", "m_Dep", new { httproute = true })',
+                                    data: { "getitem": arrgetitem, "DepID": depidadd, "DepDesc": depdescadd },
+                                    //data: { "getitem": arrmenus, "DepID": $("#DepID").val(), "DepDesc": $("#DepDesc").val()},
+                                    async: false,
+                                    beforeSend: function () {/*loading*/ },
+                                    dataType: 'json',
+                                    success: function (data) {
+                                    console.log(data);
+                                        //Dialogcustom('Insert success.', 'Insert Data');
+                                        DevExpress.ui.notify("Insert success.", "success", 2000);
+                                    },
+                                    error: function (ob, errStr) {
+                                        //Dialogcustom('Insert Error.', 'Insert Data');
+                                        ob.stopPropagation();
+                                        DevExpress.ui.notify(errStr, "error", 2000);
+                                    }
+                                });
+                                addcanselButtonClick();
+                                $('#gridContainer').dxDataGrid('instance').refresh();
+                               
+                        }
+                    }
+
+                });
+
+                },
+
+            });
+
+
+        }
+</script>

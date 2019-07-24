@@ -1,0 +1,42 @@
+﻿@model MCP_WEB.Models.m_Jig
+
+@{
+    ViewData["Title"] = "Details";
+}
+
+<h2>Details</h2>
+
+<div>
+    <h4>m_Jig</h4>
+    <hr />
+    <dl class="dl-horizontal">
+        <dt>
+            @Html.DisplayNameFor(model => model.JigNo)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.JigNo)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.Column)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.Column)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.Row)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.Row)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.ModifyBy)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.ModifyBy)
+        </dd>
+    </dl>
+</div>
+<div>
+    <a asp-action="Edit" asp-route-id="@Model.JigID">Edit</a> |
+    <a asp-action="Index">Back to List</a>
+</div>

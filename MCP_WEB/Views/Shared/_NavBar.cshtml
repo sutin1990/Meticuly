@@ -1,0 +1,67 @@
+﻿
+
+<aside class="main-sidebar">
+    <!-- sidebar: style can be found in sidebar.less -->
+    <section class="sidebar">
+        <!-- Sidebar user panel -->
+        <div class="user-panel">
+            @*<div class="pull-left image">
+                <img src="~/AdminLTE/dist/img/avatar5.png" class="img-circle" alt="User Image">
+            </div>
+            <div class="pull-left info">
+                <p>@User.FindFirst("ContactName").Value</p>
+                <a asp-controller="ResetPassword"><i class="fa fa-circle text-success"></i> Online</a>
+            </div>*@
+        </div>
+        <ul class="sidebar-menu" data-widget="tree">
+            <li class="header">MAIN Menu</li>
+            @foreach (var menuNames in menus.GetMenuMasterParent("ADMIN").Where(n => n.Parent_MenuID == "*"))
+            {
+                var icon = "fa fa-gear";
+                var MenuID = menuNames.MenuID;
+                if (menuNames.MenuID == "MasterData") { icon = "fa fa-edit"; }
+                if (menuNames.MenuID == "ReportingProcess") { icon = "fa  fa-files-o"; }
+                if (menuNames.MenuID == "Isonite") { icon = "fa fa-th"; }
+                if (menuNames.MenuID == "Productions") { icon = "fa fa-laptop"; }
+                if (menuNames.MenuID == "ReceiptStockFG") { icon = "fa fa-mail-forward"; }
+                if (menuNames.MenuID == "FinanceReport") { icon = "fa fa-book"; }
+                if (menuNames.MenuID == "DashBoard") { icon = "fa fa-dashboard"; }
+                if (menuNames.MenuID == "AdjustStockWIP") { icon = "fa fa-check-square-o"; }
+                <li id="@menuNames.MenuID" class="treeview ">
+                    <a href="#">
+                        <i class="@icon"></i>
+                        <span>@menuNames.MenuName</span>
+                        <span class="pull-right-container">
+                            <i class="fa fa-angle-left pull-right"></i>
+                        </span>
+                    </a>
+                    <ul class="treeview-menu">
+                        @foreach (var subMenu in menus.GetMenuMaster(@User.FindFirst("ContactName").Value).Where(n => n.Parent_MenuID == @menuNames.MenuID))
+                        {
+                            <li class="@(Html.IsMenuActive(@Url.Action(@subMenu.MenuFileName,@subMenu.MenuURL)) ? "active" : "")">
+                                <a href="@Url.Action(@subMenu.MenuFileName,@subMenu.MenuURL)">
+                                    <i class="fa fa-circle-o"></i>@subMenu.MenuName
+                                </a>
+                            </li>
+                        }
+                    </ul>
+                </li>
+            }
+        </ul>
+       
+    </section>
+
+</aside>
+<script>
+    var url = window.location;
+
+    // for sidebar menu entirely but not cover treeview
+    $('ul.sidebar-menu a').filter(function () {
+                return this.href == url;
+            }).parent().addClass('active');
+
+    // for treeview
+    $('ul.treeview-menu a').filter(function () {
+                return this.href == url;
+            }).parentsUntil(".sidebar-menu > .treeview-menu").addClass('active');
+</script>

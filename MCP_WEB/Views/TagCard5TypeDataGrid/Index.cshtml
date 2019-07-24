@@ -1,0 +1,179 @@
+﻿
+@{
+    ViewData["Title"] = "Index";
+}
+<script>
+    function PrintPreviewT1(data) {
+        var grid = $('#gridContainer').dxDataGrid('instance');
+        var keys = grid.getSelectedRowKeys();
+        var text = getIDs(data);
+        //var s;
+        //for (s in keys) {
+        //    if (text != "") {
+        //        text += "&";
+        //    }
+        //    text += 'id=' + keys[s].MoveTicket;
+        //}
+        window.open('TagCard5Type/T1?' + text);
+    }
+
+    function PrintPreviewT2(data) {
+        var grid = $('#gridContainer').dxDataGrid('instance');
+        var keys = grid.getSelectedRowKeys();
+        var text = "";
+        var s;
+        for (s in keys) {
+            if (text != "") {
+                text += "&";
+            }
+            text += 'id=' + keys[s].MoveTicket;
+        }
+        window.open('TagCard5Type/T2?' + text);
+    }
+
+    function PrintPreviewT3(data) {
+        var grid = $('#gridContainer').dxDataGrid('instance');
+        var keys = grid.getSelectedRowKeys();
+        var text = "";
+        var s;
+        for (s in keys) {
+            if (text != "") {
+                text += "&";
+            }
+            text += 'id=' + keys[s].MoveTicket;
+        }
+        window.open('TagCard5Type/T3?' + text);
+    }
+
+    function PrintPreviewT4(data) {
+        var grid = $('#gridContainer').dxDataGrid('instance');
+        var keys = grid.getSelectedRowKeys();
+        var text = "";
+        var s;
+        for (s in keys) {
+            if (text != "") {
+                text += "&";
+            }
+            text += 'id=' + keys[s].MoveTicket;
+        }
+        window.open('TagCard5Type/T4?' + text);
+    }
+
+    function PrintPreviewT5(data) {
+        var grid = $('#gridContainer').dxDataGrid('instance');
+        var keys = grid.getSelectedRowKeys();
+        var text = "";
+        var s;
+        for (s in keys) {
+            if (text != "") {
+                text += "&";
+            }
+            text += 'id=' + keys[s].MoveTicket;
+        }
+        window.open('TagCard5Type/T5?' + text);
+    }
+    function getIDs(data) {
+        var grid = $('#gridContainer').dxDataGrid('instance');
+        var keys = grid.getSelectedRowKeys();
+        var text = "";
+        var s;
+        for (s in keys) {
+            if (text != "") {
+                text += "&";
+            }
+            text += 'id=' + keys[s].MoveTicket;
+        }
+        return text;
+    }
+
+</script>
+
+@(Html.DevExtreme().DataGrid<MCP_WEB.Models.TagCard5Type>()
+            .ID("gridContainer")
+            .ShowBorders(true)
+            .Export(e => e.Enabled(true).FileName("Jig-" + DateTime.Now).AllowExportSelectedData(true))
+            .ColumnChooser(c => c.Enabled(true))
+            .AllowColumnResizing(true)
+            .AllowColumnReordering(true)
+            .RemoteOperations(true)
+            .ShowRowLines(true)
+            .ColumnHidingEnabled(true)
+            .ColumnAutoWidth(true)
+            .ColumnMinWidth(100)
+            .Selection(s => s.Mode(SelectionMode.Multiple)
+                .ShowCheckBoxesMode(GridSelectionShowCheckBoxesMode.Always)
+                .SelectAllMode(SelectAllMode.Page)
+                )
+
+            .HoverStateEnabled(true)
+            .RowAlternationEnabled(true)
+            .Paging(paging => paging.PageSize(10))
+            .Pager(pager => {
+                pager.ShowPageSizeSelector(true);
+                pager.AllowedPageSizes(new List<int> { 10, 25, 50, 100 });
+                pager.ShowInfo(true);
+            })
+
+            .DataSource(d => d.Mvc().Controller("TagCard5Type").LoadAction("Get"))
+
+            //.FilterPanel(f => f.Visible(true))
+            .HeaderFilter(h => h.Visible(true))
+            .FilterRow(filterRow => filterRow
+                    .Visible(true)
+                    .ApplyFilter(GridApplyFilterMode.Auto))
+            .SearchPanel(searchPanel => searchPanel
+                .Visible(true)
+                .Width(240)
+                .Placeholder("Search..."))
+
+            .Columns(columns => {
+                //columns.Add().DataField("ItemCode").Width(150).SortOrder(SortOrder.Asc);
+                //columns.AddFor(m => m.PartNo);
+                columns.Add().DataField("MoveTicket");
+                columns.Add().DataField("StatusMT");
+                columns.Add().DataField("Model");
+                columns.Add().DataField("PartNo");                
+                columns.Add().DataField("FCode");
+                columns.Add().DataField("PackingID");
+                columns.Add().DataField("PartDesType");
+                //columns.Add().DataField("ItemName");
+
+            }) // end .Columns
+
+)
+
+
+@(Html.DevExtreme().Button()
+            .ID("btnPrintPreviewT1")
+            .Text("T1")
+            .Type(ButtonType.Default)
+            .OnClick("PrintPreviewT1")
+)
+
+@(Html.DevExtreme().Button()
+            .ID("btnPrintPreviewT2")
+            .Text("T2")
+            .Type(ButtonType.Default)
+            .OnClick("PrintPreviewT2")
+)
+
+@(Html.DevExtreme().Button()
+            .ID("btnPrintPreviewT3")
+            .Text("T3")
+            .Type(ButtonType.Default)
+            .OnClick("PrintPreviewT3")
+)
+
+@(Html.DevExtreme().Button()
+            .ID("btnPrintPreviewT4")
+            .Text("T4")
+            .Type(ButtonType.Default)
+            .OnClick("PrintPreviewT4")
+)
+
+@(Html.DevExtreme().Button()
+            .ID("btnPrintPreviewT5")
+            .Text("T5")
+            .Type(ButtonType.Default)
+            .OnClick("PrintPreviewT5")
+)

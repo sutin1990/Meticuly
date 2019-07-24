@@ -1,0 +1,159 @@
+﻿.hr-hiden {
+    margin-top: 2px;
+    margin-bottom: 10px;
+    border: 0;
+    border-top: 1px solid #eee;
+}
+
+.control-label {
+    padding-top: 7px;
+}
+
+.table {
+    margin-top: 30px;
+}
+
+button {
+    /*margin: 4px 2px;*/
+}
+
+.dx-datebox.dx-auto-width.dx-dropdowneditor-button-visible .dx-texteditor-input, .dx-datebox:not(.dx-texteditor-empty).dx-auto-width.dx-dropdowneditor-button-visible .dx-texteditor-input {
+    padding-right: 10px;
+}
+
+.btn-circle {
+    width: 30px;
+    height: 30px;
+    text-align: center;
+    padding: 6px 0;
+    font-size: 12px;
+    line-height: 1.428571429;
+    border-radius: 15px;
+}
+
+    .btn-circle.btn-lg {
+        width: 50px;
+        height: 50px;
+        padding: 10px 16px;
+        font-size: 18px;
+        line-height: 1.33;
+        border-radius: 25px;
+    }
+
+    .btn-circle.btn-xl {
+        width: 50px;
+        height: 50px;
+        padding: 2.5px 4px;
+        font-size: 24px;
+        line-height: 1.33;
+        border-radius: 35px;
+    }
+
+.btn-outline {
+    background-color: transparent;
+    color: inherit;
+    transition: all .5s;
+}
+
+.btn-primary.btn-outline {
+    color: #428bca;
+}
+
+.btn-success.btn-outline {
+    color: #5cb85c;
+}
+
+.btn-info.btn-outline {
+    color: #5bc0de;
+}
+
+.btn-warning.btn-outline {
+    color: #f0ad4e;
+}
+
+.btn-danger.btn-outline {
+    color: #d9534f;
+}
+
+    .btn-primary.btn-outline:hover,
+    .btn-success.btn-outline:hover,
+    .btn-info.btn-outline:hover,
+    .btn-warning.btn-outline:hover,
+    .btn-danger.btn-outline:hover {
+        color: #fff;
+    }
+
+.size {
+    width: 16px;
+    height: 16px;
+}
+
+.table {
+    border-radius: 12px;
+}
+
+    .table thead tr {
+        background-color: lavender;
+        border: 2px solid #ddd;
+    }
+
+        .table thead tr th {
+            border: 2px solid #ddd;
+        }
+
+
+.table {
+    border: 1px solid #ddd;
+    padding: 10px;
+    text-align: center;
+    font-size: 14px;
+    margin: 4px 2px;
+    cursor: pointer;
+}
+
+    .table tr td {
+        border: 2px solid #ddd;
+    }
+
+.custom-search-form input {
+    border: 2px solid #ccc;
+    padding: 13px;
+    -moz-border-radius: 50px;
+    -webkit-border-radius: 50px;
+    border-radius: 50px;
+    font-family: 'Open Sans', sans-serif;
+}
+
+.custom-search-form {
+    margin: 50px auto auto;
+}
+
+.pading-null {
+    position: relative;
+    min-height: 1px;
+    padding-right: 0px;
+    padding-left: 0px;
+}
+
+.dx-field-label {
+    float: left;
+    width: 30%;
+    overflow: hidden;
+    -o-text-overflow: ellipsis;
+    -ms-text-overflow: ellipsis;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    font-weight: bold;
+}
+
+label {
+    font-weight: bold
+}
+
+table {
+    background-color: #d2d6de;
+}
+
+.focus {
+    background: yellow;
+}

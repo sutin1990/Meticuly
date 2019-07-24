@@ -1,0 +1,2954 @@
+﻿
+
+<br />
+<style>
+    .hr-hiden {
+        margin-top: 2px;
+        margin-bottom: 10px;
+        border: 0;
+        border-top: 1px solid #eee;
+    }
+
+    .control-label {
+        padding-top: 7px;
+    }
+
+    .table {
+        margin-top: 30px;
+    }
+
+    button {
+        /*margin: 4px 2px;*/
+    }
+
+    .dx-datebox.dx-auto-width.dx-dropdowneditor-button-visible .dx-texteditor-input, .dx-datebox:not(.dx-texteditor-empty).dx-auto-width.dx-dropdowneditor-button-visible .dx-texteditor-input {
+        padding-right: 10px;
+    }
+
+    .btn-circle {
+        width: 30px;
+        height: 30px;
+        text-align: center;
+        padding: 6px 0;
+        font-size: 12px;
+        line-height: 1.428571429;
+        border-radius: 15px;
+    }
+
+        .btn-circle.btn-lg {
+            width: 50px;
+            height: 50px;
+            padding: 10px 16px;
+            font-size: 18px;
+            line-height: 1.33;
+            border-radius: 25px;
+        }
+
+        .btn-circle.btn-xl {
+            width: 50px;
+            height: 50px;
+            padding: 2.5px 4px;
+            font-size: 24px;
+            line-height: 1.33;
+            border-radius: 35px;
+        }
+
+    .btn-outline {
+        background-color: transparent;
+        color: inherit;
+        transition: all .5s;
+    }
+
+    .btn-primary.btn-outline {
+        color: #428bca;
+    }
+
+    .btn-success.btn-outline {
+        color: #5cb85c;
+    }
+
+    .btn-info.btn-outline {
+        color: #5bc0de;
+    }
+
+    .btn-warning.btn-outline {
+        color: #f0ad4e;
+    }
+
+    .btn-danger.btn-outline {
+        color: #d9534f;
+    }
+
+        .btn-primary.btn-outline:hover,
+        .btn-success.btn-outline:hover,
+        .btn-info.btn-outline:hover,
+        .btn-warning.btn-outline:hover,
+        .btn-danger.btn-outline:hover {
+            color: #fff;
+        }
+
+    .size {
+        width: 16px;
+        height: 16px;
+    }
+
+    .table {
+        border-radius: 12px;
+    }
+
+        .table thead tr {
+            background-color: lavender;
+            border: 2px solid #ddd;
+        }
+
+            .table thead tr th {
+                border: 2px solid #ddd;
+            }
+
+
+    .table {
+        border: 1px solid #ddd;
+        padding: 10px;
+        text-align: center;
+        font-size: 14px;
+        margin: 4px 2px;
+        cursor: pointer;
+    }
+
+        .table tr td {
+            border: 2px solid #ddd;
+        }
+
+    .custom-search-form input {
+        border: 2px solid #ccc;
+        padding: 13px;
+        -moz-border-radius: 50px;
+        -webkit-border-radius: 50px;
+        border-radius: 50px;
+        font-family: 'Open Sans', sans-serif;
+    }
+
+    .custom-search-form {
+        margin: 50px auto auto;
+    }
+
+    .pading-null {
+        position: relative;
+        min-height: 1px;
+        padding-right: 0px;
+        padding-left: 0px;
+    }
+
+    .dx-field-label {
+        float: left;
+        width: 30%;
+        overflow: hidden;
+        -o-text-overflow: ellipsis;
+        -ms-text-overflow: ellipsis;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+        font-weight: bold;
+    }
+
+    table {
+        background-color: #d2d6de;
+    }
+
+    .focus {
+        background: yellow;
+    }
+
+    .list1 tr {
+        display: block;
+    }
+
+        .list1 tr:hover {
+            background-color: red;
+        }
+
+    .list-group {
+        padding-left: 0;
+        margin-bottom: 0px;
+    }
+
+    .table > thead > tr > th, .table > tbody > tr > th, .table > tfoot > tr > th, .table > thead > tr > td, .table > tbody > tr > td, .table > tfoot > tr > td {
+        padding: 1px;
+        line-height: 1.42857143;
+        vertical-align: top;
+        border-top: 1px solid #ddd;
+    }
+
+    .p_size {
+        font-size: 9px;
+        font-weight: 100;
+        max-width: 100%;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+    label {
+        font-size: 11px;
+        font-weight: 100;
+    }
+
+    .list-group-item {
+        position: relative;
+        display: block;
+        padding: 3px 0px;
+        margin-bottom: -1px;
+        background-color: #fff;
+        border: 1px solid #ddd;
+    }
+
+    table {
+        border-collapse: collapse;
+        border: 1px solid black;
+    }
+
+        table td {
+            border: 1px solid black;
+            padding: 10px;
+            text-align: center;
+        }
+
+    .process-step .btn:focus {
+        outline: none
+    }
+
+    .process {
+        display: table;
+        width: 100%;
+        position: relative
+    }
+
+    .process-row {
+        display: table-row
+    }
+
+    .process-step button[disabled] {
+        opacity: 1 !important;
+        filter: alpha(opacity=100) !important
+    }
+
+    .process-row:before {
+        top: 35px;
+        bottom: 0;
+        position: absolute;
+        content: " ";
+        width: 100%;
+        height: 1px;
+        background-color: #ccc;
+        z-order: 0;
+    }
+
+    .process-step {
+        display: table-cell;
+        text-align: center;
+        position: relative
+    }
+
+        .process-step p {
+            margin-top: 4px
+        }
+
+    .btn-circle {
+        width: 70px;
+        height: 70px;
+        text-align: center;
+        font-size: 12px;
+        border-radius: 50%;
+    }
+
+    .col-xs-4, .col-xs-6 {
+        position: relative;
+        min-height: 1px;
+        padding-right: 5px;
+        padding-left: 5px;
+    }
+
+    .col-xs-12 {
+        position: relative;
+        min-height: 1px;
+        padding-right: 5px;
+        padding-left: 2px;
+    }
+
+    .content {
+        min-height: 250px;
+        padding: 5px;
+        margin-right: auto;
+        margin-left: auto;
+        padding-left: 10px;
+        padding-right: 5px;
+    }
+
+    #popup {
+        padding: 10px;
+    }
+
+        #popup ul {
+            list-style-type: none;
+            text-align: center;
+        }
+
+            #popup ul li {
+                display: inline-block;
+                width: 160px;
+                margin: 10px;
+            }
+
+                #popup ul li img {
+                    width: 100px;
+                }
+
+    .button-info {
+        margin: 10px;
+    }
+
+    .popup p {
+        margin-bottom: 10px;
+        margin-top: 0;
+    }
+</style>
+
+<div class="container">
+    <div class="row">
+        <div class="col-md-6 col-xs-10">
+            <div class="row">
+                <div class="col-md-4 col-xs-6 text-center">
+                    <button type="button" id="btn_new" class="btn btn-default  btn-xl" data-toggle="tooltip" data-placement="top" title="New"><i class="glyphicon glyphicon-plus"></i></button>
+                    <button type="button" id="btn_clear" class="btn btn-default  btn-xl" data-toggle="tooltip" data-placement="top" title="Clear"><img src="~/images/button/icons8-broom-30.png" class="size" /></button>
+                </div><!-- /.col-lg-6 -->
+                <div class="col-md-8 col-xs-6 pading-null">
+                    <div class="input-group">
+                        <input type="text" id="search" class="form-control" placeholder="Search">
+                        <span class="input-group-btn">
+                            <button type="button" id="btn_search" class="btn btn-default  btn-xl" data-toggle="tooltip" data-placement="top" title="Search"><img src="~/images/button/010-search.png" class="size" /></button>
+                        </span>
+                    </div><!-- /input-group -->
+                </div><!-- /.col-lg-6 -->
+            </div>
+            @* <button type="button" class="btn btn-default  btn-xl" data-toggle="tooltip" data-placement="top" title="Search"><img src="~/images/button/010-search.png" class="size" /></button>*@
+        </div>
+        <div class="col-md-6  text-right col-xs-2">
+            <button type="button" id="btn_sum" class="btn btn-default btn-xl" data-toggle="tooltip" data-placement="top" title="Sum"><img src="~/images/button/001-symbol.png" class="size" /></button>
+            @*<button type="button" class="btn btn-default btn-xl" data-toggle="tooltip" data-placement="top" title="swap"><img src="~/images/button/007-repeat.png" class="size" /></button>*@
+        </div>
+    </div>
+    <hr />
+    <div class="row">
+        <div class="col-md-12">
+            <div class="row">
+                <div class="col-md-4 col-xs-12">
+                    <div class="form-inline form-group">
+                        <div class="dx-field-label col-sm-2 text-right">
+                            Ship From :
+                        </div>
+                        <div class="dx-field-value">
+                            <div id="ShipFrom"></div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4 col-xs-12">
+                    <div class="form-inline form-group">
+                        <div class="dx-field-label col-sm-2 text-right">
+                            Ship To :
+                        </div>
+                        <div class="dx-field-value">
+                            <div id="ShipTo"></div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4 col-xs-12">
+                    <div class="form-inline form-group">
+                        <div class="dx-field">
+                            <div class="dx-field-label col-sm-2 text-right">
+                                Isonite No :
+                            </div>
+                            <div class="dx-field-value">
+                                <div id="IsoniteNo"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <hr class="hr-hiden" />
+            <div class="row">
+                <div class="col-md-4 col-xs-12">
+                    <div class="form-inline form-group">
+                        <div class="dx-field">
+                            <div class="dx-field-label col-md-2 col-sm-2 text-right">Barcode :</div>
+                            <div class="dx-field-value">
+                                <div id="Barcode"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4 col-xs-12">
+                    <div class="form-inline form-group">
+                        <div class="dx-field">
+                            <div class="dx-field-label col-md-2 text-right">Doc Date :</div>
+                            <div class="dx-field-value">
+                                <div id="date-time"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4 col-xs-12">
+                    <div class="form-inline form-group text-right">
+
+                    </div>
+                </div>
+            </div>
+            <hr />
+            <div class="row">
+                <div class="process">
+                    <div class="process-row nav nav-tabs">
+                        <div class="process-step">
+                            <button type="button" id="bt_tap1" class="btn btn-info btn-circle" data-toggle="tab" href="#menu1"><i class="fa fa-table fa-3x"></i><p>#1</p></button>
+                            <p class="my-5" id="jig_tap1"></p>
+                        </div>
+                        <div class="process-step">
+                            <button type="button" id="bt_tap2" class="btn btn-default btn-circle" data-toggle="tab" href="#menu2"><i class="fa fa-table fa-3x"></i><p>#2</p></button>
+                            <p class="my-5" id="jig_tap2"></p>
+                        </div>
+                        <div class="process-step">
+                            <button type="button" id="bt_tap3" class="btn btn-default btn-circle" data-toggle="tab" href="#menu3"><i class="fa fa-table fa-3x"></i><p>#3</p></button>
+                            <p class="my-5" id="jig_tap3"></p>
+                        </div>
+                    </div>
+                </div>
+                <div class="tab-content">
+                    <div id="menu1" class="tab-pane fade active in">
+                        <div class="container">
+                            <div class="row">
+                                <div class="col-md-12 col-xs-12">
+                                    <br />
+                                    <div class="row">
+                                        <div class="col-md-6 col-xs-12 centered">
+                                            <div class="form-inline form-group">
+                                                <div class="dx-field-label col-sm-2 text-right">
+                                                    Jig#1 :
+                                                </div>
+                                                <div class="dx-field-value">
+                                                    <div id="Jig1"></div><div id="Jig1_1"></div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <br />
+                                    <div class="row">
+                                        <div class="col-md-12  col-xs-12 centered">
+                                            <div class="form-group ">
+                                                <div class="table-responsive-md">
+                                                    <table class="table table-bordered" id="tb_jig1"></table>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div id="menu2" class="tab-pane fade">
+                        <div class="container">
+                            <div class="row">
+                                <div class="col-md-12 col-xs-12">
+                                    <br />
+                                    <div class="row">
+                                        <div class="col-md-6 col-xs-12 centered">
+                                            <div class="form-inline form-group">
+                                                <div class="dx-field-label col-sm-2 text-right">
+                                                    Jig#2 :
+                                                </div>
+                                                <div class="dx-field-value">
+                                                    <div id="Jig2"></div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <br />
+                                    <div class="row">
+                                        <div class="col-md-12 col-xs-12 centered">
+                                            <div class="form-group">
+                                                <div class="table-responsive-md">
+                                                    <table class="table table-bordered" id="tb_jig2"></table>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div id="menu3" class="tab-pane fade">
+                        <div class="container">
+                            <div class="row">
+                                <div class="col-md-12 col-xs-12 ">
+                                    <br />
+                                    <div class="row">
+                                        <div class="col-md-6 col-xs-12 centered">
+                                            <div class="form-inline form-group">
+                                                <div class="dx-field-label col-sm-2 text-right">
+                                                    Jig#3 :
+                                                </div>
+                                                <div class="dx-field-value">
+                                                    <div id="Jig3"></div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <br />
+                                    <div class="row">
+                                        <div class="col-md-12 col-xs-12 centered">
+                                            <div class="form-group">
+                                                <div class="table-responsive-md">
+                                                    <table class="table table-bordered" id="tb_jig3"></table>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <hr />
+            <div class="row">
+                <div class="col-md-4 col-xs-4">
+                    <button type="button" id="btn_print" class="btn btn-info  btn-xl" data-toggle="tooltip" data-placement="top" title="Print"><i class="glyphicon glyphicon-print"></i> Print</button>
+                </div>
+                <div class="col-md-4 col-md-offset-4 text-right col-xs-8">
+                    <button type="button" id="btn_save" class="btn btn-success  btn-xl" data-toggle="tooltip" data-placement="top" title="Save"><i class="glyphicon glyphicon-save"></i> Save</button>
+                    <button type="button" id="btn_cancel" class="btn btn-warning   btn-xl" data-toggle="tooltip" data-placement="top" title="Cancel"><i class="glyphicon glyphicon-remove"></i> Cancel</button>
+                </div>
+            </div>
+            <div class="row">
+                <div id="#here_table">
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div id="popupContainerSum">
+    <div id="scrollView_">
+        <div id="ContentSum"></div>
+    </div>
+</div>
+
+<div id="popupEdit">
+    <div id="scrollView_">
+        <div id="contentEdit">
+            <input type="hidden" class="form-control" id="_JigNo" readonly>
+            <input type="hidden" class="form-control" id="_location" readonly>
+            <input type="hidden" class="form-control" id="_jigID" readonly>
+            <div class="form-horizontal">
+                <div class="form-group">
+                    <label for="inputEmail3" class="col-sm-2 control-label">Isonite No:</label>
+                    <div class="col-sm-10">
+                        <input type="text" class="form-control" id="_IsoniteNo" readonly>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="inputEmail3" class="col-sm-2 control-label">Serial No:</label>
+                    <div class="col-sm-10">
+                        <input type="text" class="form-control" id="_BarCode" readonly>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="inputEmail3" class="col-sm-2 control-label">Model:</label>
+                    <div class="col-sm-10">
+                        <input type="text" class="form-control" id="_Model" readonly>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="inputEmail3" class="col-sm-2 control-label">WIP Qty:</label>
+                    <div class="col-sm-10">
+                        <input type="text" class="form-control" id="_WIPQty" readonly>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="inputEmail3" class="col-sm-2 control-label">Confirm QTY:</label>
+                    <div class="col-sm-10">
+                        <input type="text" class="form-control" id="_ConQty">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <div class="col-sm-offset-2 col-sm-2 col-md-2">
+                        <button type="submit" class="btn btn-primary btn-lg btn-block" onClick="UpdateQtyFunction()">Save</button>
+                    </div>
+                    <div class="col-sm-offset-0 col-sm-2 col-md-2">
+                        <button type="submit" class="btn btn-danger btn-lg btn-block" onClick="DeleteQtyFunction()">Delete</button>
+                    </div>
+                    <div class="col-sm-offset-0 col-sm-2 col-md-2">
+                        <button type="submit" class="btn btn-warning btn-lg btn-block" onClick="CancelQtyFunction()">Cancel</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div id="popupInsert">
+    <div id="scrollView_1">
+        <div id="GridWorouting"></div>
+    </div>
+</div>
+
+
+
+<div class="loadpanel"></div>
+
+<input type="hidden" id="tap_index" />
+<input type="hidden" id="jig_index" />
+
+
+<script>
+    let column;
+    let row;
+
+    let jig;
+
+    let idx1;
+
+    let size_jig1;
+    let size_jig2;
+    let size_jig3;
+
+    let suspendValueChagned;
+
+    $(function () {
+
+        $("#scrollView_").dxScrollView({
+            height: '100%',
+            width: '100%'
+        });
+
+        $("#scrollView_1").dxScrollView({
+            height: '100%',
+            width: '100%'
+        });
+
+        var loadPanel = $(".loadpanel").dxLoadPanel({
+            shadingColor: "rgba(0,0,0,0.4)",
+            position: { of: "#employee" },
+            visible: false,
+            showIndicator: true,
+            showPane: true,
+            shading: true,
+            closeOnOutsideClick: false,
+            onShown: function () {
+                setTimeout(function () {
+                    loadPanel.hide();
+                }, 500);
+            },
+            onHidden: function () {
+                showEmployeeInfo(employee);
+            }
+        }).dxLoadPanel("instance");
+
+        $("#popupContainerSum").dxPopup({
+            title: "Popup Sum Isonite Qty",
+            width: 300,
+            height: 250,
+            showCloseButton: true,
+            CloseOnOutsideClick: true,
+            DragEnabled: false,
+            ResizeEnabled:true,
+            buttons: [{
+                toolbar: 'bottom', location: 'center', onClick: function (e) {
+                    $("#popupContainerSum").dxPopup("instance").hide();
+                }, widget: 'button', options: { text: 'Ok' }
+            }],
+            onShowing: function (e) {
+
+            },
+            onHiding: function (e) {
+
+            },
+            closeOnOutsideClick: function (e) {
+                return e.target === $("#someElement").get()[0];
+            }
+        });
+
+        $("#popupEdit").dxPopup({
+            title: "Popup Edit Isonite Qty",
+            minwidth: 300,
+            minheight: 250,
+            showCloseButton: true,
+            CloseOnOutsideClick: true,
+            DragEnabled: false,
+            ResizeEnabled: true,
+            buttons: [{
+                toolbar: 'bottom', location: 'center', onClick: function (e) {
+                    $("#popupContainerSum").dxPopup("instance").hide();
+                }, widget: 'button', options: { text: 'Ok' }
+            }],
+            onShowing: function (e) {
+
+            },
+            onHiding: function (e) {
+
+            },
+            closeOnOutsideClick: function (e) {
+                return e.target === $("#someElement").get()[0];
+            }
+        });
+
+        $("#popupInsert").dxPopup({
+            title: "Popup add Isonite Qty",
+            minwidth: 300,
+            minheight: 300,
+            showCloseButton: true,
+            CloseOnOutsideClick: true,
+            DragEnabled: false,
+            ResizeEnabled: true,
+            buttons: [{
+                toolbar: 'bottom', location: 'center', onClick: function (e) {
+                    $("#popupInsert").dxPopup("instance").hide();
+                }, widget: 'button', options: { text: 'Ok' }
+            }],
+            onShowing: function (e) {
+
+            },
+            onHiding: function (e) {
+
+            },
+            closeOnOutsideClick: function (e) {
+                return e.target === $("#someElement").get()[0];
+            }
+        });
+
+
+
+        var showLoadPanel = function () {
+            loadPanel.show();
+           // showEmployeeInfo({});
+        };
+
+        $("#btn_save").on('click', function () {
+
+
+            let Header_str = [{
+                    BPCodeFrom: $("#ShipFrom").dxSelectBox("instance").option('value'),
+                    BPCodeTO: $("#ShipTo").dxSelectBox("instance").option('value'),
+                    DocDate: $("#date-time").dxDateBox('instance').option('value'),
+                    JigNo1: $("#Jig1").dxSelectBox('instance').option('value'),
+                    JigNo2: $("#Jig2").dxSelectBox('instance').option('value'),
+                    JigNo3: $("#Jig3").dxSelectBox('instance').option('value')
+                }];
+
+            let Header;
+            let Detail;
+
+
+            let obj = [];
+            if (size_jig1 !== 0) {
+
+                for (let i = 1; i < size_jig1; i++) {
+                    if ($("#tb_jig1 tr td[tabindex=" + i + "] #qty").html() !== "" ) {
+
+                        let str = {
+
+                            JigNo: $("#tb_jig1 tr td[tabindex=" + i + "] a").attr("data-jig"),
+                            JigAddresss: $("#tb_jig1 tr td[tabindex=" + i + "] a").attr("data-grid"),
+                            BarCode: $("#tb_jig1 tr td[tabindex=" + i + "] #barcode").html(),
+                            Qty: $("#tb_jig1 tr td[tabindex=" + i + "] #qty").html(),
+                            Confirm_Qty: $("#tb_jig1 tr td[tabindex=" + i + "] #Confirm_Qty").html(),
+                            NgQty: $("#tb_jig1 tr td[tabindex=" + i + "] #NG_Qty").html()
+
+                        };
+                        obj.push(str);
+                    }
+
+                }
+
+            }
+
+
+            if (size_jig2 !== 0) {
+
+                for (let i = 101; i < size_jig2+101; i++) {
+                    if ($("#tb_jig2 tr td[tabindex=" + i + "] #qty").html() !== "") {
+
+                        let str1 = {
+
+                            JigNo: $("#tb_jig2 tr td[tabindex=" + i + "] a").attr("data-jig"),
+                            JigAddresss: $("#tb_jig2 tr td[tabindex=" + i + "] a").attr("data-grid"),
+                            BarCode: $("#tb_jig2 tr td[tabindex=" + i + "] #barcode").html(),
+                            Qty: $("#tb_jig2 tr td[tabindex=" + i + "] #qty").html(),
+                            Confirm_Qty: $("#tb_jig2 tr td[tabindex=" + i + "] #Confirm_Qty").html(),
+                            NgQty: $("#tb_jig2 tr td[tabindex=" + i + "] #NG_Qty").html()
+                        };
+
+                        obj.push(str1);
+                    }
+
+                }
+            }
+
+
+            if (size_jig3 !== 0) {
+                for (let i = 201; i < size_jig3+201; i++) {
+                    if ($("#tb_jig3 tr td[tabindex=" + i + "] #qty").html() !== "") {
+
+                        let str2 = {
+
+                            JigNo: $("#tb_jig3 tr td[tabindex=" + i + "] a").attr("data-jig"),
+                            JigAddresss: $("#tb_jig3 tr td[tabindex=" + i + "] a").attr("data-grid"),
+                            BarCode: $("#tb_jig3 tr td[tabindex=" + i + "] #barcode").html(),
+                            Qty: $("#tb_jig3 tr td[tabindex=" + i + "] #qty").html(),
+                            Confirm_Qty: $("#tb_jig3 tr td[tabindex=" + i + "] #Confirm_Qty").html(),
+                            NgQty: $("#tb_jig3 tr td[tabindex=" + i + "] #NG_Qty").html()
+
+                        };
+
+                        obj.push(str2);
+                    }
+
+                }
+            }
+
+            Detail = JSON.stringify({ Detail: obj });
+            Header = JSON.stringify({Header:Header_str});
+
+            let values = { Header: Header, Detail: Detail, User: '@User.FindFirst("ContactName").Value' };
+
+            $.ajax({
+                url: "api/IsoniteMant/SaveIsonite",
+                type: "POST",
+                data: JSON.stringify(values),
+                dataType: "json",
+                contentType: "application/json; charset=utf-8",
+                success: function (response) {
+                    if (response.Msg === "Error") {
+                        let result = DevExpress.ui.dialog.confirm(response.des, "Error Message");
+                        result.done(function (dialogResult) { });
+                        return;
+                    }else if (response.Msg === "OK") {
+                        let result = DevExpress.ui.dialog.confirm(response.des, "Message");
+                        result.done(function (dialogResult) {
+                            location.reload();
+                        });
+
+                        return;
+                    }
+                },
+                error: function () {
+                    $("#StorageLocations").empty();
+                }
+            });
+
+        });
+
+        $("#btn_print").on('click', function () {
+
+            let IsoniteCode = $("#IsoniteNo").dxTextBox("instance").option("value");
+
+            if (IsoniteCode === "") {
+                let result = DevExpress.ui.dialog.confirm("Messgae: IsoniteNo is null.", "Error Message");
+                result.done(function (dialogResult) { });
+                return;
+            }
+
+            let options = { isonitecode: IsoniteCode, TransType:"Sent" };
+
+            var url = "/Isonite/PrintIsonite?isonitecode=" + IsoniteCode +"&TransType=Sent";
+            window.location.href = url;
+
+
+        });
+
+        $("#btn_cancel").on('click', function () {
+
+             let options = { User:'@User.FindFirst("ContactName").Value'};
+
+                    $.ajax({
+                        url: "api/IsoniteMant/BtnCancel",
+                        type: "GET",
+                        data: options,
+                        contentType: "application/json; charset=utf-8",
+                        success: function (response) {
+
+                            if (response.Msg === "Error") {
+                                let result = DevExpress.ui.dialog.confirm(response.des, "Error Message");
+                                result.done(function (dialogResult) { });
+                                return;
+                            } else if (response.Msg === "OK") {
+                                let result = DevExpress.ui.dialog.confirm(response.des, "Message");
+                                result.done(function (dialogResult) {
+                                    location.reload();
+                                });
+
+                                return;
+                            }
+                        },
+                        error: function () {
+                            $("#StorageLocations").empty();
+                        }
+                    });
+        });
+
+        $("#btn_new").on('click', function () {
+                    let options = { User:'@User.FindFirst("ContactName").Value'};
+
+                    $.ajax({
+                        url: "api/IsoniteMant/BtnCancel",
+                        type: "GET",
+                        data: options,
+                        contentType: "application/json; charset=utf-8",
+                        success: function (response) {
+
+                            if (response.Msg === "Error") {
+                                let result = DevExpress.ui.dialog.confirm(response.des, "Error Message");
+                                result.done(function (dialogResult) { });
+                                return;
+                            } else if (response.Msg === "OK") {
+                                let result = DevExpress.ui.dialog.confirm(response.des, "Message");
+                                result.done(function (dialogResult) {
+                                    location.reload();
+                                });
+
+                                return;
+                            }
+                        },
+                        error: function () {
+                            $("#StorageLocations").empty();
+                        }
+                    });
+        });
+
+        $("#btn_clear").on('click', function () {
+                    let options = { User:'@User.FindFirst("ContactName").Value'};
+
+                    $.ajax({
+                        url: "api/IsoniteMant/BtnCancel",
+                        type: "GET",
+                        data: options,
+                        contentType: "application/json; charset=utf-8",
+                        success: function (response) {
+
+                            if (response.Msg === "Error") {
+                                let result = DevExpress.ui.dialog.confirm(response.des, "Error Message");
+                                result.done(function (dialogResult) { });
+                                return;
+                            } else if (response.Msg === "OK") {
+                                let result = DevExpress.ui.dialog.confirm(response.des, "Message");
+                                result.done(function (dialogResult) {
+                                    location.reload();
+                                });
+
+                                return;
+                            }
+                        },
+                        error: function () {
+                            $("#StorageLocations").empty();
+                        }
+                    });
+        });
+
+
+        $("#btn_search").on('click', function () {
+
+            let IsoniteCode = $("#search").val();
+            loadPanel.show();
+
+            if (IsoniteCode === "") {
+                let result = DevExpress.ui.dialog.confirm("Message:IsoniteNo is null.", "Warning");
+                result.done(function (dialogResult) {
+                    return;
+                });
+            }
+
+            let options = { Isonite: IsoniteCode };
+
+                    $.ajax({
+                        url: "api/IsoniteMant/GetSearchIsonite",
+                        type: "GET",
+                        data: options,
+                        contentType: "application/json; charset=utf-8",
+                        success: function (response) {
+
+                            if (response.Msg === "Error") {
+                                let result = DevExpress.ui.dialog.confirm(response.des, "Error Message");
+                                result.done(function (dialogResult) { });
+                                return;
+                            } else if (response.Msg === "OK") {
+
+                                //console.log(response.Header);
+
+                                $.each(response.Header, function (k, v) {
+
+                                    if (v.IsoniteCode !== "") {
+
+                                        $("#IsoniteNo").dxTextBox("instance").option("value", v.IsoniteCode);
+                                    }
+
+                                    if (v.BPCodeFrom !== "") {
+                                        $("#ShipFrom")
+                                            .dxSelectBox("instance")
+                                            .option("value", v.BPCodeFrom);
+                                    }
+
+                                    if (v.BPCodeTO !== "") {
+                                        $("#ShipTo")
+                                            .dxSelectBox("instance")
+                                            .option("value", v.BPCodeTO);
+                                    }
+
+                                    //$("#Jig1").dxSelectBox("instance").option("value", 2);
+
+                                    if (v.JigNo1 !== "") {
+
+                                        let options = { options: v.JigNo1 };
+
+                                        str_jig1 = v.JigNo1;
+
+                                        $.ajax({
+                                            url: "api/IsoniteGetJig/GetJigSize",
+                                            type: "Get",
+                                            data: options,
+                                            contentType: "application/json; charset=utf-8",
+                                            success: function (response) {
+
+                                                getjig1(response.row, response.column);
+
+                                                $("#jig_tap1").text("ID:" + v.JigNo1);
+
+                                                $("#Jig1").dxSelectBox("instance").option("value", v.JigNo1);
+
+                                                $.ajax({
+                                                    url: "api/IsoniteMant/GetIsoniteDetail",
+                                                    type: "Get",
+                                                    data: { Isonite: v.IsoniteCode, JigNo: v.JigNo1 },
+                                                    contentType: "application/json; charset=utf-8",
+                                                    success: function (response) {
+
+                                                        $.each(response.Detail, function (k, v) {
+                                                            $('#tb_jig1 tr').each(function () {
+                                                                $.each(this.cells, function () {
+                                                                    //alert(1);
+
+                                                                    //console.log(v.JigNo);
+
+                                                                    if (v.JigAddresss === $(this).find('a').data("grid")) {
+
+                                                                        //console.log(response.Detail);
+
+                                                                        $(this).focus();
+                                                                        $(this).toggleClass("focus");
+                                                                        $(this).find("#barcode").text(v.BarCode);
+                                                                        $(this).find("#model").text(v.Model);
+                                                                        $(this).find("#qty").text(v.Qty);
+                                                                        $(this).find("#IsoniteCode").text("IsoniteCode");
+                                                                        $(this).find("#SerialNo").text(v.BarCode);
+                                                                        $(this).find("#Model").text(v.Model);
+                                                                        $(this).find("#Confirm_Qty").text();
+
+
+
+                                                                        //$("#tb_jig1 tr td[tabindex=" + idx1 + "] #model").text(v.Model);
+                                                                        //$("#tb_jig1 tr td[tabindex=" + idx1 + "] #qty").text(v.ConfirmedQty);
+
+                                                                        //$("#tb_jig1 tr td[tabindex=" + idx1 + "] #SerialNo").text(v.SerialNo);
+                                                                        //$("#tb_jig1 tr td[tabindex=" + idx1 + "] #Model").text(v.Model);
+                                                                        //$("#tb_jig1 tr td[tabindex=" + idx1 + "] #WIP_Qty").text(v.WIPQty);
+                                                                        //$("#tb_jig1 tr td[tabindex=" + idx1 + "] #Confirm_Qty").text(v.ConfirmedQty);
+                                                                        //$("#tb_jig1 tr td[tabindex=" + idx1 + "] #NG_Qty").text(v.NgQty);
+                                                                    }
+
+
+
+                                                                });
+
+                                                            });
+                                                        });
+                                                    },
+                                                    error: function () {
+                                                        $("#StorageLocations").empty();
+                                                    }
+                                                });
+
+                                            },
+                                            error: function () {
+                                                $("#StorageLocations").empty();
+                                            }
+                                        });
+
+                                    } else {
+                                        getjig1(0, 0);
+                                        $("#Jig1").dxSelectBox('instance').option('value', 0);
+                                        $("#jig_tap1").text("");
+                                    }
+
+                                    if (v.JigNo2 !== "") {
+
+                                        let options = { options: v.JigNo2 };
+
+                                        str_jig2 = v.JigNo2;
+
+                                        $.ajax({
+                                            url: "api/IsoniteGetJig/GetJigSize",
+                                            type: "Get",
+                                            data: options,
+                                            contentType: "application/json; charset=utf-8",
+                                            success: function (response) {
+
+                                                getjig2(response.row, response.column);
+                                                $("#jig_tap2").text("ID:" + v.JigNo2);
+
+                                                $("#Jig2").dxSelectBox("instance").option("value", v.JigNo2);
+
+                                                $.ajax({
+                                                    url: "api/IsoniteMant/GetIsoniteDetail",
+                                                    type: "Get",
+                                                    data: { Isonite: v.IsoniteCode, JigNo: v.JigNo2 },
+                                                    contentType: "application/json; charset=utf-8",
+                                                    success: function (response) {
+
+                                                        $.each(response.Detail, function (k, v) {
+
+                                                            $('#tb_jig2 tr').each(function () {
+                                                                $.each(this.cells, function () {
+                                                                    if (v.JigAddresss === $(this).find('a').data("grid")) {
+
+                                                                        $(this).focus();
+                                                                        $(this).toggleClass("focus");
+                                                                        $(this).find("#barcode").text(v.BarCode);
+                                                                        $(this).find("#model").text(v.Model);
+                                                                        $(this).find("#qty").text(v.Qty);
+                                                                        $(this).find("#IsoniteCode").text("IsoniteCode");
+                                                                        $(this).find("#SerialNo").text(v.BarCode);
+                                                                        $(this).find("#Model").text(v.Model);
+                                                                        $(this).find("#Confirm_Qty").text();
+
+
+                                                                        //$("#tb_jig1 tr td[tabindex=" + idx1 + "] #model").text(v.Model);
+                                                                        //$("#tb_jig1 tr td[tabindex=" + idx1 + "] #qty").text(v.ConfirmedQty);
+
+                                                                        //$("#tb_jig1 tr td[tabindex=" + idx1 + "] #SerialNo").text(v.SerialNo);
+                                                                        //$("#tb_jig1 tr td[tabindex=" + idx1 + "] #Model").text(v.Model);
+                                                                        //$("#tb_jig1 tr td[tabindex=" + idx1 + "] #WIP_Qty").text(v.WIPQty);
+                                                                        //$("#tb_jig1 tr td[tabindex=" + idx1 + "] #Confirm_Qty").text(v.ConfirmedQty);
+                                                                        //$("#tb_jig1 tr td[tabindex=" + idx1 + "] #NG_Qty").text(v.NgQty);
+                                                                    }
+
+
+
+                                                                });
+
+                                                            });
+                                                        });
+                                                    },
+                                                    error: function () {
+                                                        $("#StorageLocations").empty();
+                                                    }
+                                                });
+
+                                            },
+                                            error: function () {
+                                                $("#StorageLocations").empty();
+                                            }
+                                        });
+
+
+                                    } else {
+                                        getjig2(0, 0);
+                                        $("#Jig2").dxSelectBox('instance').option('value', 0);
+                                        $("#jig_tap2").text("");
+                                    }
+
+                                    if (v.JigNo3 !== "") {
+                                        let options = { options: v.JigNo3 };
+
+                                        str_jig3 = v.JigNo3;
+
+                                        $.ajax({
+                                            url: "api/IsoniteGetJig/GetJigSize",
+                                            type: "Get",
+                                            data: options,
+                                            contentType: "application/json; charset=utf-8",
+                                            success: function (response) {
+
+                                                getjig3(response.row, response.column);
+                                                $("#jig_tap3").text("ID:" + v.JigNo3);
+
+                                                $("#Jig3").dxSelectBox("instance").option("value", v.JigNo3);
+
+                                                $.ajax({
+                                                    url: "api/IsoniteMant/GetIsoniteDetail",
+                                                    type: "Get",
+                                                    data: { Isonite: v.IsoniteCode, JigNo: v.JigNo3 },
+                                                    contentType: "application/json; charset=utf-8",
+                                                    success: function (response) {
+
+                                                        $.each(response.Detail, function (k, v) {
+
+
+                                                            $('#tb_jig3 tr').each(function () {
+                                                                $.each(this.cells, function () {
+                                                                    //alert(1);
+                                                                    //console.log(v.JigAddresss + "----" + );
+
+                                                                    if (v.JigAddresss === $(this).find('a').data("grid")) {
+
+                                                                        //console.log(response.Detail);
+
+                                                                        $(this).focus();
+                                                                        $(this).toggleClass("focus");
+                                                                        $(this).find("#barcode").text(v.BarCode);
+                                                                        $(this).find("#model").text(v.Model);
+                                                                        $(this).find("#qty").text(v.Qty);
+                                                                        $(this).find("#IsoniteCode").text("IsoniteCode");
+                                                                        $(this).find("#SerialNo").text(v.BarCode);
+                                                                        $(this).find("#Model").text(v.Model);
+                                                                        $(this).find("#Confirm_Qty").text();
+
+
+                                                                        //$("#tb_jig1 tr td[tabindex=" + idx1 + "] #model").text(v.Model);
+                                                                        //$("#tb_jig1 tr td[tabindex=" + idx1 + "] #qty").text(v.ConfirmedQty);
+
+                                                                        //$("#tb_jig1 tr td[tabindex=" + idx1 + "] #SerialNo").text(v.SerialNo);
+                                                                        //$("#tb_jig1 tr td[tabindex=" + idx1 + "] #Model").text(v.Model);
+                                                                        //$("#tb_jig1 tr td[tabindex=" + idx1 + "] #WIP_Qty").text(v.WIPQty);
+                                                                        //$("#tb_jig1 tr td[tabindex=" + idx1 + "] #Confirm_Qty").text(v.ConfirmedQty);
+                                                                        //$("#tb_jig1 tr td[tabindex=" + idx1 + "] #NG_Qty").text(v.NgQty);
+                                                                    }
+
+
+
+                                                                });
+
+                                                            });
+                                                        });
+                                                    },
+                                                    error: function () {
+                                                        $("#StorageLocations").empty();
+                                                    }
+                                                });
+
+                                            },
+                                            error: function () {
+                                                $("#StorageLocations").empty();
+                                            }
+                                        });
+
+
+
+                                    } else {
+                                        getjig3(0, 0);
+                                        $("#Jig3").dxSelectBox('instance').option('value', 0);
+                                        $("#jig_tap3").text("");
+                                    }
+
+                                    if (v.DocDate !== "") {
+
+                                        $("#date-time").dxDateBox("instance").option("value", v.DocDate);
+
+                                    }
+                                    $("#search").val("");
+
+                                });
+
+                            }
+                        },
+                        error: function () {
+                            $("#StorageLocations").empty();
+                        }
+            });
+
+        });
+
+
+        $("#btn_sum").on('click', function () {
+
+
+            let Detail;
+            let obj = [];
+            if (size_jig1 !== 0) {
+
+                for (let i = 1; i < size_jig1; i++) {
+                    if ($("#tb_jig1 tr td[tabindex=" + i + "] #qty").html() !== "" ) {
+
+                        let str = {
+
+                            JigNo: $("#tb_jig1 tr td[tabindex=" + i + "] a").attr("data-jig"),
+                            JigAddresss: $("#tb_jig1 tr td[tabindex=" + i + "] a").attr("data-grid"),
+                            Model: $("#tb_jig1 tr td[tabindex=" + i + "] #model").html(),
+                            BarCode: $("#tb_jig1 tr td[tabindex=" + i + "] #barcode").html(),
+                            Qty: $("#tb_jig1 tr td[tabindex=" + i + "] #qty").html(),
+                            Confirm_Qty: $("#tb_jig1 tr td[tabindex=" + i + "] #Confirm_Qty").html(),
+                            NgQty: $("#tb_jig1 tr td[tabindex=" + i + "] #NG_Qty").html()
+
+                        };
+                        obj.push(str);
+                    }
+
+                }
+
+            }
+
+
+            if (size_jig2 !== 0) {
+
+                for (let i = 101; i < size_jig2+101; i++) {
+                    if ($("#tb_jig2 tr td[tabindex=" + i + "] #qty").html() !== "") {
+
+                        let str1 = {
+
+                            JigNo: $("#tb_jig2 tr td[tabindex=" + i + "] a").attr("data-jig"),
+                            JigAddresss: $("#tb_jig2 tr td[tabindex=" + i + "] a").attr("data-grid"),
+                            Model: $("#tb_jig2 tr td[tabindex=" + i + "] #model").html(),
+                            BarCode: $("#tb_jig2 tr td[tabindex=" + i + "] #barcode").html(),
+                            Qty: $("#tb_jig2 tr td[tabindex=" + i + "] #qty").html(),
+                            Confirm_Qty: $("#tb_jig2 tr td[tabindex=" + i + "] #Confirm_Qty").html(),
+                            NgQty: $("#tb_jig2 tr td[tabindex=" + i + "] #NG_Qty").html()
+                        };
+
+                        obj.push(str1);
+                    }
+
+                }
+            }
+
+
+            if (size_jig3 !== 0) {
+                for (let i = 201; i < size_jig3+201; i++) {
+                    if ($("#tb_jig3 tr td[tabindex=" + i + "] #qty").html() !== "") {
+
+                        let str2 = {
+
+                            JigNo: $("#tb_jig3 tr td[tabindex=" + i + "] a").attr("data-jig"),
+                            JigAddresss: $("#tb_jig3 tr td[tabindex=" + i + "] a").attr("data-grid"),
+                            Model: $("#tb_jig3 tr td[tabindex=" + i + "] #model").html(),
+                            BarCode: $("#tb_jig3 tr td[tabindex=" + i + "] #barcode").html(),
+                            Qty: $("#tb_jig3 tr td[tabindex=" + i + "] #qty").html(),
+                            Confirm_Qty: $("#tb_jig3 tr td[tabindex=" + i + "] #Confirm_Qty").html(),
+                            NgQty: $("#tb_jig3 tr td[tabindex=" + i + "] #NG_Qty").html()
+
+                        };
+
+                        obj.push(str2);
+                    }
+
+                }
+            }
+
+            Detail = JSON.stringify({ Detail: obj });
+
+
+            let values = { Detail: Detail, User: '@User.FindFirst("ContactName").Value' };
+
+            $.ajax({
+                url: "api/IsoniteMant/BtnSum",
+                type: "POST",
+                data: JSON.stringify(values),
+                dataType: "json",
+                contentType: "application/json; charset=utf-8",
+                success: function (response) {
+                    if (response.Msg === "Error") {
+                        let result = DevExpress.ui.dialog.confirm(response.des, "Error Message");
+                        result.done(function (dialogResult) { });
+                        return;
+                    } else if (response.Msg === "OK") {
+                        let table_body = '<table class="table table-bordered">';
+                            table_body += '<thead>';
+                            table_body += '<tr><th class="text-center" scope="col">Model</th>';
+                            table_body += '<th class="text-center" scope="col">QTY</th></tr>';
+                            table_body += '</thead>';
+                            table_body += '<tbody>';
+                            $.each(response.SumIsonite, function (k, v) {
+                                table_body += '<tr>';
+                                table_body += '<td>';
+                                table_body += v.Model ;
+                                table_body += '</td>';
+                                table_body += '<td>';
+                                table_body += v.Value;
+                                table_body += '</td>';
+                                table_body += '</tr>';
+
+                            });
+                            table_body += '</tbody>';
+                            table_body += '</table>';
+
+                        $('#ContentSum').html(table_body);
+
+
+                    }
+                },
+                error: function () {
+                    $("#StorageLocations").empty();
+                }
+            });
+            $("#popupContainerSum").dxPopup("show");
+        });
+    });
+
+
+    $(function () {
+        let now = new Date();
+        $("#Barcode").dxTextBox({
+            maxLength: 17,
+            laceholder: "Enter BarCode",
+            showClearButton: true,
+            valueChangeEvent: "keyup",
+            onKeyDown: function (e) {
+                let keyCode = e.event.key;
+                // Event handling commands go here
+            },
+            onKeyPress: function (e) {
+                let keyCode = e.event.key;
+                // Event handling commands go here
+            },
+            onKeyUp: function (e) {
+                let keyCode = e.event.key;
+                // Event handling commands go here
+            },
+            onEnterKey: function (e) {
+
+                let shipFrom = $("#ShipFrom").dxSelectBox("instance").option("selectedItem");
+
+                let shipTo = $("#ShipTo").dxSelectBox("instance").option("selectedItem");
+
+                if (shipFrom === null) {
+                    let result = DevExpress.ui.dialog.confirm("The ShipFrom is selected item null.", "Error Message");
+                    result.done(function (dialogResult) { });
+                    return;
+                }
+
+                if (shipTo === null) {
+                    let result = DevExpress.ui.dialog.confirm("The ShipTo is selected item null.", "Error Message");
+                    result.done(function (dialogResult) { });
+                    return;
+                }
+
+                //alert(idx1);
+
+                if (typeof idx1 === 'undefined' || isNaN(idx1)) {
+                    //alert($("#tb_jig1 tr td[tabindex=" + idx1 + "] #barcode").text("Hello world!"));
+
+                    //alert(1);
+
+                    let BarCode = $("#Barcode").dxTextBox('instance').option('value');
+
+                    let options = { Barcode: BarCode , User:'@User.FindFirst("ContactName").Value'};
+
+                    $.ajax({
+                        url: "api/IsoniteMant/ScanBarCode",
+                        type: "Get",
+                        data: options,
+                        contentType: "application/json; charset=utf-8",
+                        success: function (response) {
+
+                            if (response.Msg === "ok") {
+                                idx1 = 1;
+                                $.each(response.data, function (k, v) {
+
+                                    if (idx1 > size_jig1) {
+                                        CheckOverJig(v.SerialNo, v.ConfirmedQty);
+                                    } else {
+                                        if ($("#tb_jig1 tr td[tabindex=" + idx1 + "] #barcode").text() == "") {
+                                            $("#tb_jig1 tr td[tabindex=" + idx1 + "]").focus();
+                                            $("#tb_jig1 tr td[tabindex=" + idx1 + "]").toggleClass("focus");
+
+                                            $("#tb_jig1 tr td[tabindex=" + idx1 + "] #barcode").text(v.SerialNo);
+                                            $("#tb_jig1 tr td[tabindex=" + idx1 + "] #model").text(v.Model);
+                                            $("#tb_jig1 tr td[tabindex=" + idx1 + "] #qty").text(v.ConfirmedQty);
+
+                                            $("#tb_jig1 tr td[tabindex=" + idx1 + "] #SerialNo").text(v.SerialNo);
+
+                                            $("#tb_jig1 tr td[tabindex=" + idx1 + "] #Model").text(v.Model);
+                                            $("#tb_jig1 tr td[tabindex=" + idx1 + "] #WIP_Qty").text(v.WIPQty);
+                                            $("#tb_jig1 tr td[tabindex=" + idx1 + "] #Confirm_Qty").text(v.ConfirmedQty);
+                                            $("#tb_jig1 tr td[tabindex=" + idx1 + "] #NG_Qty").text(v.NgQty);
+
+                                            idx1++;
+                                        } else {
+                                            CheckOverJig(v.SerialNo, v.ConfirmedQty);
+                                        }
+
+                                    }
+
+                                });
+
+                            } else if (response.Msg === "Error") {
+
+                                let result = DevExpress.ui.dialog.confirm(response.des, "Error Message");
+                                result.done(function (dialogResult) { });
+                               // idx1--;
+                                return;
+                            }
+
+                        },
+                        error: function () {
+                            $("#StorageLocations").empty();
+                        }
+                    });
+
+                } else if (idx1 <= 100) {
+
+                    //alert(1);
+
+                    let BarCode = $("#Barcode").dxTextBox('instance').option('value');
+
+                   let options = { Barcode: BarCode , User:'@User.FindFirst("ContactName").Value'};
+
+                    $.ajax({
+
+                        url: "api/IsoniteMant/ScanBarCode",
+                        type: "Get",
+                        data: options,
+                        contentType: "application/json; charset=utf-8",
+                        success: function (response) {
+
+                            if (response.Msg === "ok") {
+                                $.each(response.data, function (k, v) {
+
+                                    if (idx1 > size_jig1) {
+                                        CheckOverJig(v.SerialNo, v.ConfirmedQty);
+                                    } else {
+                                        if ($("#tb_jig1 tr td[tabindex=" + idx1 + "] #barcode").text() == "") {
+
+                                            $("#tb_jig1 tr td[tabindex=" + idx1 + "]").focus();
+                                            $("#tb_jig1 tr td[tabindex=" + idx1 + "]").toggleClass("focus");
+
+                                            $("#tb_jig1 tr td[tabindex=" + idx1 + "] #barcode").text(v.SerialNo);
+                                            $("#tb_jig1 tr td[tabindex=" + idx1 + "] #model").text(v.Model);
+                                            $("#tb_jig1 tr td[tabindex=" + idx1 + "] #qty").text(v.ConfirmedQty);
+
+                                            $("#tb_jig1 tr td[tabindex=" + idx1 + "] #SerialNo").text(v.SerialNo);
+                                            $("#tb_jig1 tr td[tabindex=" + idx1 + "] #Model").text(v.Model);
+                                            $("#tb_jig1 tr td[tabindex=" + idx1 + "] #WIP_Qty").text(v.WIPQty);
+                                            $("#tb_jig1 tr td[tabindex=" + idx1 + "] #Confirm_Qty").text(v.ConfirmedQty);
+                                            $("#tb_jig1 tr td[tabindex=" + idx1 + "] #NG_Qty").text(v.NgQty);
+
+                                            idx1++;
+                                        } else {
+                                            CheckOverJig(v.SerialNo, v.ConfirmedQty);
+                                        }
+
+                                    }
+                                });
+
+
+                            } else if (response.Msg === "Error") {
+
+                                let result = DevExpress.ui.dialog.confirm(response.des, "Error Message");
+                                result.done(function (dialogResult) { });
+                                //idx1--;
+                                return;
+                            }
+                        },
+                        error: function () {
+                            $("#StorageLocations").empty();
+                        }
+                    });
+
+                } else if (idx1 <= 200) {
+
+                    //alert(2);
+
+                    let BarCode = $("#Barcode").dxTextBox('instance').option('value');
+
+                   let options = { Barcode: BarCode , User:'@User.FindFirst("ContactName").Value'};
+
+                    $.ajax({
+
+                        url: "api/IsoniteMant/ScanBarCode",
+                        type: "Get",
+                        data: options,
+                        contentType: "application/json; charset=utf-8",
+                        success: function (response) {
+                            //alert(response.Msg);
+                            if (response.Msg === "ok") {
+                               // console.log(response.data);
+                                $.each(response.data, function (k, v) {
+                                    //alert(size_jig2);
+                                    if (idx1 > size_jig2+100) {
+                                        //alert("5");
+                                        CheckOverJig(v.SerialNo, v.ConfirmedQty);
+                                    } else {
+
+                                       // alert(idx1);
+                                        if ($("#tb_jig2 tr td[tabindex=" + idx1 + "] #barcode").text() == "") {
+                                            $("#tb_jig2 tr td[tabindex=" + idx1 + "]").focus();
+                                            $("#tb_jig2 tr td[tabindex=" + idx1 + "]").toggleClass("focus");
+
+                                            $("#tb_jig2 tr td[tabindex=" + idx1 + "] #barcode").text(v.SerialNo);
+                                            $("#tb_jig2 tr td[tabindex=" + idx1 + "] #model").text(v.Model);
+                                            $("#tb_jig2 tr td[tabindex=" + idx1 + "] #qty").text(v.ConfirmedQty);
+
+                                            $("#tb_jig2 tr td[tabindex=" + idx1 + "] #SerialNo").text(v.SerialNo);
+                                            $("#tb_jig2 tr td[tabindex=" + idx1 + "] #Model").text(v.Model);
+                                            $("#tb_jig2 tr td[tabindex=" + idx1 + "] #WIP_Qty").text(v.WIPQty);
+                                            $("#tb_jig2 tr td[tabindex=" + idx1 + "] #Confirm_Qty").text(v.ConfirmedQty);
+                                            $("#tb_jig2 tr td[tabindex=" + idx1 + "] #NG_Qty").text(v.NgQty);
+
+                                            idx1++;
+                                        } else {
+                                            CheckOverJig(v.SerialNo, v.ConfirmedQty);
+                                        }
+
+                                    }
+
+                                });
+
+                            } else if (response.Msg === "Error") {
+
+                                let result = DevExpress.ui.dialog.confirm(response.des, "Error Message");
+                                result.done(function (dialogResult) { });
+                                //idx1--;
+                                return;
+                            }
+                        },
+                        error: function () {
+                            $("#StorageLocations").empty();
+                        }
+                    });
+
+                } else if (idx1 > 200) {
+
+                    //alert(3);
+
+                    let BarCode = $("#Barcode").dxTextBox('instance').option('value');
+
+                    let options = { Barcode: BarCode , User:'@User.FindFirst("ContactName").Value'};
+
+                    $.ajax({
+                        url: "api/IsoniteMant/ScanBarCode",
+                        type: "Get",
+                        data: options,
+                        contentType: "application/json; charset=utf-8",
+                        success: function (response) {
+                            //alert(response.Msg);
+                            if (response.Msg === "ok") {
+
+                                $.each(response.data, function (k, v) {
+
+                                    if (idx1 > size_jig3+200) {
+                                        CheckOverJig(v.SerialNo, v.ConfirmedQty);
+                                    } else {
+                                        if ($("#tb_jig3 tr td[tabindex=" + idx1 + "] #barcode").text() == "") {
+                                            $("#tb_jig3 tr td[tabindex=" + idx1 + "]").focus();
+                                            $("#tb_jig3 tr td[tabindex=" + idx1 + "]").toggleClass("focus");
+
+                                            $("#tb_jig3 tr td[tabindex=" + idx1 + "] #barcode").text(v.SerialNo);
+                                            $("#tb_jig3 tr td[tabindex=" + idx1 + "] #model").text(v.Model);
+                                            $("#tb_jig3 tr td[tabindex=" + idx1 + "] #qty").text(v.ConfirmedQty);
+
+                                            $("#tb_jig3 tr td[tabindex=" + idx1 + "] #SerialNo").text(v.SerialNo);
+                                            $("#tb_jig3 tr td[tabindex=" + idx1 + "] #Model").text(v.Model);
+                                            $("#tb_jig3 tr td[tabindex=" + idx1 + "] #WIP_Qty").text(v.WIPQty);
+                                            $("#tb_jig3 tr td[tabindex=" + idx1 + "] #Confirm_Qty").text(v.ConfirmedQty);
+                                            $("#tb_jig3 tr td[tabindex=" + idx1 + "] #NG_Qty").text(v.NgQty);
+
+                                            idx1++;
+                                        } else {
+                                            CheckOverJig(v.SerialNo, v.ConfirmedQty);
+                                        }
+
+                                    }
+                                });
+
+                            } else if (response.Msg === "Error") {
+
+                                let result = DevExpress.ui.dialog.confirm(response.des, "Error Message");
+                                result.done(function (dialogResult) { });
+                               // idx1--;
+                                return;
+                            }
+                        },
+                        error: function () {
+                            $("#StorageLocations").empty();
+                        }
+                    });
+
+                }
+
+                $("#Barcode").dxTextBox('instance').option('value','');
+
+                // Event handling commands go here
+
+                //alert(idx1);
+                //idx1++;
+            }
+        });
+
+
+        function CheckOverJig(BarCode, Qty) {
+            //alert("----");
+            let options = { Barcode: BarCode, Qty: Qty, User: '@User.FindFirst("ContactName").Value'};
+
+            $.ajax({
+                url: "api/IsoniteMant/DeleteIsonniteTemp",
+                type: "Get",
+                data: options,
+                contentType: "application/json; charset=utf-8",
+                success: function (response) {
+                    if (response.Msg === "Error") {
+                        let result = DevExpress.ui.dialog.confirm(response.des, "Error Message");
+                        result.done(function (dialogResult) { });
+                        // idx1--;
+                        return;
+                    }
+
+                },
+                error: function () {
+                    $("#StorageLocations").empty();
+                }
+            });
+        }
+
+
+        $("#IsoniteNo").dxTextBox({
+            readOnly: true
+        });
+
+        $("#date-time").dxDateBox({
+            type: "datetime",
+            value: now,
+            displayFormat: "@ViewBag.GlobalDtFormat"
+        });
+
+        $("#ShipFrom").dxSelectBox({
+            dataSource: DevExpress.data.AspNet.createStore({
+                key: "BPCode",
+                loadUrl: "api/BPCode/GetTypeB",
+                onBeforeSend: function (method, ajaxOptions) {
+                    ajaxOptions.xhrFields = { withCredentials: true };
+                }
+            }),
+            searchEnabled: true,
+            valueExpr: "BPCode",
+            displayExpr: "BPName",
+            placeholder: "Choose Ship",
+            allowClearing: true,
+            showClearButton: true
+        });
+
+        $("#ShipTo").dxSelectBox({
+            dataSource: DevExpress.data.AspNet.createStore({
+                key: "BPCode",
+                loadUrl: "api/BPCode/Get",
+                onBeforeSend: function (method, ajaxOptions) {
+                    ajaxOptions.xhrFields = { withCredentials: true };
+                }
+            }),
+            searchEnabled: true,
+            valueExpr: "BPCode",
+            displayExpr: "BPName",
+            placeholder: "Choose Ship",
+            allowClearing: true,
+            showClearButton: true
+        });
+
+
+        $("#Jig1").dxSelectBox({
+            dataSource: DevExpress.data.AspNet.createStore({
+                key: "JigNo",
+                loadUrl: "api/IsoniteGetJig/GetJig",
+                onBeforeSend: function (method, ajaxOptions) {
+                    ajaxOptions.xhrFields = { withCredentials: true };
+                }
+            }),
+            searchEnabled: true,
+            valueExpr: "JigNo",
+            displayExpr: "JigNo",
+            placeholder: "Choose Jig",
+            allowClearing: true,
+            showClearButton: true,
+            hoverStateEnabled: true,
+            onValueChanged: function (e) {
+
+                    if (suspendValueChagned) {
+                        suspendValueChagned = false;
+                        return;
+                    }
+
+                    let oldValue = e.previousValue;
+                    let currentValue = e.value;
+
+                    let txt_search = $("#search").val();
+                    let txt_Isonite_code = $("#IsoniteNo").dxTextBox("instance").option("value");
+
+
+                    let jig2 = $("#Jig2").dxSelectBox('instance').option('value');
+                    let jig3 = $("#Jig3").dxSelectBox('instance').option('value');
+
+                    let options = { oldJig: oldValue, newJig: currentValue };
+
+                    $.ajax({
+                        url: "api/IsoniteGetJig/GetSumJig",
+                        type: "Get",
+                        data: options,
+                        contentType: "application/json; charset=utf-8",
+                        success: function (response) {
+
+                            if (txt_search === "" && txt_Isonite_code === "") {
+
+                                if (response === "Null") {
+                                    suspendValueChagned = true;
+                                    e.component.option('value', 0);
+
+                                } else if (e.value === jig2 || e.value === jig3) {
+
+                                    let result = DevExpress.ui.dialog.confirm("Jig have already used!", "Error Message");
+                                    result.done(function (dialogResult) { });
+                                    suspendValueChagned = true;
+                                    e.component.option('value', oldValue);
+
+                                } else if (response === "JigActive") {
+
+                                    let result = DevExpress.ui.dialog.confirm("Jig have already used!", "Error Message");
+                                    result.done(function (dialogResult) { });
+                                    suspendValueChagned = true;
+                                    e.component.option('value', oldValue);
+
+                                } else if (response === "ErrorJigSize") {
+
+                                    let result = DevExpress.ui.dialog.confirm("The number of columns & rows in the new Jig must be equal to the number of  columns & rows in the old Jig.", "Error Message");
+                                    result.done(function (dialogResult) { });
+                                    suspendValueChagned = true;
+                                    e.component.option('value', oldValue);
+
+                                } else if (response.Msg === "Ok") {
+
+                                    e.component.option('value', currentValue);
+                                    getjig1(response.row, response.column);
+                                    $("#jig_tap1").text("ID:" + e.component.option("value"));
+
+                                } else if (response === "No") {
+
+                                    suspendValueChagned = true;
+                                    e.component.option('value', oldValue);
+
+                                }
+                            } else if (txt_Isonite_code !== "") {
+
+                                //if (response === "Null") {
+                                //    suspendValueChagned = true;
+                                //    e.component.option('value', 0);
+
+                                //} else if (e.value === jig2 || e.value === jig3) {
+
+                                //    let result = DevExpress.ui.dialog.confirm("Jig have already used!", "Error Message");
+                                //    result.done(function (dialogResult) { });
+                                //    suspendValueChagned = true;
+                                //    e.component.option('value', oldValue);
+
+                                //} else if (response === "JigActive") {
+
+                                //    let result = DevExpress.ui.dialog.confirm("Jig have already used!", "Error Message");
+                                //    result.done(function (dialogResult) { });
+                                //    suspendValueChagned = true;
+                                //    e.component.option('value', oldValue);
+
+                                //} else if (response === "ErrorJigSize") {
+
+                                //    let result = DevExpress.ui.dialog.confirm("The number of columns & rows in the new Jig must be equal to the number of  columns & rows in the old Jig.", "Error Message");
+                                //    result.done(function (dialogResult) { });
+                                //    suspendValueChagned = true;
+                                //    e.component.option('value', oldValue);
+
+                                //} else if (response.Msg === "Ok") {
+
+                                //    e.component.option('value', currentValue);
+                                //    //getjig1(response.row, response.column);
+                                //    $("#jig_tap1").text("ID:" + e.component.option("value"));
+
+                                //} else if (response === "No") {
+
+                                //    suspendValueChagned = true;
+                                //    e.component.option('value', oldValue);
+
+                                //}
+                                e.component.option('value', currentValue);
+                                $("#jig_tap1").text("ID:" + e.component.option("value"));
+                            }
+
+
+                        },
+                        error: function () {
+                            $("#StorageLocations").empty();
+                        }
+                    });
+
+            }
+        });
+
+        $("#Jig2").dxSelectBox({
+            dataSource: DevExpress.data.AspNet.createStore({
+                key: "JigNo",
+                loadUrl: "api/IsoniteGetJig/GetJig",
+                onBeforeSend: function (method, ajaxOptions) {
+                    ajaxOptions.xhrFields = { withCredentials: true };
+                }
+            }),
+            searchEnabled: true,
+            valueExpr: "JigNo",
+            displayExpr: "JigNo",
+            placeholder: "Choose Jig",
+            allowClearing: true,
+            showClearButton: true,
+            onValueChanged: function (e) {
+
+                    if (suspendValueChagned) {
+                        suspendValueChagned = false;
+                        return;
+                    }
+
+
+                let oldValue = e.previousValue;
+                let currentValue = e.value;
+
+                let txt_search = $("#search").val();
+                let txt_Isonite_code = $("#IsoniteNo").dxTextBox("instance").option("value");
+
+                let jig1 = $("#Jig1").dxSelectBox('instance').option('value');
+                let jig3 = $("#Jig3").dxSelectBox('instance').option('value');
+
+                let options = { oldJig: oldValue, newJig: currentValue };
+
+
+                    $.ajax({
+                        url: "api/IsoniteGetJig/GetSumJig",
+                        type: "Get",
+                        data: options,
+                        contentType: "application/json; charset=utf-8",
+                        success: function (response) {
+                            if (txt_search === "" && txt_Isonite_code === "") {
+
+                                if (response === "Null") {
+                                    suspendValueChagned = true;
+                                    e.component.option('value', 0);
+
+                                } else if (e.value === jig1 || e.value === jig3) {
+
+                                    let result = DevExpress.ui.dialog.confirm("Jig have already used!", "Error Message");
+                                    result.done(function (dialogResult) { });
+                                    suspendValueChagned = true;
+                                    e.component.option('value', oldValue);
+
+                                } else if (response === "JigActive") {
+
+                                    let result = DevExpress.ui.dialog.confirm("Jig have already used!", "Error Message");
+                                    result.done(function (dialogResult) { });
+                                    suspendValueChagned = true;
+                                    e.component.option('value', oldValue);
+
+                                } else if (response === "ErrorJigSize") {
+
+                                    let result = DevExpress.ui.dialog.confirm("The number of columns & rows in the new Jig must be equal to the number of  columns & rows in the old Jig.", "Error Message");
+                                    result.done(function (dialogResult) { });
+                                    suspendValueChagned = true;
+                                    e.component.option('value', oldValue);
+
+                                } else if (response.Msg === "Ok") {
+
+                                    e.component.option('value', currentValue);
+                                    getjig2(response.row, response.column);
+                                    //$("#tb_jig2 tr:first").find("td:first").toggleClass("focus");
+                                    $("#jig_tap2").text("ID:" + e.component.option("text"));
+
+                                } else if (response === "No") {
+
+                                    suspendValueChagned = true;
+                                    e.component.option('value', oldValue);
+
+                                }
+                            } else if (txt_Isonite_code !== "") {
+                                e.component.option('value', currentValue);
+                                $("#jig_tap2").text("ID:" + e.component.option("value"));
+                            }
+
+
+
+                        },
+                        error: function () {
+                            $("#StorageLocations").empty();
+                        }
+                    });
+
+
+
+            }
+        });
+
+        $("#Jig3").dxSelectBox({
+            dataSource: DevExpress.data.AspNet.createStore({
+                key: "JigNo",
+                loadUrl: "api/IsoniteGetJig/GetJig",
+                onBeforeSend: function (method, ajaxOptions) {
+                    ajaxOptions.xhrFields = { withCredentials: true };
+                }
+            }),
+            searchEnabled: true,
+            valueExpr: "JigNo",
+            displayExpr: "JigNo",
+            placeholder: "Choose Jig",
+            allowClearing: true,
+            showClearButton: true,
+            onValueChanged: function (e) {
+
+
+                if (suspendValueChagned) {
+                    suspendValueChagned = false;
+                    return;
+                }
+
+                let oldValue = e.previousValue;
+                let currentValue = e.value;
+
+                let txt_search = $("#search").val();
+                let txt_Isonite_code = $("#IsoniteNo").dxTextBox("instance").option("value");
+
+                let jig1 = $("#Jig1").dxSelectBox('instance').option('value');
+                let jig2 = $("#Jig2").dxSelectBox('instance').option('value');
+
+                let options = { oldJig: oldValue, newJig: currentValue };
+
+                $.ajax({
+                    url: "api/IsoniteGetJig/GetSumJig",
+                    type: "Get",
+                    data: options,
+                    contentType: "application/json; charset=utf-8",
+                    success: function (response) {
+
+                        if (txt_search === "" && txt_Isonite_code === "") {
+                            if (response === "Null") {
+                                suspendValueChagned = true;
+                                e.component.option('value', 0);
+
+                            } else if (e.value === jig1 || e.value === jig2) {
+                                let result = DevExpress.ui.dialog.confirm("Jig have already used!", "Error Message");
+                                result.done(function (dialogResult) { });
+                                suspendValueChagned = true;
+                                e.component.option('value', oldValue);
+                            } else if (response === "JigActive") {
+
+                                let result = DevExpress.ui.dialog.confirm("Jig have already used!", "Error Message");
+                                result.done(function (dialogResult) { });
+                                suspendValueChagned = true;
+                                e.component.option('value', oldValue);
+
+                            } else if (response === "ErrorJigSize") {
+
+                                let result = DevExpress.ui.dialog.confirm("The number of columns & rows in the new Jig must be equal to the number of  columns & rows in the old Jig.", "Error Message");
+                                result.done(function (dialogResult) { });
+                                suspendValueChagned = true;
+                                e.component.option('value', oldValue);
+
+                            } else if (response.Msg === "Ok") {
+
+                                e.component.option('value', currentValue);
+                                getjig3(response.row, response.column);
+                                //$("#tb_jig3 tr:first").find("td:first").toggleClass("focus");
+                                $("#jig_tap3").text("ID:" + e.component.option("text"));
+                            } else if (response === "No") {
+
+                                suspendValueChagned = true;
+                                e.component.option('value', oldValue);
+
+                            }
+                        } else if (txt_Isonite_code !== "") {
+                            e.component.option('value', currentValue);
+                            $("#jig_tap3").text("ID:" + e.component.option("value"));
+                        }
+
+                        },
+                        error: function () {
+                            $("#StorageLocations").empty();
+                        }
+                    });
+
+
+            }
+        });
+    });
+
+
+    function getjig1(columns,rows) {
+        //ขนาด jig1
+        size_jig1 = columns * rows;
+
+        let JigId = $("#Jig1").dxSelectBox('instance').option('value');
+
+        let tapindex = 1;
+
+        let number_of_cols = columns;
+        let number_of_rows = rows;
+        let table_body = '<table border="1">';
+
+        for (let i = number_of_cols; i >= 1; i--) {
+            table_body += '<tr>';
+            for (let j = 1; j <= number_of_rows ; j++) {
+
+                let index = (number_of_cols * j - number_of_cols) + i;
+
+                table_body += '<td tabindex="' + index + '">';
+
+                table_body += '<div>';
+                table_body += '<a onclick="showDetails(this)" class="list-group-item" data-JigName = "#tb_jig1" data-grid ="' + i + 0 + j + '" data-jig="' + JigId + '">';
+                table_body += '<p data-jig="' + JigId + '" class="p_size" id="barcode"></p>';
+                table_body += '<p class="p_size" id="model"></p>';
+                table_body += '<p class="p_size" id="qty"></p>';
+                table_body += '<input type="hidden" id="IsoniteNo" name="IsoniteNo">';
+                table_body += '<input type="hidden" id="SerialNo" name="SerialNo">';
+                table_body += '<input type="hidden" id="Model" name="Model">';
+                table_body += '<input type="hidden" id="WIP_Qty" name="WIP_Qty">';
+                table_body += '<input type="hidden" id="Confirm_Qty" name="Confirm_Qty">';
+                table_body += '<input type="hidden" id="NG_Qty" name="NG_Qty">';
+                table_body += '</a>';
+                table_body += '</div></td>';
+
+                tapindex++;
+            }
+            table_body += '</tr>';
+        }
+        table_body += '</table>';
+        $('#tb_jig1').html(table_body);
+
+
+        let tbl = document.getElementById("tb_jig1");
+        if (tbl !== null) {
+            for (let i = 0; i < tbl.rows.length; i++) {
+                for (let j = 0; j < tbl.rows[i].cells.length; j++) {
+                    tbl.rows[i].cells[j].onkeydown = function (e) {
+                        if (event.keyCode === 40) { //down
+                            let idx = $("td:focus").attr("tabindex");
+                            idx++;
+
+                            $("td[tabindex=" + idx + "]").focus();
+                        }
+                        if (event.keyCode === 38) { //up
+                            let idx = $("td:focus").attr("tabindex");
+                            idx--;
+
+                            $("td[tabindex=" + idx + "]").focus();
+                        }
+                        if (event.keyCode === 13) { //enter
+                            let idx = $("td:focus").attr("tabindex");
+                            idx++;
+                            $("td[tabindex=" + idx + "]").focus();
+                        }
+                    };
+                }
+            }
+        }
+    }
+
+    function getjig2(columns, rows) {
+
+        //ขนาด jig2
+        size_jig2 = columns * rows;
+
+        let JigId = $("#Jig2").dxSelectBox('instance').option('value');
+
+        let tapindex = 100;
+
+        let number_of_cols = columns;
+        let number_of_rows = rows;
+        let table_body = '<table border="1">';
+
+        for (let i = number_of_cols; i >= 1; i--) {
+            table_body += '<tr>';
+            for (let j = 1; j <= number_of_rows; j++) {
+
+                let index = 100 + (number_of_cols * j - number_of_cols) + i;
+
+                table_body += '<td tabindex="' + index + '">';
+
+                table_body += '<div>';
+                table_body += '<a onclick="showDetails(this)" class="list-group-item" data-JigName = "#tb_jig2" data-grid ="' + i + 0 + j + '" data-jig="' + JigId + '">';
+                table_body += '<p data-jig="' + JigId + '" class="p_size" id="barcode"></p>';
+                table_body += '<p class="p_size" id="model"></p>';
+                table_body += '<p class="p_size" id="qty"></p>';
+                table_body += '<input type="hidden" id="IsoniteNo" name="IsoniteNo">';
+                table_body += '<input type="hidden" id="SerialNo" name="SerialNo">';
+                table_body += '<input type="hidden" id="Model" name="Model">';
+                table_body += '<input type="hidden" id="WIP_Qty" name="WIP_Qty">';
+                table_body += '<input type="hidden" id="Confirm_Qty" name="Confirm_Qty">';
+                table_body += '<input type="hidden" id="NG_Qty" name="NG_Qty">';
+                table_body += '</a>';
+                table_body += '</div></td>';
+
+                tapindex++;
+            }
+            table_body += '</tr>';
+        }
+        table_body += '</table>';
+        $('#tb_jig2').html(table_body);
+
+        let tbl = document.getElementById("tb_jig2");
+        if (tbl !== null) {
+            for (let i = 0; i < tbl.rows.length; i++) {
+                for (let j = 0; j < tbl.rows[i].cells.length; j++) {
+                    tbl.rows[i].cells[j].onkeydown = function (e) {
+                        if (event.keyCode === 40) { //down
+                            let idx = $("td:focus").attr("tabindex");
+                            idx++;
+
+                            $("td[tabindex=" + idx + "]").focus();
+                        }
+                        if (event.keyCode === 38) { //up
+                            let idx = $("td:focus").attr("tabindex");
+                            idx--;
+
+                            $("td[tabindex=" + idx + "]").focus();
+                        }
+                        if (event.keyCode === 13) { //enter
+                            let idx = $("td:focus").attr("tabindex");
+                            idx++;
+                            $("td[tabindex=" + idx + "]").focus();
+                        }
+                    };
+                }
+            }
+
+        }
+    }
+
+    function getjig3(columns, rows) {
+
+        //ขนาด jig3
+        size_jig3 = columns * rows;
+
+        let JigId = $("#Jig3").dxSelectBox('instance').option('value');
+
+        let tapindex = 200;
+
+        let number_of_cols = columns;
+        let number_of_rows = rows;
+        let table_body = '<table border="1">';
+
+        for (let i = number_of_cols; i >= 1; i--) {
+            table_body += '<tr>';
+            for (let j = 1; j <= number_of_rows; j++) {
+
+                let index = 200 + (number_of_cols * j - number_of_cols) + i;
+
+                table_body += '<td tabindex="' + index + '">';
+
+                table_body += '<div>';
+                table_body += '<a onclick="showDetails(this)" class="list-group-item" data-JigName = "#tb_jig3" data-grid ="' + i + 0 + j + '" data-jig="' + JigId + '">';
+                table_body += '<p data-jig="' + JigId + '" class="p_size" id="barcode"></p>';
+                table_body += '<p class="p_size" id="model"></p>';
+                table_body += '<p class="p_size" id="qty"></p>';
+                table_body += '<input type="hidden" id="IsoniteNo" name="IsoniteNo">';
+                table_body += '<input type="hidden" id="SerialNo" name="SerialNo">';
+                table_body += '<input type="hidden" id="Model" name="Model">';
+                table_body += '<input type="hidden" id="WIP_Qty" name="WIP_Qty">';
+                table_body += '<input type="hidden" id="Confirm_Qty" name="Confirm_Qty">';
+                table_body += '<input type="hidden" id="NG_Qty" name="NG_Qty">';
+                table_body += '</a>';
+                table_body += '</div></td>';
+
+                tapindex++;
+            }
+            table_body += '</tr>';
+        }
+        table_body += '</table>';
+        $('#tb_jig3').html(table_body);
+
+        let tbl = document.getElementById("tb_jig3");
+        if (tbl !== null) {
+            for (let i = 0; i < tbl.rows.length; i++) {
+                for (let j = 0; j < tbl.rows[i].cells.length; j++) {
+                    tbl.rows[i].cells[j].onkeydown = function (e) {
+                        if (event.keyCode === 40) { //down
+                            let idx = $("td:focus").attr("tabindex");
+                            idx++;
+
+                            $("td[tabindex=" + idx + "]").focus();
+                        }
+                        if (event.keyCode === 38) { //up
+                            let idx = $("td:focus").attr("tabindex");
+                            idx--;
+
+                            $("td[tabindex=" + idx + "]").focus();
+                        }
+                        if (event.keyCode === 13) { //enter
+                            let idx = $("td:focus").attr("tabindex");
+                            idx++;
+                            $("td[tabindex=" + idx + "]").focus();
+                        }
+                    };
+                }
+            }
+
+        }
+    }
+
+
+    function showDetails(e) {
+
+        idx1 = $("td:focus").attr("tabindex");
+        //$("td:focus").focus();
+        //$("td:focus").toggleClass("focus");
+
+        let JigName = e.getAttribute("data-JigName");
+        let location = e.getAttribute("data-grid");
+        let JigID = e.getAttribute("data-jig");
+
+
+        let isoniteNo = $("#IsoniteNo").dxTextBox("instance").option("value");
+        let Barcode = e.querySelector("#barcode").innerHTML;
+        let Model = e.querySelector("#model").innerHTML;
+        //let WIPQty = e.querySelector("#WIPQty").innerHTML;
+        let qty = e.querySelector("#qty").innerHTML;
+        let Conqty = e.querySelector("#Confirm_Qty").value;
+
+        if (Barcode === "") {
+            insertIsonite(JigName, location);
+            $("#popupInsert").dxPopup("show");
+        } else {
+            $("#popupEdit").dxPopup({
+                onShown: function (e) {
+                    $("#_JigNo").val(JigName);
+                    $("#_location").val(location);
+
+                    $("#_IsoniteNo").val(isoniteNo);
+                    $("#_BarCode").val(Barcode);
+                    $("#_Model").val(Model);
+                    $("#_WIPQty").val(qty);
+                    $("#_ConQty").val(Conqty);
+                }
+            });
+
+            $("#popupEdit").dxPopup("show");
+        }
+
+        //$("#tap_index").val('' + idx1 + '');
+        //alert(animalType + "====" + JigID + "---" + idx1);
+
+        //let animalType = e.getAttribute("data-grid");
+        //let JigID = e.getAttribute("data-jig");
+
+        //alert((this).getElementById("#barcode").innerHTML);
+
+        //idx1 = $("td:focus").attr("tabindex");
+
+        //e.querySelector("#barcode").innerHTML = "F0510012A1910/002";
+        //let barcode = e.innerHTML;
+
+        //<input type="text" class="form-control" id="_JigNo" readonly>
+        //    <input type="text" class="form-control" id="_location" readonly>
+        //        <input type="text" class="form-control" id="_jigID" readonly>
+
+        //$("#contentEdit").html(str);
+
+
+        ////alert($('input#IsoniteNo').val());
+        //let isoniteNo = $("#IsoniteNo").val();
+
+        //$("#tap_index").val(''+idx1+'');
+        //alert(animalType + "====" + JigID +"---"+ idx1);
+
+       // $("#_BarCode").val(barcode);
+    }
+
+    function insertIsonite(JigName, location) {
+       // popupInsert
+    }
+
+    $("#popupInsert").dxPopup({
+        onShown: function (e) {
+            $("#GridWorouting").dxDataGrid({
+                dataSource: DevExpress.data.AspNet.createStore({
+                    key: ["BarCode"],
+                    loadUrl: "api/IsoniteMant/GetWoRouting",
+                    onBeforeSend: function (method, ajaxOptions) {
+                        ajaxOptions.xhrFields = { withCredentials: true };
+                    }
+                }),filterRow: {
+                    visible: true
+                },
+                selection: {
+                    mode: "single",
+                    selectAllMode: "page",
+                    recursive: false,
+                    showCheckBoxesInMultipleMode: 'none'
+                },
+                headerFilter: {
+                    visible: true
+                },
+                loadPanel: false,
+                remoteOperations: true,
+                showColumnLines: true,
+                ShowRowLines: true,
+                rowAlternationEnabled: true,
+                showBorders: true,
+                searchPanel: {
+                    visible: true
+                },
+                paging: {
+                    pageSize: 10
+                },
+                pager: {
+                    showPageSizeSelector: true,
+                    allowedPageSizes: [10, 25, 50, 100],
+                    showInfo: true,
+                    showNavigationButtons: true,
+                    visible: true
+                },
+                columnChooser: {
+                    enabled: true,
+                    mode: "select"
+                },
+                columns: [
+                    {
+                        dataField: "BarCode",
+                        caption: "BarCode."
+                    }, {
+                        dataField: "SerialLot",
+                        caption: "SerialLot."
+                    }, {
+                        dataField: "Model",
+                        caption: "Model."
+                    }, {
+                        dataField: "WIP_Qty",
+                        caption: "WIP Qty"
+                    }],
+                onSelectionChanged: function (selectedItems) {
+                    var data = selectedItems.selectedRowsData[0];
+                    if (data) {
+                        //$(".employeeNotes").text(data.Notes);
+                        //.alert(data.BarCode);
+
+                        ClickBarCode(data.BarCode);
+                        $("#popupInsert").dxPopup("hide");
+
+                        var dataGrid = $("#GridWorouting").dxDataGrid("instance");
+                        dataGrid.deselectAll();
+                        dataGrid.clearSelection();
+                        
+                    }
+                }
+            });
+        }
+    });
+
+    function ClickBarCode(_BarCode) {
+
+        let shipFrom = $("#ShipFrom").dxSelectBox("instance").option("selectedItem");
+
+                let shipTo = $("#ShipTo").dxSelectBox("instance").option("selectedItem");
+
+                if (shipFrom === null) {
+                    let result = DevExpress.ui.dialog.confirm("The ShipFrom is selected item null.", "Error Message");
+                    result.done(function (dialogResult) { });
+                    return;
+                }
+
+                if (shipTo === null) {
+                    let result = DevExpress.ui.dialog.confirm("The ShipTo is selected item null.", "Error Message");
+                    result.done(function (dialogResult) { });
+                    return;
+                }
+
+                //alert(idx1);
+
+                if (typeof idx1 === 'undefined' || isNaN(idx1)) {
+                    //alert($("#tb_jig1 tr td[tabindex=" + idx1 + "] #barcode").text("Hello world!"));
+
+                    //alert(1);
+
+                    let BarCode = _BarCode;
+
+                    let options = { Barcode: BarCode , User:'@User.FindFirst("ContactName").Value'};
+
+                    $.ajax({
+                        url: "api/IsoniteMant/ScanBarCode",
+                        type: "Get",
+                        data: options,
+                        contentType: "application/json; charset=utf-8",
+                        success: function (response) {
+
+                            if (response.Msg === "ok") {
+                                idx1 = 1;
+                                $.each(response.data, function (k, v) {
+
+                                    if (idx1 > size_jig1) {
+                                        CheckJig(v.SerialNo, v.ConfirmedQty);
+                                        //alert("1-1");
+                                    } else {
+                                        if ($("#tb_jig1 tr td[tabindex=" + idx1 + "] #barcode").text() == "") {
+                                            $("#tb_jig1 tr td[tabindex=" + idx1 + "]").focus();
+                                            $("#tb_jig1 tr td[tabindex=" + idx1 + "]").toggleClass("focus");
+
+                                            $("#tb_jig1 tr td[tabindex=" + idx1 + "] #barcode").text(v.SerialNo);
+                                            $("#tb_jig1 tr td[tabindex=" + idx1 + "] #model").text(v.Model);
+                                            $("#tb_jig1 tr td[tabindex=" + idx1 + "] #qty").text(v.ConfirmedQty);
+
+                                            $("#tb_jig1 tr td[tabindex=" + idx1 + "] #SerialNo").text(v.SerialNo);
+                                            $("#tb_jig1 tr td[tabindex=" + idx1 + "] #Model").text(v.Model);
+                                            $("#tb_jig1 tr td[tabindex=" + idx1 + "] #WIP_Qty").text(v.WIPQty);
+                                            $("#tb_jig1 tr td[tabindex=" + idx1 + "] #Confirm_Qty").text(v.ConfirmedQty);
+                                            $("#tb_jig1 tr td[tabindex=" + idx1 + "] #NG_Qty").text(v.NgQty);
+
+                                            idx1++;
+                                        } else {
+                                            CheckJig(v.SerialNo, v.ConfirmedQty);
+                                            //alert("2-1");
+                                        }
+
+
+                                    }
+
+                                });
+
+                            } else if (response.Msg === "Error") {
+
+                                let result = DevExpress.ui.dialog.confirm(response.des, "Error Message");
+                                result.done(function (dialogResult) { });
+                               // idx1--;
+                                return;
+                            }
+
+                        },
+                        error: function () {
+                            $("#StorageLocations").empty();
+                        }
+                    });
+
+                } else if (idx1 <= 100) {
+
+                    //alert("3-1");
+
+                    let BarCode = _BarCode;
+
+                   let options = { Barcode: BarCode , User:'@User.FindFirst("ContactName").Value'};
+
+                    $.ajax({
+
+                        url: "api/IsoniteMant/ScanBarCode",
+                        type: "Get",
+                        data: options,
+                        contentType: "application/json; charset=utf-8",
+                        success: function (response) {
+
+                            if (response.Msg === "ok") {
+                                $.each(response.data, function (k, v) {
+
+                                    if (parseInt(idx1) > parseInt(size_jig1)) {
+                                        //alert("3-2");
+                                        CheckJig(v.SerialNo, v.ConfirmedQty);
+                                        
+                                    } else {
+                                        if ($("#tb_jig1 tr td[tabindex=" + idx1 + "] #barcode").text() === "") {
+                                            
+                                            $("#tb_jig1 tr td[tabindex=" + idx1 + "]").focus();
+                                            $("#tb_jig1 tr td[tabindex=" + idx1 + "]").toggleClass("focus");
+
+                                            $("#tb_jig1 tr td[tabindex=" + idx1 + "] #barcode").text(v.SerialNo);
+                                            $("#tb_jig1 tr td[tabindex=" + idx1 + "] #model").text(v.Model);
+                                            $("#tb_jig1 tr td[tabindex=" + idx1 + "] #qty").text(v.ConfirmedQty);
+
+                                            $("#tb_jig1 tr td[tabindex=" + idx1 + "] #SerialNo").text(v.SerialNo);
+                                            $("#tb_jig1 tr td[tabindex=" + idx1 + "] #Model").text(v.Model);
+                                            $("#tb_jig1 tr td[tabindex=" + idx1 + "] #WIP_Qty").text(v.WIPQty);
+                                            $("#tb_jig1 tr td[tabindex=" + idx1 + "] #Confirm_Qty").text(v.ConfirmedQty);
+                                            $("#tb_jig1 tr td[tabindex=" + idx1 + "] #NG_Qty").text(v.NgQty);
+
+                                            idx1++;
+
+                                        } else {
+                                            CheckJig(v.SerialNo, v.ConfirmedQty);
+                                            //alert("4-3");
+                                        }
+
+                                    }
+                                });
+
+
+                            } else if (response.Msg === "Error") {
+
+                                let result = DevExpress.ui.dialog.confirm(response.des, "Error Message");
+                                result.done(function (dialogResult) { });
+                                //idx1--;
+                                return;
+                            }
+                        },
+                        error: function () {
+                            $("#StorageLocations").empty();
+                        }
+                    });
+
+                } else if (idx1 <= 200) {
+
+                    //alert(2);
+
+                    let BarCode = _BarCode;
+
+                   let options = { Barcode: BarCode , User:'@User.FindFirst("ContactName").Value'};
+
+                    $.ajax({
+
+                        url: "api/IsoniteMant/ScanBarCode",
+                        type: "Get",
+                        data: options,
+                        contentType: "application/json; charset=utf-8",
+                        success: function (response) {
+                            //alert(response.Msg);
+                            if (response.Msg === "ok") {
+                               // console.log(response.data);
+                                $.each(response.data, function (k, v) {
+                                    //alert(size_jig2);
+                                    if (idx1 > size_jig2+100) {
+                                        //alert("5");
+                                        CheckJig(v.SerialNo, v.ConfirmedQty);
+                                    } else {
+
+                                       // alert(idx1);
+                                        if ($("#tb_jig2 tr td[tabindex=" + idx1 + "] #barcode").text() === "") {
+                                            $("#tb_jig2 tr td[tabindex=" + idx1 + "]").focus();
+                                            $("#tb_jig2 tr td[tabindex=" + idx1 + "]").toggleClass("focus");
+
+                                            $("#tb_jig2 tr td[tabindex=" + idx1 + "] #barcode").text(v.SerialNo);
+                                            $("#tb_jig2 tr td[tabindex=" + idx1 + "] #model").text(v.Model);
+                                            $("#tb_jig2 tr td[tabindex=" + idx1 + "] #qty").text(v.ConfirmedQty);
+
+                                            $("#tb_jig2 tr td[tabindex=" + idx1 + "] #SerialNo").text(v.SerialNo);
+                                            $("#tb_jig2 tr td[tabindex=" + idx1 + "] #Model").text(v.Model);
+                                            $("#tb_jig2 tr td[tabindex=" + idx1 + "] #WIP_Qty").text(v.WIPQty);
+                                            $("#tb_jig2 tr td[tabindex=" + idx1 + "] #Confirm_Qty").text(v.ConfirmedQty);
+                                            $("#tb_jig2 tr td[tabindex=" + idx1 + "] #NG_Qty").text(v.NgQty);
+
+                                            idx1++;
+                                        } else {
+                                            CheckJig(v.SerialNo, v.ConfirmedQty);
+                                        }
+
+                                    }
+
+                                });
+
+                            } else if (response.Msg === "Error") {
+
+                                let result = DevExpress.ui.dialog.confirm(response.des, "Error Message");
+                                result.done(function (dialogResult) { });
+                                //idx1--;
+                                return;
+                            }
+                        },
+                        error: function () {
+                            $("#StorageLocations").empty();
+                        }
+                    });
+
+                } else if (idx1 > 200) {
+
+                    //alert("2-3");
+
+                    let BarCode = _BarCode;
+
+                    let options = { Barcode: BarCode , User:'@User.FindFirst("ContactName").Value'};
+
+                    $.ajax({
+                        url: "api/IsoniteMant/ScanBarCode",
+                        type: "Get",
+                        data: options,
+                        contentType: "application/json; charset=utf-8",
+                        success: function (response) {
+                            //alert(response.Msg);
+                            if (response.Msg === "ok") {
+
+                                $.each(response.data, function (k, v) {
+
+                                    if (idx1 > size_jig3+200) {
+                                        CheckJig(v.SerialNo, v.ConfirmedQty);
+                                    } else {
+                                        if ($("#tb_jig3 tr td[tabindex=" + idx1 + "] #barcode").text() === "") {
+                                            $("#tb_jig3 tr td[tabindex=" + idx1 + "]").focus();
+                                            $("#tb_jig3 tr td[tabindex=" + idx1 + "]").toggleClass("focus");
+
+                                            $("#tb_jig3 tr td[tabindex=" + idx1 + "] #barcode").text(v.SerialNo);
+                                            $("#tb_jig3 tr td[tabindex=" + idx1 + "] #model").text(v.Model);
+                                            $("#tb_jig3 tr td[tabindex=" + idx1 + "] #qty").text(v.ConfirmedQty);
+
+                                            $("#tb_jig3 tr td[tabindex=" + idx1 + "] #SerialNo").text(v.SerialNo);
+                                            $("#tb_jig3 tr td[tabindex=" + idx1 + "] #Model").text(v.Model);
+                                            $("#tb_jig3 tr td[tabindex=" + idx1 + "] #WIP_Qty").text(v.WIPQty);
+                                            $("#tb_jig3 tr td[tabindex=" + idx1 + "] #Confirm_Qty").text(v.ConfirmedQty);
+                                            $("#tb_jig3 tr td[tabindex=" + idx1 + "] #NG_Qty").text(v.NgQty);
+
+                                            idx1++;
+                                        } else {
+                                            CheckJig(v.SerialNo, v.ConfirmedQty);
+                                        }
+
+                                    }
+                                });
+
+                            } else if (response.Msg === "Error") {
+
+                                let result = DevExpress.ui.dialog.confirm(response.des, "Error Message");
+                                result.done(function (dialogResult) { });
+                               // idx1--;
+                                return;
+                            }
+                        },
+                        error: function () {
+                            $("#StorageLocations").empty();
+                        }
+                    });
+
+                }
+
+                $("#Barcode").dxTextBox('instance').option('value','');
+    }
+
+     function CheckJig(BarCode, Qty) {
+            
+            let options = { Barcode: BarCode, Qty: Qty, User: '@User.FindFirst("ContactName").Value'};
+
+            $.ajax({
+                url: "api/IsoniteMant/DeleteIsonniteTemp",
+                type: "Get",
+                data: options,
+                contentType: "application/json; charset=utf-8",
+                success: function (response) {
+                    if (response.Msg === "Error") {
+                        let result = DevExpress.ui.dialog.confirm(response.des, "Error Message");
+                        result.done(function (dialogResult) { });
+                        // idx1--;
+                        return;
+                    }
+
+                },
+                error: function () {
+                    $("#StorageLocations").empty();
+                }
+            });
+        }
+
+    //check Tap
+    function UpdateQtyFunction() {
+
+        let jigID = $("#_JigNo").val();
+        let JigAddresss = $("#_location").val()
+
+        let conQty = $("#_ConQty").val();
+        let wip = $("#_WIPQty").val();
+
+        if (jigID === "#tb_jig1") {
+
+            $('#tb_jig1 tr').each(function () {
+                $.each(this.cells, function () {
+                    //console.log($(this).find('a').data("grid") == JigAddresss);
+                    if ($(this).find('a').data("grid") == JigAddresss) {
+                        if (parseInt(wip) < parseInt(conQty)) {
+                            let result = DevExpress.ui.dialog.confirm("Error: ConfirmQty Over WIPQTY.", "Error Message");
+                            result.done(function (dialogResult) { });
+                        } else {
+                            $(this).find("#Confirm_Qty").val(conQty);
+                            $("#popupEdit").dxPopup("hide");
+                        }
+                    }
+                });
+            });
+        } else if (jigID === "#tb_jig2") {
+            $('#tb_jig2 tr').each(function () {
+                $.each(this.cells, function () {
+                    //console.log($(this).find('a').data("grid") == JigAddresss);
+                    if ($(this).find('a').data("grid") == JigAddresss) {
+                        if (parseInt(wip) < parseInt(conQty)) {
+                            let result = DevExpress.ui.dialog.confirm("Error: ConfirmQty Over WIPQTY.", "Error Message");
+                            result.done(function (dialogResult) { });
+                        } else {
+                            $(this).find("#Confirm_Qty").val(conQty);
+                            $("#popupEdit").dxPopup("hide");
+                        }
+                    }
+                });
+            });
+        } else if (jigID === "#tb_jig3") {
+            $('#tb_jig3 tr').each(function () {
+                $.each(this.cells, function () {
+                    //console.log($(this).find('a').data("grid") == JigAddresss);
+                    if ($(this).find('a').data("grid") == JigAddresss) {
+                        if (parseInt(wip) < parseInt(conQty)) {
+                            let result = DevExpress.ui.dialog.confirm("Error: ConfirmQty Over WIPQTY.", "Error Message");
+                            result.done(function (dialogResult) { });
+                        } else {
+                            $(this).find("#Confirm_Qty").val(conQty);
+                            $("#popupEdit").dxPopup("hide");
+                        }
+                    }
+                });
+            });
+        }
+
+    }
+
+    function DeleteQtyFunction() {
+
+        let jigID = $("#_JigNo").val();
+        let JigAddresss = $("#_location").val();
+        let conQty = $("#_ConQty").val();
+
+        if (jigID === "#tb_jig1") {
+            $('#tb_jig1 tr').each(function () {
+                $.each(this.cells, function () {
+                    //console.log($(this).find('a').data("grid") == JigAddresss);
+                    if ($(this).find('a').data("grid") == JigAddresss) {
+                        $(this).focus();
+                        $(this).toggleClass("focus");
+                        $(this).find("#barcode").text("");
+                        $(this).find("#model").text("");
+                        $(this).find("#qty").text("");
+                        $(this).find("#SerialNo").text("");
+                        $(this).find("#Model").text("");
+                        $(this).find("#Confirm_Qty").val("");
+                        $("#popupEdit").dxPopup("hide");
+                    }
+                });
+            });
+        } else if (jigID === "#tb_jig2") {
+            $('#tb_jig2 tr').each(function () {
+                $.each(this.cells, function () {
+                    //console.log($(this).find('a').data("grid") == JigAddresss);
+                    if ($(this).find('a').data("grid") == JigAddresss) {
+                        $(this).focus();
+                        $(this).toggleClass("focus");
+                        $(this).find("#barcode").text("");
+                        $(this).find("#model").text("");
+                        $(this).find("#qty").text("");
+                        $(this).find("#SerialNo").text("");
+                        $(this).find("#Model").text("");
+                        $(this).find("#Confirm_Qty").val("");
+                        $("#popupEdit").dxPopup("hide");
+                    }
+                });
+            });
+        } else if (jigID === "#tb_jig3") {
+            $('#tb_jig3 tr').each(function () {
+                $.each(this.cells, function () {
+                    //console.log($(this).find('a').data("grid") == JigAddresss);
+                    if ($(this).find('a').data("grid") == JigAddresss) {
+                        $(this).focus();
+                        $(this).toggleClass("focus");
+                        $(this).find("#barcode").text("");
+                        $(this).find("#model").text("");
+                        $(this).find("#qty").text("");
+                        $(this).find("#SerialNo").text("");
+                        $(this).find("#Model").text("");
+                        $(this).find("#Confirm_Qty").val("");
+                        $("#popupEdit").dxPopup("hide");
+                    }
+                });
+            });
+        }
+    }
+
+    function CancelQtyFunction() {
+
+        $("#_JigNo").val("");
+        $("#_location").val("");
+        $("#_IsoniteNo").val("");
+        $("#_BarCode").val("");
+        $("#_Model").val("");
+        $("#_WIPQty").val("");
+        $("#_ConQty").val("");
+        $("#popupEdit").dxPopup("hide");
+    }
+
+    $(function () {
+        $("#bt_tap1").on('click', function () {
+            idx1 = 1;
+        });
+        $("#bt_tap2").on('click', function () {
+            idx1 = 101;
+        });
+        $("#bt_tap3").on('click', function () {
+            idx1 = 201;
+        });
+    });
+
+    //tap slid jig
+
+    $(function () {
+        $('.btn-circle').on('click', function () {
+            $('.btn-circle.btn-info').removeClass('btn-info').addClass('btn-default');
+            $(this).addClass('btn-info').removeClass('btn-default').blur();
+        });
+
+        $('.next-step, .prev-step').on('click', function (e) {
+            let $activeTab = $('.tab-pane.active');
+
+            $('.btn-circle.btn-info').removeClass('btn-info').addClass('btn-default');
+
+            if ($(e.target).hasClass('next-step')) {
+                let nextTab = $activeTab.next('.tab-pane').attr('id');
+                $('[href="#' + nextTab + '"]').addClass('btn-info').removeClass('btn-default');
+                $('[href="#' + nextTab + '"]').tab('show');
+            }
+            else {
+                let prevTab = $activeTab.prev('.tab-pane').attr('id');
+                $('[href="#' + prevTab + '"]').addClass('btn-info').removeClass('btn-default');
+                $('[href="#' + prevTab + '"]').tab('show');
+            }
+        });
+    });
+
+    function Search() {
+        let searchValue = document.getElementById('search').value; //get value from textBox by ID Field onkeyUp function
+        let searchTable = document.getElementById('tb_jig1 '); //Search Value In Table search Table by Id
+        let searchColCount; //Column Counetr
+        //Loop through table rows
+        for (let rowIndex = 0; rowIndex < searchTable.rows.length; rowIndex++) {
+            let rowData = '';
+            //Get column count from header row
+            if (rowIndex === 0) {
+                searchColCount = searchTable.rows.item(rowIndex).cells.length;
+                continue; //do not execute further code for header row.
+            }
+
+            //Process data rows. (rowIndex >= 1)
+            for (let colIndex = 0; colIndex < searchColCount; colIndex++) {
+                rowData += searchTable.rows.item(rowIndex).cells.item(colIndex).textContent;
+            }
+
+            //If search term is not found in row data
+            //then hide the row, else show
+            if (rowData.indexOf(searchValue) === -1)
+                searchTable.rows.item(rowIndex).style.display = 'none';
+            else
+                searchTable.rows.item(rowIndex).style.display = 'table-row';
+        }
+    }
+
+    let cells = document.querySelectorAll("#tb_jig1 td");
+    let search = document.getElementById("search");
+
+    search.addEventListener("keyup", function () {
+
+        for (let i = 0; i < cells.length; ++i) {
+            // This line checks for an exact match in a cell against what the
+            // user entered in the search box
+            //if(cells[i].textContent.toLowerCase() === search.value.toLowerCase()){
+
+            // This checks for cells that start with what the user has entered
+            if (cells[i].textContent.toLowerCase().indexOf(search.value.toLowerCase()) === 0) {
+                cells.forEach(function (element) {
+                    element.style.display = "none";
+                });
+                cells[i].style.background = "yellow";
+                cells[i].style.display = "table-cell";
+                break;
+            } else {
+                cells[i].style.background = "white";
+                cells.forEach(function (element) {
+                    if (cells[i] !== element) {
+                        element.style.display = "table-cell";
+                    }
+                });
+            }
+        }
+
+    });
+    
+</script>

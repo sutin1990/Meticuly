@@ -1,0 +1,714 @@
+﻿@model IEnumerable<MCP_WEB.Models.VW_MFC_T4_THM_GD_TSM>
+@{
+    Layout = null;
+}
+
+<!DOCTYPE html>
+
+<html>
+<head>
+    <meta name="viewport" content="width=device-width" />
+    <title>T4</title>
+    <link href="~/css/paperB.css" rel="stylesheet" />
+    <script>
+        function printContent(el) {
+            var restorepage = document.body.innerHTML;
+            var printcontent = document.getElementById(el).innerHTML;
+            document.body.innerHTML = printcontent;
+            window.print();
+            document.body.innerHTML = restorepage;
+        }
+    </script>
+    <style type="text/css">
+        .stayVisible {
+            position: fixed;
+            top: 1em;
+            left: 1em;
+            width: 8.5em;
+            right: auto;
+        }
+        .page {
+            position: relative;
+            clear: both;
+            width: 120mm;
+            height: 89mm;
+            margin-left: auto;
+            margin-right: auto;
+            padding: 0;
+            border: 1px solid black;
+            font-family: Calibri;
+        }
+
+        b {
+            font-size: 14px;
+        }
+
+        text {
+            font-size: 14px;
+        }
+        /* Layout */
+        * {
+            box-sizing: border-box;
+        }
+
+        .wrapper > div {
+            /*border-radius: 5px;*/
+            /*background-color: rgb(207,232,220);*/
+            /*padding: 1em;*/
+        }
+
+        .wrapper {
+            display: grid;
+            grid-template-columns: 50mm 69.5mm;
+            grid-template-rows: 15mm 35mm 21mm 10mm 8mm;
+            /*grid-gap: 1px;*/
+        }
+
+        .box1 {
+            grid-column: 1 / 4;
+            grid-row: 1;
+            padding-left: 5px;
+            /*border: 1px solid black;*/
+            border-bottom: 1px solid black;
+            z-index: 2;
+        }
+
+        .box2 {
+            grid-column: 1/4;
+            grid-row: 2;
+            padding-left: 5px;
+            /*border: 1px solid black;*/
+            border-bottom: 1px solid black;
+            z-index: 2;
+            height:120px;
+            
+            
+        }
+
+        .box3 {
+            grid-column: 1;
+            grid-row: 3 / 5;
+            padding-left: 5px;
+            border: 1px solid;
+            border-top:none;
+            border-left:none;
+            border-right:none;
+            position: relative;
+            z-index: 2;
+            margin-top:2px;
+        }
+
+        .box4 {
+            grid-column: 2;
+            width:100%;
+            grid-row: 3 / 5;
+            padding-left: 5px;
+            border: 1px solid;
+            border-top: none;
+            border-left: none;
+            border-right: none;
+            /*border: 1px solid green;*/
+            z-index: 2;
+            margin-top: 0px;
+        }
+        /*** ***/
+        .row1 {
+            clear: both;
+            width: 100%;
+            height: 55px;
+            /*border: 1px solid red;*/
+        }
+
+        .row {
+            clear: both;
+            width: 100%;
+            height: 25px;
+            /*border: 1px solid red;*/
+            margin-top: 3px;
+            padding: 0;
+        }
+
+        .rowMargin {
+            clear: both;
+            width: 100%;
+            height: 25px;
+            border: 1px solid red;
+            margin-top: 3px;
+            padding: 0;
+        }
+
+        .rowLotData {
+            clear: both;
+            width: 100%;
+            height: 15px;
+            /*border: 1px solid green;*/
+            margin-top: 0px;
+            margin-bottom: 0px;
+            padding-top: 0;
+            padding-bottom: 0;
+        }
+
+        .rowBottom {
+            clear: both;
+            width: 100%;
+            height: 25px;
+            /*border: 1px solid red;*/
+            margin-top: 3px;
+            padding: 0;
+        }
+
+        .col5 {
+            float: left;
+            width: 5%;
+        }
+
+        .col10 {
+            float: left;
+            width: 10%;
+        }
+
+        .col15 {
+            float: left;
+            width: 13%;
+        }
+
+        .col20 {
+            float: left;
+            width: 15%;
+        }
+
+        .col25 {
+            float: left;
+            width: 22%;
+        }
+
+        .col30 {
+            float: left;
+            width: 22%;
+        }
+
+        .col35 {
+            float: left;
+            width: 30%;
+        }
+
+        .col40 {
+            float: left;
+            width: 40%;
+        }
+
+        .col45 {
+            float: left;
+            width: 40%;
+        }
+
+        .col50 {
+            float: left;
+            width: 50%;
+        }
+
+        .col55 {
+            float: left;
+            width: 50%;
+        }
+
+        .col60 {
+            float: left;
+            width: 60%;
+        }
+
+        .col65 {
+            float: left;
+            width: 60%;
+        }
+
+        .col70 {
+            float: left;
+            width: 70%;
+        }
+
+        .col75 {
+            float: left;
+            width: 70%;
+        }
+
+        .col80 {
+            float: left;
+            width: 80%;
+        }
+
+        .col85 {
+            float: left;
+            width: 80%;
+        }
+        /**/
+        .PartName {
+            float: left;
+            width: 40%;
+            border-bottom: 1px solid black;
+        }
+
+        .PartNo {
+            float: left;
+            width: 28%;
+            border-bottom: 1px solid black;
+        }
+
+        .Model {
+            float: left;
+            width: 30%;
+            border-bottom: 1px solid black;
+        }
+
+        .Qty {
+            float: left;
+            width: 15%;
+            border-bottom: 1px solid black;
+        }
+
+        .Colour {
+            float: left;
+            width: 23%;
+            border-bottom: 1px solid black;
+        }
+
+        .LotNo {
+            float: left;
+            width: 20%;
+            border-bottom: 1px solid black;
+        }
+
+        .LotNoData {
+            float: left;
+            width: 90%;
+            /*border-bottom: 1px solid black;*/
+        }
+
+        .Location {
+            float: left;
+            width: 12%;
+            border-bottom: 1px solid black;
+        }
+
+        .Customer {
+            float: left;
+            width: 25%;
+            border-bottom: 1px solid black;            
+        }
+
+        .PlantCode {
+            float: left;
+            width: 25%;
+            border-bottom: 1px solid black;
+            margin-right:10px;
+        }
+
+        .TOD {
+            float: left;
+            width: 28%;
+            border-bottom: 1px solid black;
+        }
+
+        .By {
+            float: left;
+            width: 35%;
+            border-bottom: 1px solid black;
+            
+        }
+
+        .Date1 {
+            float: left;
+            width: 28%;
+            border-bottom: 1px solid black;
+        }
+
+        .PackingBy {
+            float: left;
+            width: 27%;
+            border-bottom: 1px solid black;
+            margin-top: 18px;
+            margin-right: 11px;
+        }
+
+        .CheckedBy {
+            float: left;
+            width: 26%;
+            border-bottom: 1px solid black;
+            margin-right: 11px;
+        }
+
+        .StoreBy {
+            float: left;
+            width: 32%;
+            border-bottom: 1px solid black;
+            margin-right: 11px;
+        }
+
+        .ReceiveNo {
+            float: left;
+            width: 27%;
+            border-bottom: 1px solid black;
+            margin-right: 11px;
+        }
+
+        .Date2 {
+            float: left;
+            width: 23%;
+            border-bottom: 1px solid black;
+        }
+
+        .rowQR {
+            clear: both;
+            width: 100%;
+            height: 15px;
+            margin-top: 0;
+        }
+
+        .colQR {
+            float: right;
+            width: 40px;
+            margin-right: 5px;
+        }
+
+        .colQRtext {
+            float: right;
+            width: 35px;
+            margin-right: 1px;
+        }
+
+
+        /* Water Mark */
+        #background {
+            position: absolute;
+            z-index: 1;
+            background: transparent;
+            display: block;
+            min-height: 50%;
+            min-width: 99%;
+            color: yellow;
+            margin-top: 0px;
+            /*margin-left: 10px;*/
+            bottom: -15px;
+        }
+
+        #bg-text {
+            color: lightgray;
+            font-size: 120px;
+            font-weight: bold;
+            
+            /*transform: rotate(90deg);*/
+            /*-webkit-transform: rotate(90deg);*/
+        }
+
+        .bottom {
+            position: absolute;
+            width: 100%;
+            bottom: 16px;
+            /*border: 3px solid #8AC007;*/
+        }
+        /*.parent {
+            position: relative;
+
+        }*/
+    </style>
+</head>
+
+<body class="A6">
+
+    &nbsp;&nbsp;&nbsp;
+    <div class="stayVisible">
+        <button class="btnPrint" onclick="printContent('print-content')">Print</button>
+    </div>
+    <div id="print-content">
+        @foreach (var item in Model)
+        {
+            <section class="sheet padding-10mm">
+                <div class="page">
+                    <div class="wrapper">
+
+                        @*<div class="box1">
+            <img class="Logo" src="~/images/LogoPartTag234.png" />
+        </div>*@
+
+                        <div class="box1">
+                            <div class="row1">
+                                <div class="col80">
+                                    <img class="Logo" src="~/images/LogoPartTag234.png" />
+                                </div>
+                                <div class="colQRtext">
+                                    <b style="font-size:12px;">@item.QR</b>
+                                </div>
+                                <div class="colQR">
+                                    @if (@item.QR != null)
+                                    {
+                                        <qrcode alt="@item.QR" size="43" content="@item.QR" />
+                                    }
+                                </div>
+                            </div>
+                        </div>
+
+                        <div id="background">
+                            <p id="bg-text">@item.Model</p>
+                        </div>
+
+                        <div class="box2">
+
+                            <div class="row">
+                                <div class="col15" style="width:70px;">
+                                    <text>PART NAME</text>
+                                </div>
+                                <div class="PartName">
+                                    &nbsp;
+                                    <b style="">@item.PartName</b>
+                                </div>
+                                <div class="col15">
+                                    <text>PART NO</text>
+                                </div>
+                                <div class="PartNo">
+                                    &nbsp;
+                                    <b>@item.PartNo</b>
+                                </div>
+
+                            </div>
+
+                            <div class="row">
+                                <div class="col10">
+                                    <text>MODEL</text>
+                                </div>
+                                <div class="Model" style="text-align:center;">
+                                    &nbsp;
+                                    <b style="font-size:16px;">@item.Model</b>
+                                </div>
+
+                                <div class="col5" style="margin-left:2px;">
+                                    <text>Qty</text>
+                                </div>
+                                <div class="Qty">
+                                    &nbsp;
+                                    <b style="font-size:16px;">@string.Format("{0:#,0}", item.OrderQty)</b>
+                                </div>
+
+                                <div class="col15">
+                                    <text>COLOUR</text>
+                                </div>
+                                <div class="Colour">
+                                    &nbsp;
+                                    <text>@item.Color</text>
+                                </div>
+                            </div>
+
+                            @*<div class="rowLotData">
+                <div class="col10">
+                    <b>&nbsp;</b>
+                </div>
+                <div class="LotNoData">
+                    &nbsp;
+                    <text>@item.LotNoShow</text>
+                </div>
+            </div>*@
+
+                            <div class="row">
+                                <div style="padding-left:40px;"><b style="font-size:13px;">@item.LotNoShow</b></div>
+                                <div class="col10">
+                                    <text>LOT NO</text>
+                                </div>
+                                <div class="LotNo" style="width:100px; margin-right:3px;">
+                                    &nbsp;
+                                    @*<b style="font-size:13px;">@item.LotNoShow</b>*@
+                                </div>
+
+                                <div class="col15">
+                                    <text>LOCATION</text>
+                                </div>
+                                <div class="Location">
+                                    <b>@item.Location &nbsp;</b>
+                                </div>
+
+                                <div class="col15" style="margin-left:3px; margin-right:10px;">
+                                    <text>CUSTOMER</text>
+                                </div>
+                                <div class="Customer">
+                                    &nbsp;
+                                    <b>@item.Customer</b>
+                                </div>
+
+                            </div>
+
+                            <div class="row" style="padding-top:2px;">
+                                <div class="col20" style="width:75px;">
+                                    <text>PLANT CODE</text>
+                                </div>
+                                <div class="PlantCode">
+                                    &nbsp;
+                                    <b>@item.PlantCode</b>
+                                </div>
+
+                                <div class="col25" style="width:110px;">
+                                    <text>TIME OF DELIVERY</text>
+                                </div>
+                                @*@if (item.Timeofdelivery != null)
+                {
+                    <div class="TOD">
+                        &nbsp;
+                        <text>@item.Timeofdelivery</text>
+                    </div>
+                }
+                else
+                {
+                    <div class="TOD">
+                        &nbsp;
+                    </div>
+                }*@
+                                <div class="TOD">
+                                    &nbsp;
+                                </div>
+                            </div>
+
+                        </div>
+
+
+                        <div class="box3" style="padding-top:4px;">
+                            <div class="parent">
+
+                                <text>INSPECTION</text>
+
+                                <div class="bottom">
+
+                                    <div class="col15">
+                                        <text>BY</text>
+                                    </div>
+                                    <div class="By">
+                                        @*<text>@item._By</text>*@&nbsp;
+                                    </div>
+
+                                    <div class="col20">
+                                        <text>DATE</text>
+                                    </div>
+                                    @*@if (item.Date0.HasValue)
+                    {
+                        <div class="Date1">
+                            <text>@Convert.ToDateTime(item.Date0).ToString("dd/MM/yyyy")</text>
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="Date1">
+                            &nbsp;
+                        </div>
+                    }*@
+                                    <div class="Date1">&nbsp;</div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="box4" style="padding-top:4px;">
+
+                            <div class="row">
+                                <div class="col30" style="width:70px;">
+                                    <text>PACKING BY</text>
+                                </div>
+                                <div class="PackingBy">
+                                    @*<text>@item.PackBy</text>*@
+                                </div>
+
+                                <div class="col15">
+                                    <text>DATE</text>
+                                </div>
+                                @*@if (item.Date1.HasValue)
+            {
+                <div class="Date2">
+                    <text>@Convert.ToDateTime(item.Date1).ToString("MM/dd/yyyy")</text>
+                </div>
+            }
+            else
+            {<div class="Date2">&nbsp;</div>}*@
+                                <div class="Date2">&nbsp;</div>
+
+                            </div>
+
+                            <div class="row">
+                                <div class="col30" style="width:72px;">
+                                    <text>CHECKED BY</text>
+                                </div>
+                                <div class="CheckedBy">
+                                    &nbsp;
+                                    @*<text>@item.CheckBy</text>*@
+                                </div>
+
+                                <div class="col15">
+                                    <text>DATE</text>
+                                </div>
+                                @*@if (item.Date2.HasValue)
+            {
+                <div class="Date2">
+                    <text>@Convert.ToDateTime(item.Date2).ToString("MM/dd/yyyy")</text>
+                </div>
+            }
+            else
+            { <div class="Date2">&nbsp;</div>}*@
+                                <div class="Date2">&nbsp;</div>
+
+                            </div>
+
+                            <div class="row">
+                                <div class="col30">
+                                    <text>STORE BY</text>
+                                </div>
+                                <div class="StoreBy">
+                                    &nbsp;
+                                    @*<text>@item.StoreBy</text>*@
+                                </div>
+
+                                <div class="col15">
+                                    <text>DATE</text>
+                                </div>
+                                @*@if (item.Date3.HasValue)
+            {
+                <div class="Date2">
+                    <text>@Convert.ToDateTime(item.Date3).ToString("MM/dd/yyyy")</text>
+                </div>
+            }
+            else
+            { <div class="Date2">&nbsp;</div>}*@
+                                <div class="Date2">&nbsp;</div>
+                            </div>
+
+                            <div class="row">
+                                <div class="col30" style="width:70px;">
+                                    <text>RECEIVE NO</text>
+                                </div>
+                                <div class="ReceiveNo">
+                                    &nbsp;
+                                    <text>@item.ReceiveNo</text>
+                                </div>
+
+                                <div class="col15">
+                                    <text>DATE</text>
+                                </div>
+                                @*@if (item.Date4.HasValue)
+            {
+                <div class="Date2">
+                    <text>@Convert.ToDateTime(item.Date4).ToString("MM/dd/yyyy")</text>
+                </div>
+            }
+            else
+            { <div class="Date2">&nbsp;</div>}*@
+                                <div class="Date2">&nbsp;</div>
+
+
+                            </div>
+                            <div style="grid-column:1/6; margin-left: -200px; margin-top:5px; ">
+                                <span style=" padding-left:10px; font-size:11px;">ต้นฉบับลูกค้า</span> <span style=" font-size:11px;">สีฟ้า สำเนาบัญชี</span>
+                            </div>
+                            <div class="row">
+
+                            </div>
+                        </div>
+                       
+                    </div>
+                </div>
+                    
+            </section>
+        }
+    </div>
+</body>
+</html>

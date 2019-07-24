@@ -1,0 +1,62 @@
+﻿<style>
+</style>
+<div class="container">
+    <div class="row">
+        <div class="col-lg-12 col-xs-12">
+            <div class="dx-viewport demo-container">
+                <div id="chart"></div>
+            </div>
+        </div>
+    </div>
+
+</div>
+<script>
+    $(function () {
+        $("#chart").dxChart({
+            dataSource: DevExpress.data.AspNet.createStore({
+                key: ["IsoniteCode"],
+                loadUrl: "api/VW_MFC_Dashboard1/GetData",
+                onBeforeSend: function (method, ajaxOptions) {
+                    ajaxOptions.xhrFields = { withCredentials: true };
+                }
+            }),
+            commonSeriesSettings: {
+                argumentField: "ProcessCode",
+                type: "stackedBar"
+            },
+            series: [
+                { valueField: "Between_Work", name: "งานระหว่างทำ" },
+                { valueField: "Close_Work", name: "งานที่ Close" }
+                ],
+            rotated: true,
+            legend: {
+                verticalAlignment: "bottom",
+                horizontalAlignment: "center"
+            },
+            "export": {
+                enabled: true
+            },
+            onPointClick: function (e) {
+                e.target.select();
+            },
+            onLegendClick: function (e) {
+                var series = e.target;
+                if (series.isVisible()) {
+                    series.hide();
+                } else {
+                    series.show();
+                }
+            },
+            tooltip: {
+                enabled: true,
+                location: "edge",
+                //customizeTooltip: function (arg) {
+                //    return {
+                //        text: arg.seriesName + " years: " + arg.valueText
+                //    };
+                //}
+            }
+        });
+    });
+    
+</script>

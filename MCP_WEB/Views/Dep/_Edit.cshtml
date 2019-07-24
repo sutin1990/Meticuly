@@ -1,0 +1,136 @@
+﻿<div id="scrollpop" class="scrollpop">
+    <div class="contentpop">
+        @model MCP_WEB.Models.m_Dep
+        @using (Html.BeginForm())
+        {
+            using (Html.DevExtreme().ValidationGroup())
+            {
+                @Html.AntiForgeryToken()
+                <form id="form1" name="form1">
+                    <div class="form-group">
+
+                        <label class="col-lg-2">DepID : </label>
+                        <div class="col-lg-4">
+                            @(Html.DevExtreme().TextBox().ID("txtDepID").Name("DepID")
+                                    //.OnValueChanged("txtDepIDchanged")
+                            )
+                        </div>
+
+                        <label class="col-lg-2">DepDesc : </label>
+                        <div class="col-lg-4" style="padding-bottom:10px;">
+                            @Html.DevExtreme().TextBox().ID("txtDepDesc").Name("DepDesc")
+                        </div>
+                        @*<label class="col-lg-2 col-sm-2 control-label">CreateDate : </label>
+                            <div class="col-lg-4">
+                            @Html.DevExtreme().DateBox().ID("txtCreateDate").Name("CreateDate").InvalidDateMessage("The date must have the following format: MM/dd/yyyy")
+                            </div>*@
+
+                        <label class="col-lg-2">MenuIdentity : </label>
+                        <div class="col-lg-4">
+                            <div id="scrolllist" class="dxlist-scroll">
+                                @*<div class="contentpop">*@
+                                    <div id="treemenu"></div>
+                                    @(Html.DevExtreme().List().ID("listMenuIdentity")
+                                        .SelectionMode(ListSelectionMode.All)
+                                        //.ShowScrollbar(ShowScrollbarMode.Always)
+                                        //.ScrollingEnabled(true)
+                                        //.ScrollByContent(true)                                       
+                                        .ShowSelectionControls(true)
+                                        .Visible(true)
+                                        //.AllowItemReordering(true)
+
+                                        //.SearchEnabled(true).SearchExpr(new string[] { "MenuName", "MenuIdentity" }))
+                                        .SearchEnabled(true).SearchExpr(new string[] { "MenuName" }))
+                                @*</div>*@
+
+                            </div>
+
+
+                        </div>
+
+                        <div class="col-sm-offset-2 col-sm-10" style="text-align:right;">
+                            <div id="selection-treeview"></div>
+                            <div class="selected-data">
+
+                                <div id="checked-items"></div>
+                            </div>
+                            @(Html.DevExtreme().Button().ID("btnSave")
+                                        //.Icon("glyphicon glyphicon-floppy-disk")
+                                        .Text("Save")
+
+                                        //.Type(ButtonType.Success)
+                                        //.UseSubmitBehavior(true)
+                                        .OnClick("function (e) {e.validationGroup.validate(); if(e.validationGroup.validate().isValid){ SaveEdit();} else{e.stopPropagation();} }"))
+                            @*.OnClick("function (e) {if(mode=='add'){SaveInsert();} if(mode=='edit'){SaveEdit();} }"))*@
+
+                            @(Html.DevExtreme().Button().Type(ButtonType.Normal)
+                                        //.Icon("glyphicon glyphicon-remove")
+                                        .Text("Cancel")
+                                        .OnClick("function (e) { canselButtonClick() }"))
+                        </div>
+                    </div>
+                </form>
+            }
+        }
+    </div>
+</div>
+
+<script>
+
+
+    function canselButtonClick() {
+        arrgetitem = [];
+        $('#EditPopup').dxPopup('instance').option('visible', false);
+
+    }
+
+    function SaveEdit(btnsave) {
+            //if (arrgetitem.length == 0) {
+            //    DevExpress.ui.notify("Please choose this Menu!", "warning", 2000);
+            //} else {
+
+                //$("#widget").dxLoadPanel({
+                //    "visible": true
+                //});
+        var depid = $("#txtDepID").dxTextBox("instance").option("value");
+        var depdesc = $("#txtDepDesc").dxTextBox("instance").option("value");
+                $.ajax({
+                    type: 'PUT',
+                    url: '@Url.Action("Upsert", "m_Dep")',
+                    //data: { "getitem": JSON.stringify(arrgetitem) }, ส่งเป็น Json
+                    //contentType: 'application/json',
+                    //processData: true,
+                    dataType: 'json',
+                    data: { "getitem": arrgetitem, "DepID": depid, "DepDesc": depdesc },
+                    //data: { "getitem": arrmenus, "DepID": $("#DepID").val(), "DepDesc": $("#DepDesc").val() },
+                    success: function (data) {
+                        if (data) {
+                                //$("#widget").dxLoadPanel({
+                                //    "visible": false
+                                //});
+                            //DevExpress.ui.notify("Edit success.", "success", 1000);
+                            //arrgetitem = [];
+                            //arrMenuIdentity = [];
+                            canselButtonClick();
+                            $('#gridContainer').dxDataGrid('instance').refresh();
+                            //$('#txtDepID').dxTextBox('instance').option('value', '');
+                            //$('#txtDepDesc').dxTextBox('instance').option('value', '');
+                        }
+                        //console.log(data);
+                        //Dialogcustom('Edit success.', 'Edit Data');
+
+
+                    },
+                    error: function (ob, errStr) {
+                        //Dialogcustom('Edit Error.', 'Edit Data');
+                        //ob.stopPropagation();
+                        DevExpress.ui.notify(errStr, "error", 2000);
+                    }
+                });
+
+                //$('#gridContainer').dxDataGrid('instance').refresh();
+            //}
+
+        }
+    
+</script>

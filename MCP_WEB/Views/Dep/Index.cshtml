@@ -1,0 +1,1079 @@
+﻿
+@{
+    ViewData["Title"] = "Department";
+
+}
+<!--<div class="container my-5">
+    <h3>Department Maintenance</h3>
+    @*@ViewBag.ID*@
+</div>-->
+<style>
+    /*.glyphicon-4x.dx-icon {
+        font-size: 4em;
+        width: auto;
+        height: auto;
+        line-height: normal;
+    }*/
+    a {
+        text-decoration: none !important;
+    }
+
+    .dx-link-edit-4x {
+        padding-right: 6px;
+        font-size: 1.2em;
+        width: auto;
+        height: auto;
+    }
+
+    .dx-link-delete-4x {
+        padding-left: 6px;
+        font-size: 1.3em;
+        width: auto;
+        height: auto;
+    }
+    /*.options {
+        padding: 0;
+        margin-top: 20px;
+        margin-left: 20px;
+        background-color: rgba(191, 191, 191, 0.15);
+    }*/
+    /*.caption {
+        font-size: 18px;
+        font-weight: 500;
+    }*/
+    /*.option {
+        margin-top: 20px;
+        margin-left: 20px;
+    }*/
+    .dx-datagrid-rowsview .dx-row-lines td {
+        /*padding-top:6px;*/
+        /*padding-top:15px;*/
+        /*padding-bottom: 0;*/
+        /*vertical-align: central;*/
+        /*margin: auto;*/
+        /*padding-bottom: 2px;*/
+    }
+
+    .dx-scrollview-content {
+        height: 300px;
+        /*overflow: auto;*/
+    }
+
+    /*.dx-scrollable-scrollbar.dx-scrollbar-hoverable.dx-scrollbar-vertical,
+    .dx-scrollable-scrollbar.dx-scrollbar-hoverable.dx-scrollbar-vertical .dx-scrollable-scroll {
+        width: 18px
+    }*/
+
+    #simple-treeview,
+    #product-details {
+        display: inline-block;
+    }
+
+    #product-details {
+        vertical-align: top;
+        width: 400px;
+        height: 420px;
+        margin-left: 20px;
+    }
+
+        #product-details > img {
+            border: none;
+            height: 300px;
+            width: 400px;
+        }
+
+        #product-details > .name {
+            text-align: center;
+            font-size: 20px;
+        }
+
+        #product-details > .price {
+            text-align: center;
+            font-size: 24px;
+        }
+
+    .dark #product-details > div {
+        color: #f0f0f0;
+    }
+
+    .hidden {
+        visibility: hidden;
+    }
+</style>
+<div id="data-grid-demo">
+    <script>
+        var mode = "";
+         @*function formatdatetime(e) {
+        var datatime = "";
+        //alert(data.value);
+        $.ajax({
+                type: 'GET',
+                url: '@Url.Action("FormatDate", "m_Dep", new { httproute = true })',                
+            success: function (result) {                
+                    $.each(result, function (key, value) {
+                        //alert(value.param_value);
+                        datatime = value.param_value.split("-");
+                        datatime = datatime[0] + "-" + datatime[1] + "-" + datatime[2].toLowerCase();
+                        //console.log(datatime);
+                    });
+                },
+                error: function (ob, errStr) {
+                    ob.stopPropagation();
+                    //DevExpress.ui.notify(errStr, "error", 2000);
+
+
+                }
+        });
+        return datatime;
+    }*@
+
+        function rowcolor(info) {
+            info.rowElement.css({ height: 20 });
+
+            if (info.rowType == 'data') {
+                //info.data.CreateDate = Globalize.formatDate(new Date(info.data.CreateDate), { raw: 'dd / MM / yyyy' });
+                if (info.rowIndex % 2 != 0)
+                    info.rowElement.css('background', '#e6e6e6');
+
+            }
+        }
+
+        function toolbar_preparing(e) {
+            e.toolbarOptions.items.unshift({
+                location: "after",
+                widget: "dxButton",
+                options: {
+                    id: "Insert",
+                    icon: "add",
+                    onClick: function (e) {
+                        OpenInsert(e);
+                    }
+                }
+            });
+        }
+
+        function cellTemplate(element, cellInfo) {
+            $('<a/>')
+                .addClass('dx-link dx-link-edit dx-icon-edit dx-link-edit-4x ')
+                .on('dxclick', function () {
+                    OpenEdit(cellInfo.data);
+                }).appendTo(element);
+
+            $('<a/>')
+                .addClass("dx-link dx-link-delete dx-icon-trash dx-link-delete-4x")
+                .on('dxclick', function () {
+                    deleteButtonClick(cellInfo.data);
+                })
+                .appendTo(element);
+
+
+        }
+
+        function btnDelete(element, cellinfo) {
+
+
+        }
+    </script>
+
+    @*@(Html.DevExtreme().Button()
+                .ID("gridDeleteSelected")
+                .Text("Delete Selected Records")
+                .Height(34)
+                .Width(195)
+                .Disabled(true)
+                .OnClick("multidelete")
+
+        )*@
+
+
+    @*@Html.DevExtreme().Button().ID("Insert").Icon("glyphicon glyphicon-plus glyphicon ").Text("Insert").OnClick("function (e) { OpenInsert() }")*@
+
+
+    @(Html.DevExtreme().DataGrid<MCP_WEB.Models.m_Dep>()
+                .ID("gridContainer")
+                .DataSource(ds => ds.Mvc()
+                .Controller("m_Dep")
+                .LoadAction("Get")
+                .Key("ID")
+                )
+                .RowAlternationEnabled(true)
+                .Selection(s => s.Mode(SelectionMode.Multiple)
+                .ShowCheckBoxesMode(GridSelectionShowCheckBoxesMode.Always)
+                .SelectAllMode(SelectAllMode.Page))
+                @*.OnSelectionChanged(@<text>
+                    function(data) {
+                    var deleteButton = $("#gridDeleteSelected").dxButton("instance");
+                    deleteButton.option("disabled", !data.selectedRowsData.length);
+                    }
+                </text>)*@
+                        .Paging(paging => paging.Enabled(true))
+                        .RemoteOperations(true)
+                        .AllowColumnReordering(true)
+                        .AllowColumnResizing(true)
+                        .FilterRow(filterRow => filterRow
+                        .Visible(true)
+                        .ApplyFilter(GridApplyFilterMode.Auto)
+                        )
+                        .HeaderFilter(h => h.Visible(true))
+                        .Export(e => e.Enabled(true).FileName("Department Maintenance" + DateTime.Now).AllowExportSelectedData(true))
+                        //.GroupPanel(p => p.Visible(true))
+                        .ColumnChooser(c => c.Enabled(true))
+                        .ShowBorders(true)
+                        .ShowRowLines(true)
+                        //.HoverStateEnabled(true)
+                        .OnRowPrepared("rowcolor")
+                        //.OnRowPrepared("function(e) {e.rowElement.css({ height: 10});}")
+                        //.ColumnFixing(c => c.Enabled(true))
+                        //.OnInitNewRow(@"function(e) { e.data.CreateDate = Globalize.formatDate(new Date(), { raw: 'yyyy / MM / dd' });}")
+                        .OnToolbarPreparing("toolbar_preparing")
+                        .ColumnMinWidth(100)
+                        .ColumnAutoWidth(true)
+                        .ColumnHidingEnabled(true)
+                        .Columns(columns =>
+                        {
+                            columns.Add().Caption("Edit or Delete").Width(100).Alignment(HorizontalAlignment.Center)
+                .CellTemplate(new JS("cellTemplate")).AllowExporting(false);
+
+                            columns.Add().DataField("DepID").Caption("Dep ID");
+
+                            columns.Add().DataField("DepDesc").Caption("Department Description");
+                            columns.Add().DataField("CreateDate").Caption("Date Create")
+                .DataType(GridColumnDataType.DateTime)
+                 .Alignment(HorizontalAlignment.Left)
+                .Format(ViewBag.GlobalDtFormat)
+;
+
+                            columns.Add().DataField("TransDate").Caption("Trans Date")
+                            .DataType(GridColumnDataType.DateTime)
+                            .Alignment(HorizontalAlignment.Left)
+                            .Format(ViewBag.GlobalDtFormat)
+                @*.CustomizeText(@<text>
+                    function(e){
+                    var datetime = "";
+                    if(e.value==null){
+                    datetime = "";
+                    }else{
+                    datetime = Globalize.formatDate(new Date(e.value), { raw: formatdatetime() });
+                    }
+
+                    return datetime;
+                    }
+                </text>)*@
+.Visible(false);
+                //.DataType(GridColumnDataType.Date).Format("MM/dd/yyyy").Visible(false);
+                columns.Add().DataField("ModifyBy").Caption("Modify By").Visible(false);
+                //columns.AddFor(c => c.CreateDate).FormItem(f => f.Visible(false));
+            })
+
+                        .Paging(paging => paging.PageSize(10))
+                        .Pager(pager =>
+                        {
+                            pager.ShowPageSizeSelector(true);
+                            pager.AllowedPageSizes(new List<int> { 10, 25, 50, 100 });
+                            pager.ShowInfo(true);
+                        })
+
+                        
+                        .SearchPanel(searchPanel => searchPanel
+                        .Visible(true)
+                        .Width(185)
+                        .Placeholder("Search...")
+                        )
+    )
+
+    @(Html.DevExtreme().Popup().MaxHeight(500).MaxWidth(900)
+                .Position(po => po.My(HorizontalAlignment.Center, VerticalAlignment.Center)
+                .At(HorizontalAlignment.Center, VerticalAlignment.Center)
+                .Of(new JS("window"))).ID("AddPopup").Title("New Department").Visible(false)
+                      .ElementAttr("class", "popup")
+
+                      //.DragEnabled(false)
+                      //.CloseOnOutsideClick(true)
+                      //.ResizeEnabled(true)
+                      .ContentTemplate(new TemplateName("Add"))
+    )
+
+    @(Html.DevExtreme().Popup().MaxHeight(500).MaxWidth(900)
+                .Position(po => po.My(HorizontalAlignment.Center, VerticalAlignment.Center)
+                .At(HorizontalAlignment.Center, VerticalAlignment.Center)
+                .Of(new JS("window"))).ID("EditPopup").Title("Edit Department").Visible(false)
+                      .ElementAttr("class", "popup")
+                        .ContentTemplate(new TemplateName("Edit"))
+    )
+    @using (Html.DevExtreme().NamedTemplate("Add"))
+    {
+        @await Html.PartialAsync("_Add")
+    }
+    @using (Html.DevExtreme().NamedTemplate("Edit"))
+    {
+        @await Html.PartialAsync("_Edit")
+    }
+
+    <div style="padding: 10px;">
+        <div id="widget"></div>
+
+    </div>
+    <script type="text/javascript">
+        var arrselected = [];
+        var arrMenuIdentity = [];
+        var arrMenuIdentityall = [];
+        var arrgetitem = [];
+        var checkDepIDitem = [];
+        var children = new Array();
+        var cc = [];
+        var arrmenus = [];
+
+        function convert(array) {
+            var map = {};
+            for (var i = 0; i < array.length; i++) {
+                var obj = array[i];
+                obj.items = [];
+
+                map[obj.MenuID] = obj;
+
+                var parent = obj.Parent_MenuID || '*';
+                if (!map[parent]) {
+                    map[parent] = {
+                        items: []
+                    };
+                }
+                map[parent].items.push(obj);
+            }
+
+            return map['*'].items;
+
+        }
+
+
+        function myconvert(arryx, parent) {
+            var mymapx = {};
+            for (var i = 0; i < arryx.length; i++) {
+                var obj = arryx[i];
+                var Id = obj.MenuID;
+                if (obj.Parent_MenuID == parent) {
+                    mymapx[Id] = obj;
+                    mymapx[Id].items = [];
+                    //console.log('Parent ' + parent + ', Found at ID ' + Id + ': ', JSON.stringify(mymapx));
+
+                    //obj.items= [];
+
+                    var obj_children = myconvert(arryx, Id);
+                    if (obj_children) mymapx[Id].items.push(obj_children);
+                    //mymapx[Id].children = obj_children;
+
+                }
+
+            }
+            return mymapx;
+
+        }
+
+
+        var getItemsCount = function (item) {//A->AA, AB
+            var itemCount = 0;
+            if (item.items) {
+                itemCount += item.items.length;
+                for (var i = 0; i < item.items.length; i++) {
+                    itemCount += getItemsCount(item.items[i]);//AA
+                }
+            }
+            return itemCount;
+        }
+
+
+
+
+        var mymap = {};
+        var items = "";
+        function convertx(array) {
+            var map = {}
+            for (var i = 0; i < array.length; i++) {
+                var obj = array[i]
+                //console.log('obj',obj.MenuID);
+                //console.log('map', map);
+                //console.log(obj.MenuID in map);
+                if (!(obj.MenuID in map)) {
+                    map[obj.MenuID] = obj
+                    map[obj.MenuID].items = []
+                }
+
+                if (typeof map[obj.MenuID].Parent_MenuID == 'undefined') {
+                    map[obj.MenuID].MenuID = obj.MenuID
+                    map[obj.MenuID].MenuIdentity = obj.MenuIdentity
+                    map[obj.MenuID].Name = obj.MenuName
+                    map[obj.MenuID].Parent_MenuID = obj.Parent_MenuID
+                    map[obj.MenuID].selected = obj.selected
+
+                }
+
+                var parent = obj.Parent_MenuID || '*';
+                if (!(parent in map)) {
+                    map[parent] = {}
+                    map[parent].items = []
+                }
+
+                map[parent].items.push(map[obj.MenuID])
+            }
+            return map['*'].items
+        }
+        function isMenu(data) {
+            return !data.items.length;
+        }
+        function eachRecursive(node) {
+
+            var itemIndex = -1;
+            $.each(arrmenus, function (index, item) {
+                //alert(item.key +'==='+ node.key)
+                //console.log(node.itemData.MenuIdentity);
+                if (item === node.itemData.MenuIdentity) {
+                    itemIndex = index;
+                    return false;
+                }
+            });
+            if (node.items) {
+                $.each(node.items, function (index, item) {
+                    //console.log(item);
+                    eachRecursive($.extend({
+                        MenuIdentity: item.itemData.MenuIdentity
+                    }, item));
+
+                });
+            }
+            if (node.selected && itemIndex === -1) {
+                //alert(node.items.length);
+                if (node.items.length > 0) {
+                    //console.log(node.items);
+                    $.each(node.items, function (index, item) {
+                        //arrmenus.push(item.itemData.MenuIdentity);
+                    });
+                }
+                else {
+                    //console.log(node.items);
+                    arrmenus.push(node.itemData.MenuIdentity);
+                }
+
+            } else if (!node.selected) {
+                if (node.items.length > 0) {
+                    //console.log(node.items);
+
+                    $.each(node.items, function (index, item) {
+                        //console.log(index);
+                        //arrmenus.splice(index, 1);
+                        //arrmenus.push(item.itemData.MenuIdentity);
+                    });
+                }
+                else {
+                    //console.log(node.items);
+                    arrmenus.splice(itemIndex, 1);
+                }
+
+
+
+            }
+
+            //alert(itemIndex);
+            //alert(arrmenus);
+            //console.log(arrmenus);
+        }
+
+
+        function getCookie(cname) {
+            var name = cname + "=";
+            var ca = document.cookie.split(';');
+            for (var i = 0; i < ca.length; i++) {
+                var c = ca[i].trim();
+                if (c.indexOf(name) == 0) return c.substring(name.length, c.length);
+            }
+            return "";
+        }
+          var storedep = DevExpress.data.AspNet.createStore({
+                "key": "ID",
+                "loadUrl": "@Url.Action("Get", "m_Dep",new { httproute = true })",
+        });
+
+        function canselButtonClick() {
+            arrgetitem = [];
+            $('#customPopup').dxPopup('instance').option('visible', false);
+
+        }
+        @*function multidelete(data) {
+            var grid = $('#gridContainer').dxDataGrid('instance');
+            var keys = grid.getSelectedRowKeys();
+            var result = DevExpress.ui.dialog.confirm('Are you sure you want to Delete selected record ?', 'Selected Delete');
+            result.done(function (dialogResult) {
+                if (dialogResult) { // Yes:
+            $.ajax({
+                type: 'POST',
+                url: '@Url.Action("deletemulti", "m_Dep", new { httproute = true })',
+                data: { "selectedID": keys},
+                async: false,
+                beforeSend: function () {/*loading*/ },
+                dataType: 'json',
+                success: function (data) {
+                    DevExpress.ui.notify("Delete success.", "success", 1000);
+                    grid.refresh();
+                    //location.reload();
+                },
+                error: function (ob, errStr) {
+                    ob.stopPropagation();
+                    DevExpress.ui.notify(errStr, "error", 2000);
+                    grid.refresh();
+
+                }
+            });
+                    //$.each(keys, function (value, key) {
+                    //    var index = grid.getRowIndexByKey(key);
+                    //    grid.deleteRow(index);
+                    //    grid.refresh();
+                    //});
+
+                } else { // No:
+
+
+                }
+            });
+
+        }*@
+
+        function deleteButtonClick(data) {
+
+            var grid = $('#gridContainer').dxDataGrid('instance');
+            var result = ShowConfirmDialog('Are you sure you want to Delete this record ?', 'Delete Department');
+            result.done(function (dialogResult) {
+                if (dialogResult) { // Yes: confirm close
+                    $.ajax({
+                    type: 'GET',
+                url: '@Url.Action("deleterowdep", "m_Dep", new { httproute = true })',
+                //data: {"MenuIdentity": data.MenuIdentity, "DepID": data.DepID},
+                data: { "ID":data.ID ,"DepID":data.DepID},
+                async: false,
+                beforeSend: function () {/*loading*/ },
+                dataType: 'json',
+                success: function (result) {
+                    if (result == 1) {
+                        DevExpress.ui.notify("There are users in this department.", "warning", 2000);
+                    } else {
+                        DevExpress.ui.notify("Delete success.", "success", 1000);
+                        grid.refresh();
+                    }
+                    //location.reload();
+                },
+                error: function (ob, errStr) {
+                    ob.stopPropagation();
+                    DevExpress.ui.notify(errStr, "error", 2000);
+                    grid.refresh();
+
+                }
+            });
+
+
+                } else { // No: don't close popup
+                    //closeConfirmed = false;
+                }
+            });
+
+
+            //grid.deleteRow(rowIndex)
+        }
+            function txtDepIDchanged(data) {//เช็คในตอน insert ว่าให้ดึงรายการ menu ของ depID ที่กรอกไป ออกมา selected ใน list
+                checkDepIDitem = [];
+                 $.ajax({
+                    type: 'GET',
+                    url: '@Url.Action("Check_Have_DepID", "m_Dep", new { httproute = true })',
+                    data: {"DepID": $("#DepID").val()},
+                    //data: { "getitem": JSON.stringify(arrgetitem) },
+                    cache: false,
+                    async: false,
+                    beforeSend: function () {/*loading*/ },
+                    dataType: 'json',
+                    success: function (data) {
+                    //console.log(data);
+
+                    $.each(data, function (key, value) {
+                        if ($("#txtDepID").dxTextBox("instance").option("value") != "") {
+
+                            if (value.length > 0) {
+
+                                var customDialog = DevExpress.ui.dialog.custom({
+                                    title: 'DepID error',
+                                    message: 'DepID have already',
+                                    toolbarItems: [
+                                        { text: "Close", onClick: function () { return "Ok" } },
+                                        //{ text: "Not Ok", onClick: function () { return "Not Ok" } }
+                                    ]
+
+                                });
+
+                                customDialog.show().done(function (dialogResult) {
+                                    $("#txtDepID").dxTextBox("instance").focus();
+                                });
+
+                                //DevExpress.ui.notify('DepID have already', "error", 2000);
+                                //$("#txtDepID").dxTextBox("instance").option("value") = "";
+
+
+                                $("#btnSave").dxButton({
+                                    disabled: true
+                                }).dxButton("instance");
+                            }
+                            else {
+                                //alert(value.length);
+                                $("#btnSave").dxButton({
+                                    disabled: false
+                                }).dxButton("instance");
+                            }
+                        }
+
+                    });
+
+                    },
+
+                });
+
+            }
+
+
+        function Dialogcustom(Message, Title) {
+            var customDialog = DevExpress.ui.dialog.custom({
+                title: Title,
+                message: Message,
+                toolbarItems: [
+                    { text: "Ok", onClick: function () { return "Ok" } },
+                    //{ text: "Not Ok", onClick: function () { return "Not Ok" } }
+                ]
+            });
+
+          return  customDialog.show().done(function (dialogResult) {
+                DevExpress.ui.notify(dialogResult, "success", 1000);
+            });
+
+        }
+        function ShowConfirmDialog(message, title) {
+            return DevExpress.ui.dialog.confirm(message, title);
+        }
+        function isProduct(data) {
+            return !data.items.length;
+        }
+        function OpenInsert(e) {           
+            mode = "add";
+            var store = DevExpress.data.AspNet.createStore({
+                "key": "MenuIdentity",
+                "loadUrl": "@Url.Action("MenuMasterLookup", "m_Dep",new { httproute = true })"
+            });
+            
+            //var txtDepID = $('#addtxtDepID').dxTextBox({
+
+            //}).dxValidator({
+            //    validationRules: [{
+            //        type: "required",
+            //        message: "The DepID field is required."
+            //    }]
+            //}).dxTextBox('instance');
+            //var txtDepDesc = $('#addtxtDepDesc').dxTextBox('instance');
+
+            $('#AddPopup')
+                    .dxPopup({
+                    title:"Insert Department Maintenance",
+                        onShown: function () {
+                           
+                        $("#scrollpopadd").dxScrollView({
+                            height: '100%',
+                            width: '100%'
+                        });
+                        
+                        @*$.ajax({
+                            type: 'GET',
+                            url: '@Url.Action("MenuMasterLookup", "m_Dep", new { httproute = true })',
+                            //data: { "DepID": data.DepID},
+                            async: false,
+                            beforeSend: function () {/*loading*/ },
+                            dataType: 'json',
+                            success: function (result) {
+                                $.each(result, function (index, item) {
+                                    items = convertx(item);
+                                });
+                            }
+                        });
+                        var style =[];
+                        var treeview = $("#treemenu").dxTreeView({
+                            //items: items,
+                            dataSource:items,
+                            width: 300,
+                            //searchEnabled: true,
+                            //searchValue: "",
+                            showCheckBoxesMode: 'selectAll',
+                            //showCheckBoxesMode: "normal",
+                            itemTemplate: function (itemData, itemElement, itemIndex) {
+                                var itemsCount = getItemsCount(itemData);
+                                var itemText =itemData.MenuIdentity+' - '+ itemData.MenuID + ' (' + itemsCount.toString() + ')';
+                                return $('<span>')
+                                    .text(itemText);
+                            },
+                            onItemSelectionChanged: function  (e) {
+                                //eachRecursive(e.node);
+                                var item = e.node;
+                                console.log(isMenu(item));
+                                if (isMenu(item)) {
+                                    //console.log(item.itemData.MenuIdentity);
+                                    eachRecursive($.extend({
+                                        MenuIdentity: item.itemData.MenuIdentity
+                                    }, item));
+                                } else {
+                                    $.each(item.items, function (index, menu) {
+                                        //console.log(menu.itemData.MenuIdentity);
+                                        eachRecursive($.extend({
+                                            MenuIdentity: menu.itemData.MenuIdentity
+                                        }, menu));
+                                    });
+                                }
+                            },
+                            onItemRendered: function (e) {
+                                if (e.itemData) {
+                                    style.push(e.itemElement.addClass("myClass" + e.itemData.MenuIdentity + "")); //This line will help you find the required node in onContentReadyAction
+                                }
+                            },
+
+                            onContentReady: function (e) {//เซ็ตให้ตอนเปิดpopupinsertไม่เลือกเมนูอะไรเลย
+                                console.log(style);
+                                for (var i = 0; i < style.length; i++) {
+                                    e.element.find(style[i]).parent().find(".dx-checkbox").dxCheckBox('instance').option("value", false);
+                                }
+                                //console.log(e.component);
+                                $("#scrolllist").dxScrollView({
+                                    height: '100%',
+                                    width: '100%'
+                                });
+
+                            }
+
+                        }).dxTreeView("instance");*@
+
+                        },
+                        onShowing: function () {                                                  
+                            $('#addtxtDepID').removeClass('dx-invalid');
+                            $('#addtxtDepDesc').removeClass('dx-invalid');
+                        },
+                    onHiding: function (options) {
+                        arrgetitem = [];
+                        $("#addlistMenuIdentity").dxList('instance').reload();
+                        
+                        if ($('#addtxtDepID').dxTextBox('instance').option('value') && $('#addtxtDepDesc').dxTextBox('instance').option('value')) {
+                            $('#addtxtDepID').dxTextBox('instance').option('value', '');
+                            $('#addtxtDepDesc').dxTextBox('instance').option('value', '');
+                        }
+                        //console.log(e.validationGroup);
+                        //$("#gridContainer").dxDataGrid('instance').refresh();
+                            //location.reload();
+                    }
+
+                }).dxPopup('instance').option('visible', true);
+
+
+
+            var list = $("#addlistMenuIdentity").dxList({
+                dataSource: {
+                    paginate: true,
+                    pageSize: arrMenuIdentityall.length,
+                    store: store
+                },
+                selectionMode: "all",
+                //scrollByContent: true,
+                //scrollByThumb: true,
+                //useNativeScrolling: false,
+                //showScrollbar: 'always',
+                selecItemsByDefault: true,
+                showSelectionControls: true,
+                selectionEnabled: true,
+                editEnabled: true,
+                autoPagingEnabled: true,
+                selectionType: 'control',
+                itemTemplate: function (c) {
+                    arrMenuIdentityall.push(c.MenuIdentity);
+                    if (c.selected == "selected") {
+                        arrselected.push(c.selected);
+                        arrMenuIdentity.push(c.MenuIdentity);
+                    }
+                    return c ? c.MenuName : '';
+                },
+                onContentReady: function (e) {
+                    //alert(checkDepIDitem);
+                    $("#scrolllistadd").dxScrollView({
+                        height: '100%',
+                        width: '100%'
+                    });
+                    arrgetitem = [];
+
+                    //for (var i = 0; i < checkDepIDitem.length; i++) {
+
+                    //    for (var j = 0; j < arrMenuIdentityall.length; j++) {
+                    //        if (checkDepIDitem[i] == arrMenuIdentityall[j]) {
+
+                    //            e.component.selectItem(j);
+
+                    //            arrgetitem.push(e.component.selectItem(j));
+                    //        }
+                    //    }
+                    //}
+                },
+
+                onSelectionChanged: function (e) {
+                    arrgetitem = [];
+                    var selectedItems = e.component.option("selectedItems");
+                    for (var i = 0; i < selectedItems.length; i++) {
+                        arrgetitem.push(selectedItems[i].MenuIdentity);
+                    }
+                },
+                onItemDeleted: function (e) {
+                    arrgetitem = [];
+                    var selectedItems = e.component.option("selectedItems");
+                    for (var i = 0; i < selectedItems.length; i++) {
+                        arrgetitem.push(selectedItems[i].MenuIdentity);
+                    }
+                }
+            }).dxList("instance");
+
+        }
+
+
+        function OpenEdit(data) {
+            mode = "edit";
+            arrMenuIdentity = [];
+            var style = [];           
+            @*var store = DevExpress.data.AspNet.createStore({
+                "key": "MenuIdentity",
+                "loadUrl": "@Url.Action("MenuMasterLookup", "m_Dep",new { httproute = true })",
+                "loadParams": { "DepID": data.DepID }
+            });*@            
+             var listdata = "";
+            $.ajax({
+                type: 'GET',
+                url: '@Url.Action("MenuMasterLookup", "m_Dep", new { httproute = true })',
+                data: { "DepID": data.DepID},
+                async: false,
+                beforeSend: function () {/*loading*/ },
+                dataType: 'json',
+                success: function (result) {
+                    listdata = result.data;
+                    $.each(result, function (index, item) {
+                        
+                        for (var i = 0; i < item.length; i++) {
+                            if (item[i].selected) {
+                                arrgetitem.push(item[i].MenuIdentity);
+                            }
+                        }
+                    });
+                }
+            });
+            //alert(arrgetitem);
+            var closeConfirmed = false;
+            $('#EditPopup')
+                .dxPopup({
+                    title: "Edit Department Maintenance",
+                    onShown: function () {
+                        //$("#listMenuIdentity").dxList('instance').reload();
+                        $("#scrollpop").dxScrollView({
+                            height: '100%',
+                            width: '100%'
+                        });
+
+                        $("#btnSave").dxButton({
+                            disabled: false
+                        }).dxButton("instance");
+                @*$.ajax({
+                type: 'GET',
+                url: '@Url.Action("MenuMasterLookup", "m_Dep", new { httproute = true })',
+                data: { "DepID": data.DepID},
+                async: false,
+                beforeSend: function () {/*loading*/ },
+                dataType: 'json',
+                success: function (result) {
+                    $.each(result, function (index, item) {
+                        //mymap = myconvert(item, "*");
+                        //items = convertx(item);
+                        for (var i = 0; i < item.length; i++) {
+                            //arrMenuIdentityall.push(item[i].MenuIdentity);
+                            if (item[i].selected) {
+                                //arrmenus.push(item[i].MenuIdentity);                                
+                                //arrselected.push(item[i].selected);
+                                //arrMenuIdentity.push(item[i].MenuIdentity);
+                                //console.log(arrMenuIdentity);
+                            }
+                            //
+                        }
+
+                        //console.log(JSON.stringify(items));
+                        //var str = JSON.stringify(r);
+                        //var len = String(r);
+                        //bbb = len.substring(9,1961);
+                    });
+
+                }
+            });
+                         var treeview = $("#treemenu").dxTreeView({
+                            //items: items,
+                            dataSource:items,
+                            width: 300,
+                            //searchEnabled: true,
+                            //searchValue: "",
+                            showCheckBoxesMode: 'selectAll',
+                            //showCheckBoxesMode: "normal",
+                            itemTemplate: function (itemData, itemElement, itemIndex) {
+                                var itemsCount = getItemsCount(itemData);
+                                var itemText =itemData.MenuIdentity+' - '+ itemData.MenuID + ' (' + itemsCount.toString() + ')';
+                                return $('<span>')
+                                    .text(itemText);
+                            },
+                            onItemSelectionChanged: function  (e) {
+                                //eachRecursive(e.node);
+                                var item = e.node;
+                                console.log(isMenu(item));
+                                if (isMenu(item)) {
+                                    //console.log(item.itemData.MenuIdentity);
+                                    eachRecursive($.extend({
+                                        MenuIdentity: item.itemData.MenuIdentity
+                                    }, item));
+                                } else {
+                                    $.each(item.items, function (index, menu) {
+                                        //console.log(menu.itemData.MenuIdentity);
+                                        eachRecursive($.extend({
+                                            MenuIdentity: menu.itemData.MenuIdentity
+                                        }, menu));
+                                    });
+                                }
+                            },
+
+                            onContentReady: function (e) {
+                                console.log(arrmenus);
+                                $("#scrolllist").dxScrollView({
+                                    height: '100%',
+                                    width: '100%'
+                                });
+
+                            }
+
+                        }).dxTreeView("instance");*@
+                        //var options = $("#treemenu").dxTreeView("option");
+                        //console.log(options.items);
+                        //console.log(arrMenuIdentity);
+                        //for (i = 0; i < options.items.length; i++) {
+                        //    console.log(arrMenuIdentity);
+                        //    //options.items[i].expanded = true;
+                        //    if (options.items[i].MenuIdentity === arrMenuIdentity[i]) {
+                        //        options.items[i].selected = true;
+                        //    }
+                        //    else {
+                        //        options.items[i].selected = false;
+                        //    }
+                        //}
+                    },
+                    onHiding: function (options) {
+                        $("#listMenuIdentity").dxList('instance').reload();
+                        //$("#gridContainer").dxDataGrid('instance').refresh();
+                            arrgetitem = [];
+                            //arrMenuIdentity = [];
+                            //style = [];
+                            //location.reload();
+
+                    }
+                }).dxPopup('instance').option('visible', true);
+
+            var txtDepID = $('#txtDepID').dxTextBox({
+                validationRules: [{
+                    type: "required",
+                    message: "The DepID field is required."
+                }],
+                readOnly: true
+            }).dxTextBox('instance').option('value',data.DepID);
+            var txtDepDesc = $('#txtDepDesc').dxTextBox('instance').option('value', data.DepDesc);
+            //var txtCreateDate = $('#txtCreateDate').dxDateBox('instance');
+
+           
+            //console.log(listdata);
+            var list = $("#listMenuIdentity").dxList({
+                    dataSource: {
+                        paginate: true,
+                        pageSize: arrMenuIdentityall.length,
+                        store: listdata
+                },
+                //scrollByContent: true,
+                //scrollByThumb: true,
+                selecItemsByDefault: true,
+                showSelectionControls: true,
+
+               // useNativeScrolling: true,
+                selectionMode: "all",
+                selectionEnabled: true,
+                editEnabled: true,
+                selectionType: 'control',
+                itemTemplate: function (c) {
+                        arrMenuIdentityall.push(c.MenuIdentity);
+                        //if (c.selected == "selected") {
+                        //    arrselected.push(c.selected);
+                        //    arrMenuIdentity.push(c.MenuIdentity);
+                        //    //arrgetitem.push(c.MenuIdentity);
+                        //}
+
+                        return c ? c.MenuIdentity+"-"+c.MenuName : '';
+                },
+
+                onItemRendered: function (e) {
+                    style = [];
+                    if (e.itemData.selected == "selected") {
+                        //arrgetitem.push(e.itemData.MenuIdentity);
+                        //e.component.selectItem(e.itemElement.index());
+                        //style.push(e.itemElement.addClass("myClass" + e.itemData.MenuIdentity + ""));
+                        e.itemElement.find(".dx-checkbox").dxCheckBox('instance').option("value", true);
+                    } else { e.itemElement.find(".dx-checkbox").dxCheckBox('instance').option("value", false);}
+
+                },
+
+                onContentReady: function (e) {                    
+                    console.log(arrgetitem);                   
+
+                    //for (var i = 0; i < style.length; i++) {
+                    //    e.element.find(style[i]).parent().find(".dx-checkbox").dxCheckBox('instance').option("value", false);
+                    //}
+                    
+                        $("#scrolllist").dxScrollView({
+                            height: '100%',
+                            width: '100%'
+                        });
+
+                        //var selectedItems = e.component.option("selectedItems");
+                        //var sItems = [];
+                        //window.setTimeout(function () {
+                        //    for (var i = 0; i < arrMenuIdentity.length; i++) {
+                        //        for (var j = 0; j < arrMenuIdentityall.length; j++) {
+                        //            if (arrMenuIdentity[i] == arrMenuIdentityall[j]) {
+                        //                e.component.selectItem(j);
+                        //                arrgetitem.push(e.component.selectItem(j));
+                        //            }
+                        //        }
+                        //    }
+                        //}, 100);
+
+                    },
+
+                    onSelectionChanged: function (e) {
+                        arrgetitem = [];
+                        var selectedItems = e.component.option("selectedItems");
+                        for (var i = 0; i < selectedItems.length; i++) {
+                            arrgetitem.push(selectedItems[i].MenuIdentity);
+                        }
+                    },
+                    onItemDeleted: function (e) {
+                        arrgetitem = [];
+                        var selectedItems = e.component.option("selectedItems");
+                        for (var i = 0; i < selectedItems.length; i++) {
+                            arrgetitem.push(selectedItems[i].MenuIdentity);
+                        }
+                    }
+                }).dxList("instance");
+
+
+        }
+
+
+    </script>
+
+</div>

@@ -1,0 +1,85 @@
+﻿<style>
+    #main {
+        height: 100vh;
+    }
+
+    .padding-top {
+        padding-top: 30px;
+    }
+</style>
+
+<div class="d-flex justify-content-center align-items-center" id="main">
+    @*<h1 class="mr-3 pr-3 align-top border-right inline-block align-content-center">404</h1>*@
+    <div class="inline-block align-middle">
+        <p class="bg-warning" id="Confirmdesc">The page you requested was not found.</p>
+    </div>
+
+    <div class='form-row'>
+        <div class='col-lg-6 col-xs-6 form-group form-group-sm padding-top'>
+            <button class='form-control btn btn-primary submit-button btn-xs' type='button' name="btnConfirmYes" id="btnConfirmYes">Yes</button>
+        </div>
+        <div class='col-lg-6 col-xs-6 form-group form-group-sm padding-top'>
+            <button class='form-control btn btn-warning submit-button btn-xs' type='button' name="btnComfirmNo" id="btnComfirmNo">No</button>
+        </div>
+    </div>
+</div>
+
+<script>
+    //No
+    $('#btnComfirmNo').click(function () {
+        $('#ConfirmPopup').dxPopup('instance').option('visible', false);
+        $('#Confirmdesc').html("");
+    });
+
+    //Yes
+    $('#btnConfirmYes').click(function () {
+        //alert("Yes");
+        $('#ConfirmPopup').dxPopup('instance').option('visible', false);
+        $('#Confirmdesc').html("");
+
+        var processtext = "@(ViewBag.ProcessText)";
+        var barcode = document.getElementById("Barcode").value.toString();
+        var operationno = $('#OperationNo').val();
+        var shiftid = $('#ShiftID').val();
+        var pstatus = "C";
+        var proqtyok = $('#ProQtyOK').val();
+        var qtyng = $('#ProQtyNg').val();
+        var machinecode = $('#MachineCode').val();
+
+        //alert(processtext);
+        //alert(barcode);
+        //alert(shiftid);
+        //alert(pstatus);
+        //alert(qtycomplete);
+        //alert(operationno);
+
+        $.ajax({
+            url: 'Confirm',
+            data: JSON.stringify({ ProcessText: processtext, Barcode: barcode, OperationNo: operationno, ShiftID: shiftid, PStatus: pstatus, QtyComplete: proqtyok, QtyNG: qtyng, MachineCode: machinecode }),
+            dataType: 'json',
+            type: "Post",
+            contentType: "application/json; charset=utf-8",
+            success: function (obj) {
+
+                //alert(obj.SqlStatus);
+                if (obj.SqlStatus === "OK") {
+
+                    $('#ProQtyOK').val("");
+                    $('#ProQtyNg').val("");
+
+                    scan();
+                }
+                else {
+                    $('#ErrPopup').dxPopup('instance').option('visible', true);
+                    $('#desc').html(obj.SqlErrtext);
+                }
+            },
+            error: function (xhr, status, error) {
+                alert(xhr.responseText);
+                alert(status);
+                alert(error);
+            }
+        });
+
+    });
+</script>

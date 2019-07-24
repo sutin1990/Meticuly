@@ -1,0 +1,147 @@
+﻿<head>
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="expires" content="-1">
+</head>
+<div id="addscrollpop" class="scrollpop">
+    <div class="addcontentpop">
+        @model MCP_WEB.Models.PartDescTagSelect
+        @using (Html.BeginForm())
+        {
+            using (Html.DevExtreme().ValidationGroup())
+            {
+                @Html.AntiForgeryToken()
+                <form id="form1" name="form1" autocomplete=off>
+                    <div class="form-group" autocomplete=off>
+
+                        <label class="col-lg-2 " >Model : <span style="color:red;">*</span></label>
+                        <div class="col-lg-3 " style="padding-bottom:10px;">
+                            @(Html.DevExtreme().TextBox().ID("addtxtModel").Name("Model"))
+                        </div>
+
+
+                        <label class="col-lg-3 " >Serail No. of Barcode : <span style="color:red;">*</span></label>
+                        <div class="col-lg-4" style="padding-bottom:10px;">
+                            @(Html.DevExtreme().TextBox().ID("addtxtSerailNoofBarcode").Name("SerailNoofBarcode").ReadOnly(true))
+                        </div>
+
+                        <label class="col-lg-2 " >Packing Std. ID : </label>
+                        <div class="col-lg-4" style="padding-bottom:10px;">
+                            @*<div id="txtDepID"></div>*@
+                            @(Html.DevExtreme().SelectBox().ID("addtxtPackingID").Name("PackingID")
+                            )
+                        </div>
+
+                        <label class="col-lg-2 " >Part DesType : </label>
+                        <div class="col-lg-4" style="padding-bottom:10px;">
+                            @*<div id="txtDepID"></div>*@
+                            @(Html.DevExtreme().SelectBox().ID("addtxtPartDesType").Name("PasrtDesType")
+                            )
+                        </div>
+
+
+                        <label class="col-lg-2 " >Pack Qty : </label>
+                        <div class="col-lg-4" style="padding-bottom:10px;">
+                            @Html.DevExtreme().TextBox().ID("addtxtPackQty").Name("PackQty").ReadOnly(true)
+                        </div>
+
+                        <label class="col-lg-2 " >WIPQTY : </label>
+                        <div class="col-lg-4" style="padding-bottom:10px;">
+                            @Html.DevExtreme().TextBox().ID("addtxtWIPQTY").Name("WIPQTY").ReadOnly(true)
+                        </div>
+
+                        <label class="col-lg-2 " >Packed Qty : </label>
+                        <div class="col-lg-4" style="padding-bottom:10px;">
+                            @Html.DevExtreme().TextBox().ID("addtxtQtyPacked").Name("QtyPacked")
+                        </div>
+
+                        <label class="col-lg-2 " >Box Qty : </label>
+                        <div class="col-lg-4" style="padding-bottom:10px;">
+                            @Html.DevExtreme().TextBox().ID("addtxtBoxQty").Name("BoxQty").ReadOnly(true)
+                        </div>
+
+                        <label class="col-lg-2 " >Excess Qty : </label>
+                        <div class="col-lg-4" style="padding-bottom:10px;">
+                            @Html.DevExtreme().TextBox().ID("addtxtExcessQty").Name("ExcessQty").ReadOnly(true)
+                        </div>
+
+                        <div class="col-sm-offset-2 col-sm-10" style="text-align:right; padding-bottom:10px;">
+                            <div id="selection-treeview"></div>
+                            <div class="selected-data">
+
+                                <div id="checked-items"></div>
+                            </div>
+                            @(Html.DevExtreme().Button().ID("addbtnSave")
+                                                                    .Text("Save")
+                                                                    .OnClick("function (e) {if(e.validationGroup.validate().isValid){callsotre(e);} e.validationGroup.reset(); }"))
+
+                            @(Html.DevExtreme().Button().Type(ButtonType.Normal).ID("addbtnCancel")
+                                                                    .Text("Cancel")
+                                                                    .OnClick("function (e) { addcanselButtonClick(); e.validationGroup.reset(); }"))
+                        </div>
+                    </div>
+                </form>
+            }
+        }
+    </div>
+</div>
+<script>
+  
+    function addcanselButtonClick() {
+        //arrgetitem = [];
+        //e.validationGroup.reset();
+        $('#AddPopup').dxPopup('instance').option('visible', false);
+
+    }
+    function callsotre() {
+        var model = $("#addtxtModel").dxTextBox("instance").option("value");
+        var BoxType = $("#addtxtPackingID").dxSelectBox("instance").option("value");
+        var TagType = $("#addtxtPartDesType").dxSelectBox("instance").option("value");
+        var QtyMT = $("#addtxtQtyPacked").dxTextBox("instance").option("value");
+        var packQty = $("#addtxtPackQty").dxTextBox("instance").option("value");
+        var NumOfBox = $("#addtxtBoxQty").dxTextBox("instance").option("value");
+        var QtyExcess = $("#addtxtExcessQty").dxTextBox("instance").option("value");
+        var msg = "";
+        var status = "";
+        $.ajax({
+            type: 'POST',
+            url: '@Url.Action("CallStore", "PartDescTagSelect", new { httproute = true })',
+            data: { "model": model, "BoxType": BoxType, "TagType": TagType, "QtyMT": QtyMT, "packQty": packQty, "NumOfBox": NumOfBox, "QtyExcess": QtyExcess},
+            async: false,
+            beforeSend: function () {/*loading*/ },
+            dataType: 'json',
+            success: function (result) {
+                //console.log("result:=>",result);
+                //$.each(result, function (item,value) {
+                //    console.log("value:=>", value[0].QtyLot);
+                //});
+                msg = result.moveTicket;
+                status = result.SqlStatus;
+
+                var customDialog = DevExpress.ui.dialog.custom({
+                    title: 'Insert Moveticket Success',
+                    message: 'New Moveticket: ' + msg +' status:'+ status,
+                    toolbarItems: [
+                        { text: "Close", onClick: function () { return "Ok" } },
+                        //{ text: "Not Ok", onClick: function () { return "Not Ok" } }
+                    ],
+                    width: "500px"
+
+                });
+
+                customDialog.show().done(function (dialogResult) {
+                    //$("#addtxtModel").dxTextBox("instance").focus();
+                    addcanselButtonClick();
+                });
+
+            },
+            error: function (ob, errStr) {
+                //Dialogcustom('Insert Error.', 'Insert Data');
+                ob.stopPropagation();
+                //DevExpress.ui.notify(errStr, "error", 2000);
+            }
+
+        });
+    }
+
+</script>
+

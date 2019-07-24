@@ -1,0 +1,244 @@
+﻿<head>   
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="expires" content="-1">
+</head>
+    <div id="addscrollpop" class="scrollpop">
+        <div class="addcontentpop">
+            @model MCP_WEB.Models.m_UserMaster
+            @using (Html.BeginForm())
+            {
+                using (Html.DevExtreme().ValidationGroup())
+                {
+                    @Html.AntiForgeryToken()
+                    <form id="form1" name="form1" autocomplete=off>
+                        <div class="form-group" autocomplete=off>
+
+                            <label class="col-lg-2" >UserName : <span style="color:red;">*</span></label>
+                            <div class="col-lg-4" style="padding-bottom:10px;">
+                                @(Html.DevExtreme().TextBox().ID("addtxtUserName").Name("UserName"))
+
+                            </div>
+
+                            <label class="col-lg-2" >UserPassword : <span style="color:red;">*</span></label>
+                            <div class="col-lg-4" style="padding-bottom:10px;">
+                                @(Html.DevExtreme().TextBox().Mode(TextBoxMode.Password).ID("addtxtUserPassword").Name("UserPassword"))
+                            </div><br>
+
+                            <label class="col-lg-2" >FirstName : </label>
+                            <div class="col-lg-4" style="padding-bottom:10px;">
+                                @Html.DevExtreme().TextBox().ID("addtxtFirstName").Name("FirstName")
+                            </div>
+
+                            <label class="col-lg-2" >LastName : </label>
+                            <div class="col-lg-4" style="padding-bottom:10px;">
+                                @Html.DevExtreme().TextBox().ID("addtxtLastName").Name("LastName")
+                            </div>
+
+                            <label class="col-lg-2" >Email : </label>
+                            <div class="col-lg-4" style="padding-bottom:10px;">
+                                @Html.DevExtreme().TextBox().Mode(TextBoxMode.Email).ID("addtxtUserEmail").Name("UserEmail")
+                            </div>
+
+                            <label class="col-lg-2 " >Shift : </label>
+                            <div class="col-lg-4" style="padding-bottom:10px;">
+                                @*<div id="txtShiftType"></div>*@
+                                @(Html.DevExtreme().SelectBox().ID("addtxtShiftType").Name("ShiftID")
+                                )
+                                @*<div class="dx-texteditor-container">
+                                        <div class="form-group">
+                                            <select id="shifttest" class="form-control">
+
+                                            </select>
+                                            <script>
+                                                function lookup_valueChanged(e) {
+                                                    var x = e.ShiftID;
+                                                    //alert(x);
+                                                    //$(".selected").show();
+                                                    //$("#selected-employee-img").attr("src", e.value.Picture);
+                                                    //$("#selected-employee-notes").text(e.value.Notes);
+                                                }
+
+                                                $.ajax({
+                                            url: "@Url.Action("ShiftLookup", "m_UserMaster")",
+                                            //data: {selectedValue:selectedValue},
+                                            dataType: "json",
+                                            type: "GET",
+                                            error: function () {
+                                                alert(" An error occurred.");
+                                            },
+                                            success: function (data) {
+                                                //var optionhtml1 = '<option value="' +
+                                                // 0 + '">' + "--Select Shift...--" + '</option>';
+                                                //$("#shifttest").append(optionhtml1);
+
+                                                $.each(data, function (j,k) {
+                                                    for (var i = 0; i < k.length; i++) {
+                                                        var optionhtml = '<option value="' +
+                                                            k[i].ShiftID + '">' + k[i].ShiftType + '</option>';
+                                                        $("#shifttest").append(optionhtml);
+                                                    }
+
+                                                });
+                                            }
+                                        });
+                                            </script>
+                                        </div>
+                                    </div>*@
+
+                            </div>
+
+
+                            <label class="col-lg-2 " >Department : </label>
+                            <div class="col-lg-4" style="padding-bottom:10px;">
+                                @*<div id="txtDepID"></div>*@
+                                @(Html.DevExtreme().SelectBox().ID("addtxtDepID").Name("DepID")
+                                )
+                            </div>
+
+                            <label class="col-lg-2" >Status : </label>
+                            <div class="col-lg-4" style="padding-bottom:10px;">
+                                @(Html.DevExtreme().SelectBox().ID("addtxtStatus").Name("Status")
+                                                            .DataSource(new string[] { "Active", "Inactive" })
+                                                .SearchEnabled(true)
+
+                                )
+                            </div>
+                            <label class="col-lg-2" >MenuIdentity : </label>
+                            <div class="col-lg-4" style="padding-bottom:10px;">
+                                <div id="addscrolllist" class="dxlist-scroll">
+
+                                    @(Html.DevExtreme().List()
+                                            .ID("addlistMenuIdentity")
+                                            .ShowSelectionControls(true)
+                                            .SearchEnabled(true).SearchExpr(new string[] { "MenuName" })
+                                    )
+
+                                </div>
+                            </div>
+
+                            <div class="col-sm-offset-2 col-sm-10" style="text-align:right; padding-bottom:10px;">
+                                <div id="selection-treeview"></div>
+                                <div class="selected-data">
+
+                                    <div id="checked-items"></div>
+                                </div>
+                                @(Html.DevExtreme().Button().ID("addbtnSave")
+                                                            .Text("Save")
+                                                            .OnClick("function (e) { if(e.validationGroup.validate().isValid){SaveInsert(e); } }"))
+
+                                @(Html.DevExtreme().Button().Type(ButtonType.Normal).ID("addbtnCancel")
+                                                            .Text("Cancel")
+                                                            .OnClick("function (e) { addcanselButtonClick(); e.validationGroup.reset(); }"))
+                            </div>
+                        </div>
+                    </form>
+                }
+            }
+        </div>
+    </div>
+
+    <script>
+
+    function addcanselButtonClick() {
+        //arrgetitem = [];
+        //e.validationGroup.reset();
+        $('#AddPopup').dxPopup('instance').option('visible', false);
+
+    }
+    function SaveInsert(e) {
+        var validate;
+        $("#addtxtUserPassword").dxTextBox({
+            mode: "password"
+        }).dxValidator({
+            validationRules: [
+            {
+                type: "custom",
+                message: "Please specify at least 6 characters of password.",
+                    validationCallback: function (e) {                        
+                        if (e.value.length < 6) {                            
+                        return false;
+                    } else { return true;}
+                    
+                }
+            }
+            ]
+            });
+        
+        $("#addtxtUserName").dxTextBox({
+            //mode: "password"
+        }).dxValidator({
+            validationRules: [
+                {
+                    type: "custom",
+                    message: "Please specify at least 3 characters of Username.",
+                    validationCallback: function (e) {
+                        if (e.value.length < 3) {
+                            return false;
+                        } else { return true; }
+
+                    }
+                }
+            ]
+        });
+        
+        //console.log(e.validationGroup.validate().isValid);
+        var UserName = $("#addtxtUserName").dxTextBox('instance').option('value');
+        var UserPassword = $("#addtxtUserPassword").dxTextBox("instance").option("value");
+        var FirstName = $("#addtxtFirstName").dxTextBox("instance").option("value");
+        var LastName = $("#addtxtLastName").dxTextBox("instance").option("value");
+        var UserEmail = $("#addtxtUserEmail").dxTextBox("instance").option("value");
+        var Status = $("#addtxtStatus").dxSelectBox("instance").option("value");
+        if (e.validationGroup.validate().isValid) {
+             $.ajax({
+                type: 'POST',
+                url: '@Url.Action("Insert", "m_UserMaster", new { httproute = true })',
+                data: {
+                    "getitem": arrgetitem,
+                    "UserName": UserName,
+                    "UserPassword": UserPassword,
+                    "FirstName": FirstName,
+                    "LastName": LastName,
+                    "UserEmail": UserEmail,
+                    "ShiftID": selectedShift,
+                    "DepID": selectedDep,
+                    "Status": Status
+                    },
+                    async: false,
+                    beforeSend: function () {/*loading*/ },
+                    dataType: 'json',
+                    success: function (data) {
+                        if (data == 0) {//ถ้า UserId ซํ้า
+                                var customDialog = DevExpress.ui.dialog.custom({
+                                    title: 'UserName error',
+                                    message: 'UserName: ' + UserName +' have already',
+                                    toolbarItems: [
+                                        { text: "Close", onClick: function () { return "Ok" } },
+                                        //{ text: "Not Ok", onClick: function () { return "Not Ok" } }
+                                    ],
+                                    width:"500px"
+
+                                });
+
+                                customDialog.show().done(function (dialogResult) {
+                                    $("#addtxtUserName").dxTextBox("instance").focus();
+                                });
+
+                        } else {
+                            $('#AddPopup').dxPopup('instance').option('visible', false);
+                            //addcanselButtonClick();
+                            $('#gridContainer').dxDataGrid('instance').refresh();
+                            //DevExpress.ui.notify("Insert Username: " + $("#UserName").val() +" success.", "success", 1000);
+                        }
+
+                    },
+                    error: function (ob, errStr) {
+                        //Dialogcustom('Insert Error.', 'Insert Data');
+                        //ob.stopPropagation();
+                        DevExpress.ui.notify(errStr, "error", 2000);
+                    }
+                });
+        }
+           
+
+    }
+    </script>

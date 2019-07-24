@@ -1,0 +1,186 @@
+﻿
+@{
+    ViewData["Title"] = "Index";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+<style>
+
+    /************* GENERIC  *****************/
+    a {
+        color: #696969;
+    }
+
+    img {
+        width: 100%;
+    }
+
+    .twhite {
+        color: #fff !important;
+    }
+
+        .twhite a {
+            color: #fff !important;
+        }
+    /************* Background ****************/
+    .bglight1 {
+        background: #f2f2f2;
+    }
+    /************* TOP-HEAD *****************/
+    .top-head ul li {
+        padding-right: 8px;
+    }
+    /****************** Navigation **************/
+    .navbar-toggler {
+        border-color: #dd0000;
+    }
+
+    .navbar-toggler-icon {
+        background-image: url("data:image/svg+xml;charset=utf8,%3Csvg viewBox='0 0 32 32' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath stroke='rgb(221, 0, 0, 0.7)' stroke-width='2' stroke-linecap='round' stroke-miterlimit='10' d='M4 8h24M4 16h24M4 24h24'/%3E%3C/svg%3E");
+    }
+    /**************** Banner Slider Carousel **************/
+    .carousel-inner img {
+        width: 100%;
+    }
+
+    .carousel-caption {
+        color: #000;
+        top: 110px;
+        bottom: auto;
+        text-align: left;
+    }
+
+        .carousel-caption h1 {
+            color: #dd0000;
+            background-color: #;
+        }
+    /************ Services **************/
+    .most-car-box:hover {
+        background:;
+        box-shadow: 0 3px 6px rgba(0,0,0,0.16), 0 3px 6px rgba(0,0,0,0.23);
+    }
+    /*********** TABS *******/
+    .nav-tabs {
+        border-bottom: 1px solid #ccc;
+    }
+
+        .nav-tabs .nav-link.active {
+            border-bottom: 1px solid #dd0000;
+            border-radius: 0px;
+        }
+    /**************** Social ICONS ***************/
+
+    .social-icons {
+        margin: 0;
+        padding: 0;
+        font-size: 8px;
+    }
+
+    .social {
+        margin: 7px 7px 7px 0px;
+    }
+
+    #social-fb:hover {
+        color: #3B5998;
+        transition: all .25s;
+    }
+
+    #social-tw:hover {
+        color: #4099FF;
+        transition: all .25s;
+    }
+
+    #social-gp:hover {
+        color: #d34836;
+        transition: all .25s;
+    }
+
+    #social-em:hover {
+        color: #f39c12;
+        transition: all .25s;
+    }
+</style>
+<div class="content py-5 bg-light  ">
+    <div class="container">
+        <div class="row">
+            <div class="col-md-6 offset-md-3">
+                <span class="anchor" id="formChangePassword"></span>
+                <!-- form card change password -->
+                <div class="card card-outline-secondary">
+                    <div class="card-header">
+                        <h3 class="mb-0">Change Password</h3>
+                    </div>
+                    <br />
+                    <div class="card-body">
+
+                        <div class="form-group">
+                            <label for="inputPasswordOld">Current Password</label>&nbsp;<span class="text-danger">*</span>
+                            <input type="password" class="form-control" id="CurrentPassword" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="inputPasswordNew">New Password</label>&nbsp;<span class="text-danger">*</span>
+                            <input type="password" class="form-control" id="NewPassword" required>
+                            <span class="form-text small text-muted">
+                                The password must be 6-20 characters, and must <em>not</em> contain spaces.
+                            </span>
+                        </div>
+                        <div class="form-group">
+                            <label for="inputPasswordNewVerify">Verify</label>&nbsp;<span class="text-danger">*</span>
+                            <input type="password" class="form-control" id="ConfirmPassword" required>
+                            <span class="form-text small text-muted">
+                                To confirm, type the new password again.
+                            </span>
+                        </div>
+                        <div class="form-group">
+                            <button type="submit" id="BtnReset" class="btn btn-success btn-md float-right">Save</button>
+                        </div>
+
+                    </div>
+                </div>
+                <!-- /form card change password -->
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+    $("#BtnReset").on("click", function () {
+
+        let user = "@User.FindFirst("ContactName").Value";
+        let cerPass = $("#CurrentPassword").val();
+        let newPass = $("#NewPassword").val();
+        let conPass = $("#ConfirmPassword").val();
+
+        if (cerPass.length < 6 || newPass.length < 6 || conPass.length < 6) {
+            let result = DevExpress.ui.dialog.alert("Field is not 6 characters minimum!", "Error Message");
+            result.done(function (dialogResult) { });
+        }
+
+        if (newPass !== conPass) {
+
+            let result = DevExpress.ui.dialog.alert("Confirm password do not match!", "Error Message");
+            result.done(function (dialogResult) { });
+        }
+       
+        $.ajax({
+            url: "ResetPassword/Reset",
+            type: "POST",
+            data: JSON.stringify({ user: user, CurrentPassword: cerPass, NewPassword: newPass, ConfirmPassword:conPass}),
+            contentType: "application/json; charset=utf-8",
+            success: function (response) {
+                if (response.Msg === "Error") {
+                    let result = DevExpress.ui.dialog.alert(response.des, "Error Message");
+                    result.done(function (dialogResult) { });
+                    // idx1--;
+                    return;
+                } else {
+                    window.location.href = "@Url.Action("index", "Home")";
+                }
+
+            },
+            error: function () {
+                $("#StorageLocations").empty();
+            }
+        });
+
+
+    });
+</script>

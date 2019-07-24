@@ -1,0 +1,458 @@
+﻿@model System.Data.DataTable
+@using System.Data;
+@using System.Globalization;
+@{
+    Layout = null;
+
+}
+
+
+<html>
+<head>
+    <meta name="viewport" content="width=device-width" />
+    <title>Print DailyReport</title>
+    <link href="~/css/paper.css" rel="stylesheet" type="text/css" />
+    <script>
+        function printContent(el) {
+            var restorepage = document.body.innerHTML;
+            var printcontent = document.getElementById(el).innerHTML;
+            document.body.innerHTML = printcontent;
+            window.print();
+            document.body.innerHTML = restorepage;
+        }
+
+        function getDate() {
+            var d = new Date();
+
+            var str;
+            //console.log(d.getMonth());
+            switch (d.getMonth() + 1) {
+
+                case 1:
+                    str = "มกราคม";
+                    break;
+                case 2:
+                    str = "กุมภาพันธ์";
+                    break;
+                case 3:
+                    str = "มีนาคม";
+                    break;
+                case 4:
+                    str = "เมษายน";
+                    break;
+                case 5:
+                    str = "พฤษภาคม";
+                    break;
+                case 6:
+                    str = "มิถุนายน";
+                    break;
+                case 7:
+                    str = "กรกฎาคม";
+                    break;
+                case 8:
+                    str = "สิงหาคม";
+                    break;
+                case 9:
+                    str = "กันยายน";
+                    break;
+                case 10:
+                    str = "ตุลาคม";
+                    break;
+                case 11:
+                    str = "พฤศจิกายน";
+                    break;
+                case 12:
+                    str = "ธันวาคม";
+                    break;
+            }
+            d = d.getDate() + ' ' + str + ' ' + (parseInt(d.getFullYear()) + 543) + ' ' + d.getHours() + ':' + d.getMinutes() + ' ' + ("น.");
+
+            return d;
+            //document.getElementById("lblDate").value = str;
+            //alert(d.getMonth());
+        }
+
+    </script>
+
+    <style type="text/css">
+        .stayVisible {
+            position: fixed;
+            top: 1em;
+            left: 1em;
+            width: 8.5em;
+            right: auto;
+            z-index: 3;
+        }
+
+        .btnPrint {
+            width: 70px;
+            height: 30px;
+        }
+
+        .boxBarcode {
+            border: 1px solid black;
+            width: 100%;
+            height: 150px;
+            text-align: center;
+            margin-right: 4px;
+        }
+
+        .page {
+            position: relative;
+            clear: both;
+            width: 100%;
+            height: 100%;
+            margin: 0;
+            padding: 0;
+            z-index: 2;
+            font-family: Tahoma;
+            font-style: normal;
+            font-variant: normal;
+            /*font-size: 12px;*/
+        }
+
+        .subReport {
+            position: relative;
+            float: left;
+            width: 33%;
+            height: 100%;
+            border: 1px solid black;
+        }
+
+        /*table {
+            border-collapse: collapse;
+        }*/
+
+
+
+
+        @@media print {
+            /*@@page {
+                size: A4 landscape;
+                max-height: 100%;
+                max-width: 100%
+            }*/
+            /*body {
+                width: 100%;
+                height: 100%;
+                -webkit-transform: rotate(-90deg) scale(.68,.68);
+                -moz-transform: rotate(-90deg) scale(.58,.58)
+            }*/
+        }
+
+        div.relative1 {
+            position: relative;
+            width: 100%;
+            height: 120px;
+            /*border: 1px solid lightgray;*/
+        }
+
+        .absolute1 {
+            position: absolute;
+            padding-top: 20px;
+            top: 10px;
+            right: 420px;
+            width: 300px;
+            height: 80px;
+            /*border: 1px solid lightgray;*/
+        }
+
+        .absoluteicon {
+            position: absolute;
+            padding-top: 10px;
+            top: 0px;
+            right: 600px;
+            width: 200px;
+            height: 40px;
+            /*border: 1px solid lightgray;*/
+        }
+
+
+        .absolute2 {
+            position: absolute;
+            padding-top: 20px;
+            top: 50px;
+            right: 400px;
+            width: 400px;
+            /*height: 70px;*/
+            text-align: left;
+            /*border: 1px solid lightgray;
+            border-right:none;
+            border-top:none;
+            border-bottom:none;*/
+        }
+
+        div.relative2 {
+            position: relative;
+            /*padding-left: 535px;*/
+            top: 20px;
+            /*font-size:10px;*/
+            /*right: 400px;*/
+            /*width: 720px;*/
+            /*height: 800px;*/
+            /*border: 1px solid lightgray;*/
+            /*border-left: none;*/
+        }
+
+        div.relative3 {
+            position: relative;
+            padding-left: 0;
+            top: 10px;
+            width: 296px;
+            height: 480px;
+            border: 1px solid lightgray;
+            border-top: none;
+            border-bottom: none;
+            border-left: none;
+            border-right: none;
+        }
+
+
+
+        table, th, td {
+            border: 0.1px lightgray;
+            border-collapse: collapse;
+            text-align: center;
+        }
+
+    </style>
+
+</head>
+<body class="A4 landscape">
+    <form>
+        &nbsp;&nbsp;&nbsp;
+        <div class="stayVisible">
+            <button class="btnPrint" onclick="printContent('print-content')">Print</button>
+        </div>     
+        <div id="print-content">
+            @{List<MCP_WEB.Models.DailyReport> list = new List<MCP_WEB.Models.DailyReport>();
+                var lt = ViewBag.listdata as IEnumerable<MCP_WEB.Models.DailyReport>;
+                list = lt.ToList();
+                int per = 0;
+                int excess = 0;
+                int count = 1;
+                int rowNo = 0;
+                //int sumBoxQty = 0; int sumExcessQty = 0;
+                int CUTOFFBAR = 0; int FRICTION = 0;
+                int FORGING = 0; int STELLITETIP = 0; int STELLITESEAT = 0;
+                int STRAIGHTENING = 0; int STEMROUGH = 0; int STEMFINISH = 0; int ISONITE = 0; int SEATFINISH = 0; int QCVISUAL = 0;
+                int Total = 0;
+                int mcline = 0;
+                int getnumrow = 25;
+                int getlistcount = list.Count;
+                int ggnumrow = 0;
+                string[] arr_Month = new string[] { "Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec" };
+                string Date = Convert.ToString(ViewBag.fromdate);
+                string MM = Date.Substring(Date.Length-2);
+                string yyyy = Date.Substring(0,4);
+                DateTimeFormatInfo mfi = new DateTimeFormatInfo();
+                string strMonthName = mfi.GetMonthName(Convert.ToInt32(MM)).ToString();
+
+            }
+            
+            @{
+                List<int> footer_total_D = new List<int>();
+                List<int> footer_total_N = new List<int>();
+                var footer_total_index = 0;
+            }
+
+            @if (getnumrow >= getlistcount)
+            {
+                per = 1;
+                excess = 0;
+            }
+            @if (getnumrow < getlistcount) { per = getlistcount / getnumrow; excess = getlistcount % getnumrow; }
+
+            @if (excess != 0) { per = per + 1; }
+            @*@foreach (var item in Model)
+        {*@
+
+            @while (count <= per)
+            {
+                <section class="sheet padding-10mm">
+                    <div class="page">
+                        <div class="relative1">
+                            <div class="absoluteicon" style="top:0 ;font-size:11px; left:980px; "> Page : @count <label>/</label> @per</div>
+                            <div class="absoluteicon" style="right:800px;"><img style="width:80px;" src="~/images/logonittan.png" /></div>
+                            <div class="absolute2" style="font-size:14px; right:640px;"><b>NITTAN (THAILAND) CO.,LTD.</b><br />DailyReport<br />Work In Process<br />Balance at: @strMonthName @yyyy</div>
+
+                        </div>
+                        <div class="relative2">
+                            <table style="width:100%; border: 1px solid lightgray; font-size:6px;">
+
+                                <tr style="border: 1px solid lightgray;">
+                                    <td rowspan="2" style="border: 1px solid lightgray; ">No.</td>
+                                    <td rowspan="2" style="border: 1px solid lightgray; ">M/C Line</td>
+                                    <td rowspan="2" style="border: 1px solid lightgray; ">F-Code</td>
+                                    <td rowspan="2" style="border: 1px solid lightgray;">Model</td>
+                                    @for (var x = 0; x < 31; x++)
+                                    {
+                                        var number = "0" + (x + 1);
+                                        number = number.Substring(number.Length - 2);
+                                        var month = ViewBag.listdata[0].period;
+                                        month = month.Substring(0, month.Length - 4);
+                                        <td colspan="2" style="border: 1px solid lightgray;">@number/@arr_Month[Convert.ToInt32(MM)-1].ToString()</td>
+                                        footer_total_D.Add(0);
+                                        footer_total_N.Add(0);
+                                    }
+
+                                    <td rowspan="2" style="border: 1px solid lightgray;">Total</td>
+                                </tr>
+                                <tr style="border: 1px solid lightgray;">
+                                    @for (var i = 0; i < 31; i++)
+                                    {
+                                        
+                                        var number = "0" + (i + 1);
+                                        number = number.Substring(number.Length - 2);
+                                        var D = "D" + number;
+                                        var N = "N" + number;
+
+                                        <td style="border: 1px solid lightgray;">@D</td>
+                                        <td style="border: 1px solid lightgray;">@N</td>
+                                    }
+                                </tr>
+
+                                @*@while (rowNo <= 40) {*@
+
+                                @if (getnumrow >= getlistcount)//กรณีที่มีหน้าเดียว ไม่ต้อง remove list
+                                {
+
+                                    @for (var x = 0; x < Enumerable.Count(ViewBag.listdata); x++)
+                                    {
+                                <tr style="border: 1px solid lightgray;">
+                                    @{rowNo++;
+                                        footer_total_index = 0;
+                                    }
+
+                                    <td style="border: 1px solid lightgray;"> @rowNo</td>
+                                    <td style="border: 1px solid lightgray;">@ViewBag.listdata[x].MachineCode</td>
+                                    <td style="border: 1px solid lightgray;">@ViewBag.listdata[x].FCode</td>
+                                    <td style="border: 1px solid lightgray;">@ViewBag.listdata[x].Model</td>
+
+                                    @foreach (DataRow row in Model.Rows)
+                                    {
+
+                                        if (Convert.ToInt32(ViewBag.listdata[x].RowNumber) == Convert.ToInt32(row["RowNumber"]))
+                                        {
+                                            @for (var i = 0; i < 31; i++)
+                                            {
+                                                var number = "0" + (i + 1);
+                                                number = number.Substring(number.Length - 2);
+                                                var D = "D" + number;
+                                                var N = "N" + number;
+                                                <td style="text-align:right; border: 1px solid lightgray;">@string.Format("{0:N0}",row[D])</td>
+                                                <td style="text-align:right; border: 1px solid lightgray;">@string.Format("{0:N0}",row[N])</td>
+                                                footer_total_D[i] += Convert.ToInt32(row[D]);
+                                                footer_total_N[i] += Convert.ToInt32(row[N]);
+
+
+
+                                            }
+
+                                        }
+
+
+                                    }
+                                    <td style="text-align:right; border: 1px solid lightgray;">@string.Format("{0:N0}", ViewBag.listdata[x].total)</td>
+
+
+                                </tr>
+                                            footer_total_index += 1;
+                                            Total += Convert.ToInt32(ViewBag.listdata[x].total);
+                                        }
+
+                                        count = per + 1;
+                                    }
+                                    @if (getnumrow < getlistcount)//กรณีที่มีหลายหน้า ให้ remove list ออกไป แล้วยึด item ตัวที่ 0 (itemตัวล่าสุดที่ยังเหลืออยู่ ) มาแสดงตลอด
+                                {
+                                        ggnumrow = getnumrow;
+
+                                        @while (list.Count > 0)
+                                    {
+
+                                            @if (ggnumrow == 0) { break; }
+                                        else
+                                        {
+
+                                        <tr style="border: 1px solid lightgray;">
+                                            @{rowNo++;
+                                                    footer_total_index = 0;
+                                                }
+                                            <td style="border: 1px solid lightgray;"> @rowNo</td>
+                                            <td style="border: 1px solid lightgray;">@list[0].MachineCode</td>
+                                            <td style="border: 1px solid lightgray;">@list[0].FCode</td>
+                                            <td style="border: 1px solid lightgray;">@list[0].Model</td>
+
+                                            @foreach (DataRow row in Model.Rows)
+                                            {
+
+                                                    if (Convert.ToInt32(list[0].RowNumber) == Convert.ToInt32(row["RowNumber"]))
+                                                    {
+                                                        @for (var i = 0; i < 31; i++)
+                                                    {
+                                                            var number = "0" + (i + 1);
+                                                            number = number.Substring(number.Length - 2);
+                                                            var D = "D" + number;
+                                                            var N = "N" + number;
+                                                        <td style="text-align:right; border: 1px solid lightgray;">@string.Format("{0:N0}",row[D])</td>
+                                                        <td style="text-align:right; border: 1px solid lightgray;">@string.Format("{0:N0}",row[N])</td>
+                                                        footer_total_D[i] += Convert.ToInt32(row[D]);
+                                                        footer_total_N[i] += Convert.ToInt32(row[N]);
+
+                                                        }
+                                                    }
+
+
+                                                }
+
+                                            <td style="text-align:right; border: 1px solid lightgray;">@string.Format("{0:N0}", list[0].total)</td>
+                                        </tr>
+                                                    Total += Convert.ToInt32(list[0].total);
+                                                    list.Remove(list.Single(s => s.RowNumber == list[0].RowNumber));
+                                                    ggnumrow = ggnumrow - 1;
+                                                }
+                                            footer_total_index += 1;
+
+                                            
+                                        @*@list.Count
+                                    <label>,</label>*@
+                                                }
+                                }
+
+                                @if (count >= per)
+                                    {
+                                        <tr>
+                                            <td colspan="4" style="text-align:right; border: 1px solid lightgray;">
+                                                Total:
+                                            </td>
+
+                                            @{ 
+
+                                                for (var i = 0; i < 31; i++)
+                                                {
+                                                    <td style="text-align:right; border: 1px solid lightgray;">@string.Format("{0:N0}", footer_total_D[i])</td>
+                                                    <td style="text-align:right; border: 1px solid lightgray;">@string.Format("{0:N0}", footer_total_N[i])</td>
+                                                }
+                                            }
+
+                                            <td style="text-align:right; border: 1px solid lightgray;">@string.Format("{0:N0}", Total)</td>
+                                        </tr>
+
+
+                                    }
+
+                            </table>
+                        </div>
+                    </div>
+                </section>
+                count++;
+            }
+
+            @*}*@
+
+
+
+        </div>
+    </form>
+</body>
+</html>

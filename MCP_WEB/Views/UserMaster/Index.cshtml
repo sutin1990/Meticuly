@@ -1,0 +1,1049 @@
+﻿<!--<div class="container my-5">
+    <h3>User Master</h3>
+    @*@ViewBag.ID*@
+</div>-->
+<style>
+    /*.glyphicon-4x.dx-icon {
+        font-size: 4em;
+        width: auto;
+        height: auto;
+        line-height: normal;
+    }*/
+
+    a {
+        text-decoration: none !important;
+    }
+
+    .dx-link-edit-4x {
+        padding-right: 5px;
+        font-size: 1.2em;
+        width: auto;
+        height: auto;
+    }
+
+    .dx-link-delete-4x {
+        padding-left: 5px;
+        font-size: 1.3em;
+        width: auto;
+        height: auto;
+    }
+
+    .dx-scrollview-content {
+        height: 300px;
+        /*overflow: auto;*/
+    }
+
+    .chromeHack-autocomplete {
+        height: 0px !important;
+        width: 0px !important;
+        opacity: 0 !important;
+        padding: 0 !important;
+        margin: 0 !important;
+    }
+
+    .visually-hidden {
+        margin: -1px;
+        padding: 0;
+        width: 1px;
+        height: 1px;
+        overflow: hidden;
+        clip: rect(0 0 0 0);
+        clip: rect(0, 0, 0, 0);
+        position: absolute;
+    }
+
+    input[readonly] {
+        /*cursor: text;*/
+        background-color: #ffffff;
+    }
+</style>
+<script>
+    var mode = "";
+    var selectedShift = "";
+    var selectedDep = "";
+    var getuserid_onedit = "";
+    var needSummaryUpdate = false;
+    var arrcountuser = [];
+
+    function countUnique(iterable) {
+        return new Set(iterable).size;
+    }
+
+    function rowcolor(info) {
+        info.rowElement.css({ height: 20 });
+
+        if (info.rowType == 'data') {
+            //if (info.dataField == "LastSignedin") {
+
+            //    info.component.cellValue("xxx");
+            //}
+            //info.data.LastSignedin = Globalize.formatDate(new Date(info.data.LastSignedin), { raw: 'YYYY/MM/DD hh:mm:ss' });
+            if (info.rowIndex % 2 != 0)
+                info.rowElement.css('background', '#e6e6e6');
+
+        }
+    }
+
+    function toolbar_preparing(e) {
+        e.toolbarOptions.items.unshift({
+            location: "after",
+            widget: "dxButton",
+            options: {
+                id: "Insert",
+                icon: "add",
+                onClick: function (c) {
+                    OpenInsert();
+                }
+            }
+        });
+    }
+
+    function cellTemplate(element, cellInfo) {
+        $('<a/>')
+            .addClass('dx-link dx-link-edit dx-icon-edit dx-link-edit-4x ')
+            .on('dxclick', function () {
+                //$('#EditPopup').dxPopup('instance').option('visible', true);
+                OpenEdit(cellInfo.data);
+            }).appendTo(element);
+
+        $('<a/>')
+            .addClass("dx-link dx-link-delete dx-icon-trash dx-link-delete-4x")
+            .on('dxclick', function () {
+                deleteButtonClick(cellInfo.data);
+            })
+            .appendTo(element);
+
+    }
+
+    function formatdatetime(e) {
+        var datatime = "";
+        //alert(data.value);
+        $.ajax({
+                type: 'GET',
+                url: '@Url.Action("FormatDate", "m_UserMaster", new { httproute = true })',
+                async: false,
+                dataType: 'json',
+                success: function (result) {
+                    $.each(result, function (key, value) {
+
+                        datatime = value.param_value.split("-");
+                        datatime = datatime[0].toLowerCase() + "-" + datatime[1] + "-" + datatime[2].toLowerCase();
+
+                    });
+                },
+                error: function (ob, errStr) {
+                    ob.stopPropagation();
+                }
+        });
+        return datatime;
+    }
+
+    //$(function () {
+    //    $("#gridContainer").dxDataGrid({
+    //        columns: [{
+    //            cellTemplate: function (container, options) {
+    //                $('<a/>').addClass('dx-link dx-link-edit dx-icon-edit').appendTo(container)
+    //            }
+    //        }]
+    //    });
+    //});
+
+    function calculateCellValue(rowData) {
+
+        var d = new Date(rowData.LastSignedin);
+        console.log(d);
+        //return d.getMonth() + "/" + d.getDate() + "/" + d.getFullYear();
+        return Globalize.formatDate(new Date(rowData.LastSignedin), { raw: "yyyy/M/d, HH:mm:ss" });
+    }
+
+</script>
+@*@(Html.DevExtreme().Button()
+            .ID("gridDeleteSelected")
+            .Text("Delete Selected Records")
+            .Height(34)
+            .Width(195)
+            .Disabled(true)
+            .OnClick("multidelete")
+
+    )*@
+
+@{
+        var filterValue = new object[] {
+            new object[] { "Status", FilterBuilderFieldFilterOperations.NotContains,"Inactive"  }
+};
+    }
+@(Html.DevExtreme().DataGrid<MCP_WEB.Models.m_UserMaster>()
+            .ID("gridContainer")
+            .DataSource(ds => ds.Mvc()
+            .Controller("m_UserMaster")
+            .LoadAction("Get")           
+            //.InsertAction("Post")
+            //.UpdateAction("Put")
+            //.DeleteAction("Delete")
+            //.Key("DepID")
+
+            .Key("UserId")
+            )
+            .RowAlternationEnabled(true)
+            .Selection(s => s.Mode(SelectionMode.Multiple)
+            .ShowCheckBoxesMode(GridSelectionShowCheckBoxesMode.Always)
+            .SelectAllMode(SelectAllMode.Page))
+            /**/
+            /**/
+            /**/
+            @*.OnSelectionChanged(@<text>
+                function(data) {
+                var deleteButton = $("#gridDeleteSelected").dxButton("instance");
+                deleteButton.option("disabled", !data.selectedRowsData.length);
+                }
+                </text>)*@
+            /**/
+            /**/
+            /**/
+            .Paging(paging => paging.Enabled(true))
+            .RemoteOperations(true)
+            .AllowColumnReordering(true)
+            .AllowColumnResizing(true)            
+            //.HeaderFilter(headerFilter => headerFilter.Visible(true))
+
+            .Export(e => e.Enabled(true).FileName("UserMaster" + DateTime.Now).AllowExportSelectedData(true))
+
+            .ColumnChooser(c => c.Enabled(true))
+            .ShowBorders(true)
+            .ShowRowLines(true)
+            .Grouping(grouping => grouping.AutoExpandAll(true))
+            .GroupPanel(groupPanel => groupPanel.Visible(true))
+            //.OnRowPrepared("rowcolor")
+            .OnToolbarPreparing("toolbar_preparing")            
+            .ColumnMinWidth(100)
+            .ColumnAutoWidth(true)
+            .ColumnHidingEnabled(true)
+            .Columns(columns =>
+            {
+                columns.Add().Caption("Edit or Delete").Width(125).Alignment(HorizontalAlignment.Center)
+        .CellTemplate(new JS("cellTemplate")).AllowExporting(false);
+
+                columns.Add().DataField("UserId").Caption("User Id").ShowInColumnChooser(false).Visible(false);                
+
+                columns.Add().DataField("UserName").Caption("User Name");
+    //.GroupIndex(0);
+    columns.Add().DataField("UserPassword").Caption("User Password").Visible(false);
+                columns.Add().DataField("FirstName").Caption("First Name").Visible(false);
+                columns.Add().DataField("LastName").Caption("Last Name").Visible(false);
+                columns.Add().DataField("UserEmail").Caption("Email").Visible(false);
+                columns.Add().DataField("ClusterCode").Caption("Cluster Code").Visible(false);
+                columns.Add().DataField("MenuName").Caption("Menu Name");
+
+                columns.Add().DataField("DepID").Caption("Department").Visible(false)
+        .Width(125)
+        .Lookup(lookup => lookup
+        .DataSource(d => d.Mvc().Controller("m_UserMaster").LoadAction("DepartmentLookup"))
+        .DisplayExpr("DepDesc")
+        .ValueExpr("DepID"));
+
+                columns.Add().DataField("ShiftID").Caption("Shift")
+        .Width(125)
+        .Lookup(lookup => lookup
+        .DataSource(d => d.Mvc().Controller("m_UserMaster").LoadAction("ShiftLookup").Key("ShiftID"))
+        .DisplayExpr("ShiftType")
+        .ValueExpr("ShiftID"));
+
+                columns.Add().DataField("Status").Caption("Status");
+                columns.Add().DataField("EmployeeCode").Caption("Employee Code").Visible(false);
+                columns.Add().DataField("CompanyCode").Caption("Company Code").Visible(false);
+                columns.Add().DataField("LocationCode").Caption("Location Code").Visible(false);
+                columns.Add().DataField("UserLocationId").Caption("User LocationId").Visible(false);
+                columns.Add().DataField("UserImage").Caption("User Image").Visible(false);
+                columns.Add().DataField("UserExpireDate").Caption("User ExpireDate").Visible(false);
+                columns.Add().DataField("CreateDate").Caption("Create Date").DataType(GridColumnDataType.Date).Format(ViewBag.GlobalDtFormat).AllowSearch(true)
+        @*.CustomizeText(@<text>
+            function(e){
+
+            var datetime = "";
+            if(e.value==null){
+            datetime = "";
+            }else{
+            datetime = Globalize.formatDate(new Date(e.value), { raw: formatdatetime() });
+            }
+            return datetime;
+            }
+        </text>)*@
+                .Visible(false);
+                    columns.Add().DataField("UserCreated").Caption("User Created").Visible(false);
+                    columns.Add().DataField("TransDate").Caption("Trans Date")
+                    .DataType(GridColumnDataType.Date).Format(ViewBag.GlobalDtFormat).AllowSearch(true)
+        @*.CustomizeText(@<text>
+            function(e){
+
+            var datetime = "";
+            if(e.value==null){
+            datetime = "";
+            }else{
+            datetime = Globalize.formatDate(new Date(e.value), { raw: formatdatetime() });
+            }
+
+            return datetime;
+            }
+        </text>)*@
+                    .Visible(false);
+
+                    columns.Add()
+                    .DataField("LastSignedin").Caption("Last Signed in")
+                    .AllowSearch(true)
+                    .DataType(GridColumnDataType.DateTime)
+                    .Format(ViewBag.GlobalDtFormat)
+                    //.CalculateCellValue("calculateCellValue")
+@*.CustomizeText(@<text>
+    function(e){
+
+    var datetime = "";
+    if(e.value==null){
+    datetime = "";
+    }else{
+    datetime = Globalize.formatDate(new Date(e.value), { raw: formatdatetime() });
+    }
+
+    return datetime;
+    }
+</text>)*@
+;
+                        columns.Add().DataField("ModifyBy").Caption("Modify By").Visible(false);
+
+            //columns.AddFor(c => c.CreateDate).FormItem(f => f.Visible(false));
+        })
+
+
+                                                .Paging(paging => paging.PageSize(10))
+                                                .Pager(pager =>
+                                                {
+                                                    pager.ShowPageSizeSelector(true);
+                                                    pager.AllowedPageSizes(new List<int> { 10, 25, 50, 100 });
+                                                    pager.ShowInfo(true);
+                                                })
+                                                .HeaderFilter(h => h.Visible(true))
+                                                .FilterPanel(f => f.Visible(true))
+                                                .FilterValue(filterValue)
+                                                .FilterRow(filterRow => filterRow
+                                                .Visible(true)
+                                                .ApplyFilter(GridApplyFilterMode.Auto)
+                                                )
+                                                .SearchPanel(searchPanel => searchPanel
+                                                .Visible(true)
+                                                .Width(185)
+                                                .Placeholder("Search...")
+                                                )
+)
+
+@(Html.DevExtreme().Popup().MaxHeight(500).MaxWidth(900)
+            .Position(po => po.My(HorizontalAlignment.Center, VerticalAlignment.Center)
+            .At(HorizontalAlignment.Center, VerticalAlignment.Center)
+            .Of(new JS("window"))).ID("AddPopup").Title("New UserMaster").Visible(false)
+                  .ElementAttr("class", "popup")
+
+                  //.DragEnabled(false)
+                  //.CloseOnOutsideClick(true)
+                  //.ResizeEnabled(true)
+                  .ContentTemplate(new TemplateName("Add"))
+)
+
+@(Html.DevExtreme().Popup().MaxHeight(500).MaxWidth(900)
+            .Position(po => po.My(HorizontalAlignment.Center, VerticalAlignment.Center)
+            .At(HorizontalAlignment.Center, VerticalAlignment.Center)
+            .Of(new JS("window"))).ID("EditPopup").Title("Edit UserMaster").Visible(false)
+                  .ElementAttr("class", "popup")
+                    .ContentTemplate(new TemplateName("Edit"))
+)
+@using (Html.DevExtreme().NamedTemplate("Add"))
+{
+    @await Html.PartialAsync("_Add")
+}
+@using (Html.DevExtreme().NamedTemplate("Edit"))
+{
+    @await Html.PartialAsync("_Edit")
+}
+
+
+
+<script>
+
+    var count = "";
+    //function countamount(e) {
+        //var gridItems = $("#gridContainer").dxDataGrid("getDataSource");
+        //console.log(gridItems.load());
+    var summaryValue;
+
+    var dataSource = new DevExpress.data.DataSource({
+        loadMode: "raw",
+        load: function (loadOptions) {
+            return $.getJSON('@Url.Action("Get", "m_UserMaster", new { httproute = true })');
+        }
+    });
+    var store_grid = "@Url.Action("Get", "m_UserMaster",new { httproute = true })";
+    //console.log(dataSource);
+    $("#gridContainer").dxDataGrid({
+
+        onCellPrepared: function (e) {
+            if (e.rowType === "data" && e.column.dataField === "UserName" && e.rowIndex != undefined) {
+                arrcountuser.push(e.data.UserName);
+
+            }
+
+            //if (e.rowType == 'header' && e.column.dataField == 'UserName') {
+            //    e.cellElement.find('.dx-datagrid-text-content').on('click', function () {
+            //        e.component.option('sortByGroupSummaryInfo[0].sortOrder', e.component.option('sortByGroupSummaryInfo[0].sortOrder') == 'asc' ? 'desc' : 'asc');
+            //    });
+            //}
+        },
+
+        sortByGroupSummaryInfo: [{
+            summaryItem: "count"
+        }],
+
+        summary: {
+            totalItems: [{
+                column:"UserName",
+                name: "SelectedRowsSummary",
+                showInColumn: "Edit or Delete",
+                customizeText: function (data) {
+
+                    return "User Amount: " + countUnique(arrcountuser);
+                }              
+                },
+                
+            ],
+            groupItems: [{
+                column: "UserName",
+                summaryType: "count",
+                displayFormat: "{0} user",
+            }],            
+
+        },
+        //onCellPrepared: function (e) {
+
+        //    var prevValue = e.component.cellValue(e.rowIndex, "UserName");
+        //    var x = prevValue + "=" + e.value;
+        //    console.log(x);
+        //    if (prevValue === e.value) {
+        //        e.cellElement.css("color", "red")
+        //    }
+        //},
+        allowColumnReordering: true,
+        grouping: {
+            autoExpandAll: true,
+        },
+        @*headerFilter: {
+            dataSource: {
+                load: function (loadOptions) {
+                    var deferred = new $.Deferred();
+                    var requestSettings = {
+                        url: "@Url.Action("Get", "m_UserMaster",new { httproute = true })",
+                        type: "GET",
+                        data: {
+                            skip: loadOptions.skip,  //These parameters should be considered on the server side for paging
+                            take: loadOptions.take
+                        },
+                        dataType: 'json',
+                        success: function (data) {
+                            deferred.resolve(data);
+                        },
+                        error: function (jqXHR, textStatus, errorThrown) {
+                            deferred.reject();
+                        }
+                    };
+                    $.ajax(requestSettings);
+
+                    return deferred.promise();
+                }
+            }
+        },*@
+
+        onContentReady: function (e) {
+            arrcountuser = [];
+            var gridItems = $("#gridContainer").dxDataGrid('instance')._controllers.data._items;
+            //console.log(gridItems);
+            //var selectedDatasUsers = e.component.getDataSource();
+            //console.log(selectedDatasUsers);
+            var grid = $("#gridContainer").dxDataGrid("instance");
+            //var dataRowCountOnThePage = grid.pageSize() - e.component.element().find(".dx-datagrid-rowsview .dx-group-row").length;
+            //console.log(dataRowCountOnThePage);
+            //let filterValues = grid.columnOption("UserName", "");
+
+            //console.log(grid.totalCount() / grid.pageSize() % 1);
+            var visibleRowCount = grid.totalCount() > grid.pageSize() ? grid.pageSize() : grid.totalCount();
+            //console.log(grid.totalCount());
+
+            var cc = 0;
+            //for (var i = 0; i < grid.totalCount(); i++) {
+            //    if (grid.cellValue(i, "UserName") != grid.cellValue(i + 1, "UserName")) {
+            //        cc = cc + 1;
+            //    }
+            //   //console.log(grid.cellValue(i, "UserName"));
+            //}
+                @*$.ajax({
+                type: 'GET',
+                url: '@Url.Action("Get", "m_UserMaster", new { httproute = true })',
+                async: false,
+                beforeSend: function () {/*loading*/ },
+                dataType: 'json',
+                    success: function (result) {
+                        $.each(result, function (item, value) {
+                            count = value[1].count;
+                        });
+
+                    }
+                });*@
+
+                //$('#gridContainer .dx-datagrid-summary-item ').replaceWith(function () {
+                //    return e.element.find('.dx-datagrid-summary-item').text(" User Amount: " + count); // this.outerHTML.replace('|||', '<br/>');
+                //});
+                //console.log(e.element.find('.dx-info'));
+                if (needSummaryUpdate) {
+                    needSummaryUpdate = false;
+                    //e.element.find('.dx-info').text(summaryValue);
+                    //$(e.element.find('.dx-info')).load(window.location.href + e.element.find('.dx-info'));
+                    e.component.refresh();
+
+                }
+
+
+                //e.element.find(".dx-datagrid-total-footer").load()
+                //    .css("border-top", 0)
+                //    .css("border-bottom", "1px solid #d3d3d3")
+                //    .insertBefore(e.element.find(".dx-datagrid-rowsview"))
+            }
+
+        });
+    //}
+
+
+    var arrselected = [];
+    var arrMenuIdentity = [];
+    var arrMenuIdentityall = [];
+    var arrgetitem = [];
+    var depMenus = [];
+    var sshift = [];
+    var choose_dep = 0;
+
+    function itemtemplateselect(itemData, itemIndex, itemElement) {
+        return $("<p />").text(itemData.ShiftType);
+    }
+
+    function ShowConfirmDialog(message, title) {
+        return DevExpress.ui.dialog.confirm(message, title);
+    }
+
+
+    function deleteButtonClick(data) {
+            var grid = $('#gridContainer').dxDataGrid('instance');
+            var result = ShowConfirmDialog('Are you sure you want to Delete this record ?', 'Delete User');
+            result.done(function (dialogResult) {
+                if (dialogResult) { // Yes: confirm close
+                    $.ajax({
+                    type: 'GET',
+                url: '@Url.Action("deleterowuser", "m_UserMaster", new { httproute = true })',
+                data: { "UserId": data.UserId},
+                async: false,
+                beforeSend: function () {/*loading*/ },
+                dataType: 'json',
+                success: function (result) {
+                    if (result == 1) {
+                        needSummaryUpdate = true;
+                        DevExpress.ui.notify("Delete success.", "success", 1000);
+                        //$(".dx-datagrid-total-footer").load(".dx-datagrid-total-footer");
+                        grid.refresh();
+
+
+                    } else {
+                        DevExpress.ui.notify("Parameter UserId incorrect.", "warning", 2000);
+                    }
+                    //location.reload();
+                },
+                error: function (ob, errStr) {
+                    ob.stopPropagation();
+                    DevExpress.ui.notify(errStr, "error", 2000);
+                    grid.refresh();
+
+                }
+            });
+
+
+                } else { // No: don't close popup
+                    //closeConfirmed = false;
+                }
+            });
+
+        }
+
+    function OpenEdit(data) {
+        mode = "edit";
+        getuserid_onedit = data.UserId;
+        selectedShift = data.ShiftID;
+        selectedShift = data.ShiftID;
+        selectedDep = data.DepID;
+        var status = "";
+        var display = "";
+        @*var store = DevExpress.data.AspNet.createStore({
+                "key": "MenuIdentity",
+                "loadUrl": "@Url.Action("MenuMasterLookup", "m_UserMaster",new { httproute = true })",
+                "loadParams": { "UserId": data.UserId }
+        });*@
+
+        var listdata = "";
+            $.ajax({
+                type: 'GET',
+                url: '@Url.Action("MenuMasterLookup", "m_UserMaster", new { httproute = true })',
+                data: { "UserId": data.UserId},
+                async: false,
+                beforeSend: function () {/*loading*/ },
+                dataType: 'json',
+                success: function (result) {
+                    listdata = result.data;
+                    $.each(result, function (index, item) {
+
+                        for (var i = 0; i < item.length; i++) {
+                            //arrMenuIdentityall.push(item[i].MenuIdentity);
+                            if (item[i].selected) {
+                                arrgetitem.push(item[i].MenuIdentity);
+                            }
+                        }
+                    });
+                }
+            });
+            var storeShift= DevExpress.data.AspNet.createStore({
+                "key": "ShiftID",
+                "loadUrl": "@Url.Action("ShiftLookup", "m_UserMaster", new { httproute = true })",
+                "loadParams": {ShiftID:data.ShiftID}
+        });
+
+        var storeDep= DevExpress.data.AspNet.createStore({
+                "key": "DepID",
+                "loadUrl": "@Url.Action("DepartmentLookup", "m_UserMaster",new { httproute = true })"
+            });
+        //if (data.Status == "A") { status="Active" }
+        //if (data.Status == "I") { status="Inactive" }
+
+            $('#EditPopup')
+                    .dxPopup({
+                    title:"Edit User Master",
+                    onShown: function () {
+                        $("#scrollpop").dxScrollView({
+                            height: '100%',
+                            width: '100%'
+                        });
+                        $('#txtUserName').dxTextBox('instance').option('value', data.UserName);
+                       // $('#txtUserPassword').dxTextBox('instance').option('value', data.UserPassword);
+                        $('#txtFirstName').dxTextBox('instance').option('value', data.FirstName);
+                        $('#txtLastName').dxTextBox('instance').option('value', data.LastName);
+                        $('#txtUserEmail').dxTextBox('instance').option('value', data.UserEmail);
+
+                        $("#txtShiftType").dxSelectBox({
+                            dataSource: storeShift,
+                            valueExpr: 'ShiftID',
+                            displayExpr: 'ShiftType',
+                            searchEnabled: true,
+                            searchExpr: ["ShiftID", "ShiftType"],
+                            itemTemplate: function (itemData) {
+                                return $("<div />").append(
+                                    $("<p />").text(itemData.ShiftType)
+                                        .css("display", "inline-block")
+                                );
+                            },
+                            onValueChanged: function (e) {
+                                selectedShift = e.value;
+                                //var item = e.component.option('selectedItem');
+                            },
+                            value: data.ShiftID
+
+                        });
+
+
+                        $("#txtDepID").dxSelectBox({
+                            dataSource: storeDep,
+                            displayExpr: function (e) {
+                                if (e == null) {
+                                    display = ""
+                                    $("#listMenuIdentity").dxList("instance").reload();
+                                } else {
+                                    display = e.DepID + " - " + e.DepDesc;
+                                }
+                                return display;
+                            },
+                            //displayExpr: "DepDesc",
+                            valueExpr: 'DepID',
+                            searchEnabled: true,
+                            searchExpr: ["DepID", "DepDesc"],
+
+                            itemTemplate: function (itemData) {
+                                return $("<div />").append(
+                                    $("<p />").text(itemData.DepID + " - " + itemData.DepDesc)
+                                        .css("display", "inline-block")
+                                );
+                            },
+                            onItemClick: function (e) { choose_dep = 1; $("#listMenuIdentity").dxList("instance").reload();},
+                            onValueChanged: function (e) {
+                                //console.log(e.previousValue);
+                                //console.log(e.value);
+                                selectedDep = e.value;
+                                arrMenuIdentityall = [];
+                                arrMenuIdentity = [];
+                                arrgetitem = [];
+                                depMenus = [];
+                                $.ajax({
+                                    type: 'GET',
+                                    url: '@Url.Action("CloneDepID", "m_UserMaster", new { httproute = true })',
+                                    data: { "DepID": e.value},
+                                    cache: false,
+                                    async: false,
+                                    beforeSend: function () {/*loading*/ },
+                                    dataType: 'json',
+                                    success: function (result) {
+                                        //console.log(result);
+                                        $.each(result, function (key, value) {
+                                            for (var i = 0; i < value.length; i++) {
+                                                depMenus.push(value[i]);
+                                                if (value[i].selected) {
+                                                    arrgetitem.push(value[i].MenuIdentity);
+                                                }
+                                            }
+
+                                        });
+
+                                    }
+
+                                });
+
+                            },
+                            value: data.DepID
+
+                        });
+
+                        $("#txtStatus").dxSelectBox({
+                            value: data.Status
+                        });
+
+                    },
+                        onHiding: function (options) {
+                            depMenus = [];
+                            arrgetitem = [];
+                            choose_dep = 0;
+                            //location.reload();
+                    }
+
+                }).dxPopup('instance').option('visible', true);
+
+            var list = $("#listMenuIdentity").dxList({
+                dataSource: {
+                    paginate: true,
+                    pageSize: arrMenuIdentityall.length,
+                    store: listdata
+                },
+                selectionMode: "all",
+                selecItemsByDefault: true,
+                showSelectionControls: true,
+                selectionEnabled: true,
+                pageLoadMode: "scrollBottom",
+                //editEnabled: true,
+                selectionType: 'control',
+                itemTemplate: function (c) {
+                    arrMenuIdentityall.push(c.MenuIdentity);
+                    return c ? c.MenuName : '';
+                },
+                onItemRendered: function (e) {
+                    if (choose_dep == 1) { //case หลังจากคลิก edit มาแล้วทำการเลือก department
+                        if (depMenus[e.itemElement.index()].selected =="selected") {
+                                e.itemElement.find(".dx-checkbox").dxCheckBox('instance').option("value", true);
+                            } else {
+                                e.itemElement.find(".dx-checkbox").dxCheckBox('instance').option("value", false);
+                            }
+
+                    } else {//case มาจากการคลิก edit ในตอนแรกยังไม่ได้เลือก department
+                        if (e.itemData.selected == "selected") {
+                            e.itemElement.find(".dx-checkbox").dxCheckBox('instance').option("value", true);
+                        } else { e.itemElement.find(".dx-checkbox").dxCheckBox('instance').option("value", false); }
+                    }
+
+                },
+                onContentReady: function (e) {
+                    $("#scrolllist").dxScrollView({
+                        height: '100%',
+                        width: '100%'
+                    });
+                },
+
+                onSelectionChanged: function (e) {
+                    arrgetitem = [];
+                    var selectedItems = e.component.option("selectedItems");
+                    for (var i = 0; i < selectedItems.length; i++) {
+                        arrgetitem.push(selectedItems[i].MenuIdentity);
+                    }
+                },
+                onItemDeleted: function (e) {
+                    arrgetitem = [];
+                    var selectedItems = e.component.option("selectedItems");
+                    for (var i = 0; i < selectedItems.length; i++) {
+                        arrgetitem.push(selectedItems[i].MenuIdentity);
+                    }
+                }
+            }).dxList("instance");
+    }
+
+    function OpenInsert() {
+        mode = "add";
+        var menudep_add = [];
+        var store = DevExpress.data.AspNet.createStore({
+            "key": "MenuIdentity",
+            "loadUrl": "@Url.Action("MenuMasterLookup", "m_UserMaster",new { httproute = true })"
+        });
+        var storeShift= DevExpress.data.AspNet.createStore({
+            "key": "ShiftID",
+            "loadUrl": "@Url.Action("ShiftLookup", "m_UserMaster",new { httproute = true })"
+        });
+
+        var storeDep = DevExpress.data.AspNet.createStore({
+                "key": "DepID",
+                "loadUrl": "@Url.Action("DepartmentLookup", "m_UserMaster", new { httproute = true })"
+            });
+
+
+        $('#AddPopup')
+            .dxPopup({
+                title: "Insert User Master",
+                onShowing: function () {
+                    $("#addtxtUserPassword").dxTextBox("instance").option("value", '');
+                    $('#addtxtUserName').removeClass('dx-invalid');
+                    $('#addtxtUserPassword').removeClass('dx-invalid');
+                    $('#addtxtFirstName').removeClass('dx-invalid');
+                    $('#addtxtLastName').removeClass('dx-invalid');
+                    $('#addtxtUserEmail').removeClass('dx-invalid');
+                    $('#addtxtShiftType').removeClass('dx-invalid');
+                    $('#addtxtDepID').removeClass('dx-invalid');
+                    $('#addtxtStatus').removeClass('dx-invalid');
+                },
+                onShown: function () {                   
+                        $("#addscrollpop").dxScrollView({
+                            height: '100%',
+                            width: '100%'
+                        });
+
+                        $("#addtxtUserPassword").dxTextBox("instance").option("value", '');
+                        $("#addtxtUserPassword").dxTextBox({
+                            inputAttr: {
+                                //class:'chromeHack-autocomplete',
+                                readonly:"true",
+                                onfocus:"this.removeAttribute('readonly')",
+                                //autocomplete: 'new-password',
+                                //placeholder: 'password'
+                            }
+                        });
+                        $("#addtxtUserName").dxTextBox("instance").option("value", '');
+                        $("#addtxtUserName").dxTextBox({
+                            inputAttr: {
+                                readonly: "true",
+                                onfocus: "this.removeAttribute('readonly')",
+                            }
+                        });
+                        //var some_id = $("#addtxtUserPassword").dxTextBox("instance");
+                        //some_id.prop('type', 'password');
+                        //some_id.removeAttr('autocomplete');
+                        //jQuery(window).load(function () {
+                        //    $(".chromeHack-autocomplete").delay(100).hide(0, function () {
+                        //        $(this).remove();
+                        //    });
+                        //});
+
+                        //window.setTimeout(function () {
+                        //    $(".fake-autofill-fields").hide();
+                        //}, 1);
+
+                        $("#addtxtStatus").dxSelectBox({
+                            value: "Active"
+                        });
+
+                        $("#addtxtShiftType").dxSelectBox({
+                            dataSource: storeShift,
+                            valueExpr: 'ShiftID',
+                            displayExpr: 'ShiftType',
+                            searchEnabled: true,
+                            searchExpr: ["ShiftID", "ShiftType"],
+                            itemTemplate: function (itemData) {
+                                return $("<div />").append(
+                                    $("<p />").text(itemData.ShiftType)
+                                        .css("display", "inline-block")
+                                );
+                            },
+                            onValueChanged: function (e) {
+                                selectedShift=e.value;
+                            }
+                        });
+
+                        $("#addtxtDepID").dxSelectBox({
+                            dataSource: storeDep,
+                            valueExpr: 'DepID',
+                            searchEnabled: true,
+                            searchExpr: ["DepID", "DepDesc"],
+                            displayExpr: function (e) {
+                                if (e == null) {
+                                    //console.log(arrMenuIdentityall);
+                                    display = ""
+                                } else {
+                                    display = e.DepID + " - " + e.DepDesc;
+                                }
+                                return display;
+                            },
+                            itemTemplate: function (itemData) {
+                                return $("<div />").append(
+                                    $("<p />").text(itemData.DepID + " - " + itemData.DepDesc)
+                                        .css("display", "inline-block")
+                                );
+                            },
+                            //displayExpr: 'DepDesc',
+                            onItemClick: function (e) { choose_dep = 1; $("#addlistMenuIdentity").dxList("instance").reload();},
+                            onValueChanged: function (e) {
+                                $("#addlistMenuIdentity").dxList("instance").reload();
+                                selectedDep = e.value;
+                                arrMenuIdentityall = [];
+                                depMenus = [];
+                                arrgetitem = [];
+                                $.ajax({
+                                    type: 'GET',
+                                    url: '@Url.Action("CloneDepID", "m_UserMaster", new { httproute = true })',
+                                    data: { "DepID": e.value},
+                                    cache: false,
+                                    async: false,
+                                    beforeSend: function () {/*loading*/ },
+                                    dataType: 'json',
+                                    success: function (result) {
+                                    //console.log(result);
+                                        $.each(result, function (key, value) {
+                                            for (var i = 0; i < value.length; i++) {
+                                                depMenus.push(value[i]);
+                                                if (value[i].selected) {
+                                                    arrgetitem.push(value[i].MenuIdentity);
+                                                }
+                                            }
+
+                                        });
+
+                                    }
+
+                                });
+
+                            }
+
+                    });
+
+                    $('#addtxtUserName').removeClass('dx-invalid');
+                    $('#addtxtUserPassword').removeClass('dx-invalid');
+                    $('#addtxtFirstName').removeClass('dx-invalid');
+                    $('#addtxtLastName').removeClass('dx-invalid');
+                    $('#addtxtUserEmail').removeClass('dx-invalid');
+                    $('#addtxtShiftType').removeClass('dx-invalid');
+                    $('#addtxtDepID').removeClass('dx-invalid');
+                    $('#addtxtStatus').removeClass('dx-invalid');
+
+                    },
+                    onHiding: function (options) {
+                        arrgetitem = [];
+                        menudep_add = [];
+                        choose_dep = 0;
+                        $("#addtxtUserName").dxTextBox("instance").option("value", '');
+                        $("#addtxtUserPassword").dxTextBox("instance").option("value", '');
+                        $("#addtxtFirstName").dxTextBox("instance").option("value", '');
+                        $("#addtxtLastName").dxTextBox("instance").option("value", '');
+                        $("#addtxtUserEmail").dxTextBox("instance").option("value", '');
+                        $("#addtxtShiftType").dxSelectBox("instance").option("value", '');
+                        $("#addtxtDepID").dxSelectBox("instance").option("value", '');
+                        $("#addtxtStatus").dxSelectBox("instance").option("value", '');
+                        $("#addlistMenuIdentity").dxList("instance").reload();
+                        
+                       // console.log(options.element.find('dx-validator'));
+                            //location.reload();
+                        $('#addtxtUserName').removeClass('dx-invalid');
+                        $('#addtxtUserPassword').removeClass('dx-invalid');
+                        $('#addtxtFirstName').removeClass('dx-invalid');
+                        $('#addtxtLastName').removeClass('dx-invalid');
+                        $('#addtxtUserEmail').removeClass('dx-invalid');
+                        $('#addtxtShiftType').removeClass('dx-invalid');
+                        $('#addtxtDepID').removeClass('dx-invalid');
+                        $('#addtxtStatus').removeClass('dx-invalid');
+                },
+                closeOnOutsideClick: function (e) {
+                    //var xx = e.view.DevExpress.validationEngine.resetGroup;
+                    ////alert(xx.validationGroup.validate());
+                    //console.log($("#dxValidationGroup").get()[0]);
+                    //$("input.dx-validator").attr("disabled", true);
+                    //$('#addtxtUserName').removeClass('dx-invalid');
+                    //$('#addtxtUserPassword').removeClass('dx-invalid');
+                    //$('#addtxtFirstName').removeClass('dx-invalid');
+                    //$('#addtxtLastName').removeClass('dx-invalid');
+                    //$('#addtxtUserEmail').removeClass('dx-invalid');
+                    //$('#addtxtShiftType').removeClass('dx-invalid');
+                    //$('#addtxtDepID').removeClass('dx-invalid');
+                    //$('#addtxtStatus').removeClass('dx-invalid');
+                   
+                    //e.validationGroup.reset();
+                   // return e.target === $("#someElement").get()[0];
+                }
+               
+
+                }).dxPopup('instance').option('visible', true);
+
+            var list = $("#addlistMenuIdentity").dxList({
+                dataSource: {
+                    paginate: true,
+                    pageSize: arrMenuIdentityall.length,
+                    store: store
+                },
+                selectionMode: "all",
+                selecItemsByDefault: true,
+                showSelectionControls: true,
+                selectionEnabled: true,
+                editEnabled: true,
+                autoPagingEnabled: true,
+                selectionType: 'control',
+                itemTemplate: function (c) {
+                    arrMenuIdentityall.push(c.MenuIdentity);
+                    return c ? c.MenuName : '';
+                },
+                onItemRendered: function (e) {
+                    if (choose_dep > 0) {
+                        if (depMenus.length > 0) {
+                            //console.log(depMenus[e.itemElement.index()]);
+                            if (depMenus[e.itemElement.index()].selected == "selected") {
+                                e.itemElement.find(".dx-checkbox").dxCheckBox('instance').option("value", true);
+                            } else {
+                                e.itemElement.find(".dx-checkbox").dxCheckBox('instance').option("value", false);
+                            }
+                        }
+                        else { e.itemElement.find(".dx-checkbox").dxCheckBox('instance').option("value", false); }
+                    }
+                    else { e.itemElement.find(".dx-checkbox").dxCheckBox('instance').option("value", false); }
+
+
+                },
+                onContentReady: function (e) {
+                    //alert(checkDepIDitem);
+                    $("#addscrolllist").dxScrollView({
+                        height: '100%',
+                        width: '100%'
+                    });
+                },
+
+                onSelectionChanged: function (e) {
+                    arrgetitem = [];
+                    var selectedItems = e.component.option("selectedItems");
+                    for (var i = 0; i < selectedItems.length; i++) {
+                        arrgetitem.push(selectedItems[i].MenuIdentity);
+                    }
+                },
+                onItemDeleted: function (e) {
+                    arrgetitem = [];
+                    var selectedItems = e.component.option("selectedItems");
+                    for (var i = 0; i < selectedItems.length; i++) {
+                        arrgetitem.push(selectedItems[i].MenuIdentity);
+                    }
+                }
+            }).dxList("instance");
+
+        }
+</script>

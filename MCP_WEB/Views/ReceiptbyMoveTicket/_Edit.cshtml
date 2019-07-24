@@ -1,0 +1,255 @@
+﻿<div id="editscrollpop" class="scrollpop">
+    <div class="editcontentpop">
+        <form id="form1" name="form1" autocomplete=off>
+            <div class="form-group" autocomplete=off>
+
+                <label class="col-lg-2 " >Delivery Note : </label>
+                <div class="col-lg-4 " style="padding-bottom:10px;">
+                    @(Html.DevExtreme().TextBox().ID("edittxtDeliverynote").Name("Deliverynote").ReadOnly(true))
+                </div>
+
+                <label class="col-lg-2 " >Move Ticket :</label>
+                <div class="col-lg-4 " style="padding-bottom:10px;">
+                    @(Html.DevExtreme().TextBox().ID("edittxtMoveTicket").Name("MoveTicket").ReadOnly(true))
+
+                </div>
+
+                <label class="col-lg-2 " >Model :</label>
+                <div class="col-lg-4 " style="padding-bottom:10px;">
+                    @(Html.DevExtreme().TextBox().ID("edittxtModel").Name("Model").ReadOnly(true))
+
+                </div>
+
+                <label class="col-lg-2 " >Box Qty :</label>
+                <div class="col-lg-4 " style="padding-bottom:10px;">
+                    @(Html.DevExtreme().TextBox().ID("edittxtBoxQty").Name("BoxQty").ReadOnly(true))
+
+                </div>
+
+                <label class="col-lg-2 " >Packing Qty :</label>
+                <div class="col-lg-4 " style="padding-bottom:10px;">
+                    @(Html.DevExtreme().TextBox().ID("edittxtPackingQty").Name("PackingQty").ReadOnly(true))
+
+                </div>
+
+                <label class="col-lg-2 " >FG Excess Qty :</label>
+                <div class="col-lg-4 " style="padding-bottom:10px;">
+                    @(Html.DevExtreme().TextBox().ID("edittxtFGExcessQty").Name("FGExcessQty").ReadOnly(true))
+
+                </div>
+
+
+                @*<div class="col-lg-3 " >
+            @(Html.DevExtreme().Button()
+                   .Type(ButtonType.Normal).ID("CancelledDeliveryNote")
+                   .Text("Cancelled Delivery Note").Type(ButtonType.Success).Icon("clear")
+                   .OnClick("function (e) {if(e.validationGroup.validate().isValid){ CancelledDeliveryNote(e);} }"))
+        </div>*@
+
+                <div class="col-lg-12" style="padding-bottom:10px;">
+                    @(Html.DevExtreme().DataGrid<MCP_WEB.Models.MoveTicket>()
+                                                            .ID("gridreceivedbymoveticket")
+                                                            .ShowBorders(true)
+
+                                                            //.ColumnChooser(c => c.Enabled(true))
+                                                            .AllowColumnResizing(true)
+                                                            //.AllowColumnReordering(true)
+                                                            .RemoteOperations(true)
+                                                            .ShowRowLines(true)
+                                                            .Editing(editing =>
+                                                            {
+                                                                editing.Mode(GridEditMode.Batch);
+                                                                editing.AllowUpdating(true);
+                                                            })
+                                                            .Selection(s => s.Mode(SelectionMode.Multiple)
+                                                                .ShowCheckBoxesMode(GridSelectionShowCheckBoxesMode.Always)
+                                                                .SelectAllMode(SelectAllMode.Page)
+                                                                )
+
+                                                            .HoverStateEnabled(true)
+                                                            //.RowAlternationEnabled(true)
+                                                            //.Paging(paging => paging.PageSize(10))
+                                                            //.Pager(p => p
+                                                            //.AllowedPageSizes(new int[] { 5, 10, 25, 50 })
+                                                            //.ShowInfo(true)
+                                                            //.ShowNavigationButtons(true)
+                                                            //.ShowPageSizeSelector(true)
+                                                            //.Visible(true))
+                                                            .OnSelectionChanged("onSelectionChanged")
+                                                            .OnCellPrepared("onCellPrepared")
+                                                            //.DataSource(d => d.Mvc().Controller("DeliverynoteSelect").LoadAction("GetMoveticket")
+                                                            //.LoadParams(new { deliverynote = new JS("data.DeliveryNote") })
+                                                            //)
+
+                                                            //.FilterPanel(f => f.Visible(true))
+                                                            .HeaderFilter(h => h.Visible(true))
+                                                            //.FilterValue(filterValue)
+                                                            .FilterRow(filterRow => filterRow
+                                                                    .Visible(true)
+                                                                    .ApplyFilter(GridApplyFilterMode.Auto)
+                                                                    )
+
+                                                            .SearchPanel(searchPanel => searchPanel
+                                                                .Visible(true)
+                                                                .Width(240)
+                                                                .Placeholder("Search...")
+                                                            )
+                                                            .Height(500)
+                                                            
+                                                            .Columns(columns =>
+                                                            {
+                                                                columns.Add().DataField("RECID").Visible(false);
+                                                                columns.Add().DataField("BoxNo").Caption("MT Box Runing");
+
+                                                                columns.Add().DataField("Barcode").Caption("Lot");
+
+                                                                columns.Add().DataField("QtyLot").Caption("WIP Qty").Width(70);
+
+                                                                columns.Add().DataField("FGQty").Caption("FG Qty").Width(70);
+
+                                                                //columns.Add().DataField("Reason").Caption("Reason").CellTemplate(new JS("celltemplateselect")).Width(400);
+                                                                //columns.Add().DataField("Remark").Caption("Remark").CellTemplate(new JS("celltemplatetextbox"));
+
+                                                            }) // end .Columns
+
+
+
+                    )
+                </div>
+                
+                <div class="col-sm-offset-2 col-sm-10" style="text-align:right; padding-bottom:10px;">
+                    @(Html.DevExtreme().Button()
+                                            .Type(ButtonType.Normal).ID("EditbtnSave")
+                                            .Text("Save")
+                                            .OnClick("function (e) { savedata(e); }"))
+                    @(Html.DevExtreme().Button()
+                                            .Type(ButtonType.Normal).ID("EditbtnCancel")
+                                            .Text("Cancel")
+                                            .OnClick("function (e) { editcanselButtonClick(); e.validationGroup.reset(); }"))
+                </div>
+            </div>
+
+        </form>
+    </div>
+</div>
+
+<script>  
+    function editcanselButtonClick() {
+        $('#EditPopup').dxPopup('instance').option('visible', false);
+    }
+
+   function savedata() {
+        var grid = $('#gridreceivedbymoveticket').dxDataGrid('instance');
+        var moveticket = $("#edittxtMoveTicket").dxTextBox("instance").option("value");
+        var deliverynote = $("#edittxtDeliverynote").dxTextBox("instance").option("value");
+        //console.log(arrputdata);
+        var barcode = [];
+        $.each(arrputdata, function (item, value) {
+            barcode.push(value.Barcode);
+        });
+        var checkerror = 0;
+        var ErrorSelectLot = [];
+
+        var confirmsave = DevExpress.ui.dialog.confirm("Are you Accept change of the Move Ticket :[" + moveticket + "] ?", "Confirm Save Data");
+        confirmsave.done(function (dialogResult) {
+            if (dialogResult) {
+                $.ajax({
+                type: 'POST',
+                url: "api/DataGridReceiptByMoveTicket/SaveData",
+                @*url: '@Url.Action("Update", "m_UserMaster", new { httproute = true })',*@
+                data: {                    
+                    "deliverynote": deliverynote, 
+                    "moveticket": moveticket, 
+                    "dttable": JSON.stringify(arrputdata)
+                    },
+                    async: false,
+                    beforeSend: function () {/*loading*/ },
+                    dataType: 'json',
+                    success: function (result) {
+                    //console.log(result);
+                        if (result.length > 0) {
+                        $.each(result, function (item, value) {
+
+                            if (value.SqlStatus == 'Success') {
+                                //console.log(value.SqlStatus);
+
+                            }
+                            if (value.SqlStatus == 'ErrorSelectLot') {
+                                ErrorSelectLot.push(value.BoxNo);
+                                checkerror = 1;
+                            }
+                            if (value.SqlStatus == 'Error') {
+                                checkerror = 2;
+                                //console.log(value.SqlStatus);
+                            }
+                        });
+                        //console.log(checkerror);
+                        if (checkerror == 0) {
+                            var customDialog = DevExpress.ui.dialog.custom({
+                                title: 'Save Receipt OR Returned by Move Ticke',
+                                message: 'Save Receipt OR Returned by Move Ticket: ' + moveticket + 'Success',
+                                toolbarItems: [
+                                    { text: "Close", onClick: function () { return "Ok" } },
+                                    //{ text: "Not Ok", onClick: function () { return "Not Ok" } }
+                                ],
+                                width: "500px"
+
+                            });
+                            customDialog.show().done(function (dialogResult) {
+                                //focus something ...
+                                //$.each(result, function (item, value) {
+                                //    $("#edittxtFGExcessQty").dxTextBox("instance").option("value", value.FGExcessQty);
+                                //});
+                                $('#EditPopup').dxPopup('instance').option('visible', false);
+
+                            });
+                        }
+
+                        if (checkerror == 1) {
+                            //console.log(ErrorSelectLot);
+                            var ErrorSelectLotDialog = DevExpress.ui.dialog.custom({
+                                title: 'Save Receipt OR Returned by Move Ticke Error',
+                                message: 'Lot in this Box: ' + ErrorSelectLot.join(",") + 'Not Select complete',
+                                toolbarItems: [
+                                    { text: "Close", onClick: function () { return "Ok" } },
+                                    //{ text: "Not Ok", onClick: function () { return "Not Ok" } }
+                                ],
+                                width: "500px"
+                            });
+                            ErrorSelectLotDialog.show().done(function (dialogResult) {
+                                //focus something ...                                   
+
+                            });
+                        }
+
+                        if (checkerror == 2) {
+                            var ErrorExceptionDialog = DevExpress.ui.dialog.custom({
+                                title: 'ErrorDataBase',
+                                message: 'The data is broken',
+                                toolbarItems: [
+                                    { text: "Close", onClick: function () { return "Ok" } },
+                                    //{ text: "Not Ok", onClick: function () { return "Not Ok" } }
+                                ],
+                                width: "500px"
+                            });
+                            ErrorExceptionDialog.show().done(function (dialogResult) {
+                                //focus something ...                                   
+
+                            });
+                        }
+
+
+                    }
+
+                    },
+                    error: function (ob, errStr) {
+                       
+                        DevExpress.ui.notify(errStr, "error", 2000);
+                    }
+                });
+            }
+
+        });
+         
+    }
+</script>

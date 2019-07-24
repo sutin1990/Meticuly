@@ -1,0 +1,285 @@
+﻿<div id="scrollView_">
+
+    <div class="container">
+        <div class="row">
+            <div class="col-md-6 col-xs-12">
+                <div class="form-group">
+                    <h6 class="col-sm-2 control-label">Part No:</h6>
+                    <div class="col-sm-6">
+                        @(Html.DevExtreme().Lookup()
+                                            .ID("PartNo_Edit")
+                                            .DataSource(d => d.Mvc().Controller("BomLookup").LoadAction("GetTypeF").Key("ItemCode"))
+                                            .DisplayExpr("ItemCode")
+                                            .ValueExpr("ItemCode")
+                                            .ShowPopupTitle(false)
+                                            .CloseOnOutsideClick(true)
+                        )
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6 col-xs-12">
+                <div class="form-group">
+                    <h6 class="col-sm-2 control-label">Part Name:</h6>
+                    <div class="col-sm-6">
+                        @(Html.DevExtreme().TextBox().ID("PartName_Edit").ReadOnly(true))
+                    </div>
+                </div>
+            </div>
+        </div>
+        <br />
+        <div class="row">
+            <div class="col-md-6 col-xs-12">
+                <div class="form-group">
+                    <h6 class="col-sm-2 control-label">F-CODE:</h6>
+                    <div class="col-sm-6">
+                        @(Html.DevExtreme().TextBox().ID("Fcode_Edit").ReadOnly(true))
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6 col-xs-12">
+                <div class="form-group">
+                    <h6 class="col-sm-2 control-label">Model:</h6>
+                    <div class="col-sm-6">
+                        @(Html.DevExtreme().TextBox().ID("Model_Edit").ReadOnly(true))
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+    <br />
+
+    @(Html.DevExtreme().DataGrid<MCP_WEB.Models.v_Routing>()
+                            .ID("GridEdit")
+                            //.DataSource(ds => ds.Mvc()
+                            //    .Controller("m_Routing")
+                            //    .LoadAction("NewData")
+                            //    .InsertAction("Post")
+                            //    .Key("ItemCode")
+                            //)
+
+                            .Paging(paging => paging.Enabled(false))
+                             .RemoteOperations(true)
+                             .ShowColumnLines(true)
+                             .ShowRowLines(true)
+                             .RowAlternationEnabled(true)
+                             .ShowBorders(true)
+                             .FilterRow(f => f.Visible(false))
+                             .SearchPanel(p => p.Visible(false))
+                             .Pager(p => p
+                             .AllowedPageSizes(new int[] { 10, 25, 50, 100 })
+                             .ShowInfo(false)
+                             .ShowNavigationButtons(true)
+                             .ShowPageSizeSelector(true)
+                             .Visible(false))
+                             .Paging(p => p.PageSize(15))
+                             .ColumnChooser(c => c
+                                 .Enabled(false)
+                                 .Mode(GridColumnChooserMode.DragAndDrop))
+                             .AllowColumnResizing(true)
+                             .ColumnMinWidth(100)
+                             .ColumnAutoWidth(true)
+                             .ColumnHidingEnabled(false)
+
+                            .Editing(e => e
+                             .AllowAdding(true)
+                                .AllowUpdating(true)
+                                .AllowDeleting(true)
+                                .Mode(GridEditMode.Form)
+                                .UseIcons(true)
+                            )
+                            .OnEditingStart(@<text> function(e) {
+                                e.component.columnOption("ItemCode", "allowEditing", false);
+                                e.component.columnOption("PartName", "allowEditing", false);
+                                e.component.columnOption("Model", "allowEditing", false);
+                                e.component.columnOption("FCode", "allowEditing", false);
+                                e.component.columnOption("OperationNo", "allowEditing", false);
+                                e.component.columnOption("TransDate", "allowEditing", false);
+                                e.component.columnOption("CreateDate", "allowEditing", false);
+                                e.component.columnOption("ModifyBy", "allowEditing", false);
+                                } </text>)
+    )
+
+</div>
+
+
+<script>
+    var DateFprmat = "dd/MM/yyyy hh:mm:ss";
+    $(function () {
+        $("#scrollView_").dxScrollView({
+            height: '100%',
+            width: '100%'
+        });
+    });
+
+    function moveEditColumnToLeft(dataGrid) {
+        dataGrid.columnOption("command:edit", {
+            visibleIndex: -1
+        });
+    }
+    $(function () {
+        $("#GridEdit").dxDataGrid({
+
+            columns: [{
+                dataField: "ItemCode",
+                caption: "Part No.",
+                visible: false,
+                editorOptions: {
+                    showClearButton: true
+                }
+            }, {
+                dataField: "PartName",
+                caption: "Part Name.",
+                visible: false
+
+            }, {
+                dataField: "Model",
+                caption: "Model.",
+                visible: false
+            }, {
+                dataField: "FCode",
+                caption: "F-CODE.",
+                visible: false
+            }, {
+                dataField: "OperationNo",
+                caption: "Operation No.",
+                validationRules: [{ type: "required" }]
+            }, {
+                dataField: "ProcessCode",
+                caption: "Process Key.",
+                lookup: {
+                    dataSource: DevExpress.data.AspNet.createStore({
+                        key: "ProcessCode",
+                        loadUrl: "api/RoutingLookup/GetProcessMstr",
+                        onBeforeSend: function (method, ajaxOptions) {
+                            ajaxOptions.xhrFields = { withCredentials: true };
+                        }
+                    }),
+                    valueExpr: "ProcessCode",
+                    displayExpr: "ProcessName"
+                },
+                validationRules: [{ type: "required" }]
+            }, {
+                dataField: "MachineCode",
+                caption: "Machine No.",
+                lookup: {
+                    dataSource: DevExpress.data.AspNet.createStore({
+                        key: "MachineCode",
+                        loadUrl: "api/RoutingLookup/GetMachineMstr",
+                        onBeforeSend: function (method, ajaxOptions) {
+                            ajaxOptions.xhrFields = { withCredentials: true };
+                        }
+                    }),
+                    valueExpr: "MachineCode",
+                    displayExpr: "MachineCode"
+                }
+            }, {
+                dataField: "PiecePerMin",
+                caption: "PiecePerMin.",
+                format: "#,##0.00"
+                
+            }, {
+                dataField: "TransDate",
+                caption: "TransDate.",
+                visible: false,
+                dataType: 'date',
+                format:"@ViewBag.format",
+                pickerType: "Rollers"
+            }, {
+                dataField: "CreateDate",
+                caption: "CreateDate.",
+                visible: false,
+                dataType: 'date',
+                format:"@ViewBag.format",
+                pickerType: "Rollers"
+            }, {
+                dataField: "ModifyBy",
+                caption: "ModifyBy.",
+                visible: false,
+
+                }],
+
+            onInitNewRow: function (e) {
+                var lookup = $("#PartNo_Edit").data("dxLookup");
+                var selectedValue = lookup.option("value");
+                $("#PartNo_Edit").dxLookup({
+                    disabled: true
+                });
+                var date = new Date();
+                e.component.columnOption("ItemCode", "allowEditing", false);
+                e.component.columnOption("PartName", "allowEditing", false);
+                e.component.columnOption("Model", "allowEditing", false);
+                e.component.columnOption("Fcode", "allowEditing", false);
+                e.component.columnOption("OperationNo", "allowEditing", true);
+                e.component.columnOption("TransDate", "allowEditing", false);
+                e.component.columnOption("CreateDate", "allowEditing", false);
+                e.component.columnOption("ModifyBy", "allowEditing", false);
+
+                e.data.ItemCode = selectedValue;
+                e.data.PartName = $("#PartName_Edit").text();
+                e.data.Model = $("#Model_Edit").text();
+                e.data.FCode = $("#Fcode_Edit").text();
+
+                e.data.TransDate = date;
+                e.data.CreateDate = date;
+                e.data.ModifyBy = "@User.FindFirst("ContactName").Value";
+
+            },
+            onEditingStart: function (e) {
+                var lookup = $("#PartNo_Edit").data("dxLookup");
+                var selectedValue = lookup.option("value");
+                $("#PartNo_Edit").dxLookup({
+                    disabled: true
+                });
+                var date = new Date();
+                e.component.columnOption("ItemCode", "allowEditing", false);
+                e.component.columnOption("PartName", "allowEditing", false);
+                e.component.columnOption("Model", "allowEditing", false);
+                e.component.columnOption("Fcode", "allowEditing", false);
+                e.component.columnOption("OperationNo", "allowEditing", true);
+                e.component.columnOption("TransDate", "allowEditing", false);
+                e.component.columnOption("CreateDate", "allowEditing", false);
+                e.component.columnOption("ModifyBy", "allowEditing", false);
+
+                e.data.ItemCode = selectedValue;
+                e.data.PartName = $("#PartName_Edit").text();
+                e.data.Model = $("#Model_Edit").text();
+                e.data.FCode = $("#Fcode_Edit").text();
+
+                e.data.TransDate = date;
+                //e.data.CreateDate = date;
+                e.data.ModifyBy = "@User.FindFirst("ContactName").Value";
+            }
+        });
+    });
+    $(function () {
+        $("#PartNo_Edit").dxLookup({
+            placeholder: "Select PartNo",
+            onValueChanged: function (e) {
+                $(".selected").show();
+                $.ajax({
+                    url: "api/BomLookup/getItemResult?options=" + e.value,
+                    type: "Get",
+                    //data: options,
+                    contentType: "application/json; charset=utf-8",
+                    success: function (response) {
+                        $.each(response, function (i, item) {
+                            $("#PartName_Edit").text(item.ItemName);
+                            $("#Fcode_Edit").text(item.Fcode);
+                            $("#Model_Edit").text(item.Model);
+                        });
+                    },
+                    error: function () {
+                        $("#StorageLocations").empty();
+                    }
+                });
+
+            }
+        });
+    });
+
+    function getDate() {
+
+    }
+
+</script>

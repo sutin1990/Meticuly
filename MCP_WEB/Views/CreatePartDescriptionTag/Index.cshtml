@@ -1,0 +1,799 @@
+﻿
+@{
+    var filterValue = new object[] {
+            new object[] { "QTYLeft", FilterBuilderFieldFilterOperations.GreaterThan, '0' }
+};
+}
+<script>
+
+    var sumWIPQTY = [];
+    var sumQtyPacked = [];
+    var sumQTYLeft = [];
+
+
+    function toolbar_preparing(e) {
+        e.toolbarOptions.items.unshift({
+        
+            location: "after",
+            widget: "dxButton",
+            locateInMenu: 'auto',           
+            options:
+            {
+                id: "Insert",
+                icon: "add",               
+                onClick: function (c) {
+                    OpenInsert();
+                }
+            }
+        
+        });
+    }
+
+    function ShowConfirmDialog(message, title) {
+        return DevExpress.ui.dialog.confirm(message, title);
+    }
+
+    function calculation(m, p,s) {
+        var BoxQty = "";
+        var ExcessQty = "";
+        $.ajax({
+            type: 'GET',
+            url: '@Url.Action("CalculateNumBox", "PartDescTagSelect")',
+            data: { "model": m, "packQty": p ,"sumwip":s},
+            async: false,
+            beforeSend: function () {/*loading*/ },
+            dataType: 'json',
+            success: function (dt) {
+                //console.log(dt);
+                $.each(dt, function (item, value) {
+                    //console.log("dtSqlStatus:", value.SqlStatus + "ex:" + value.ExcessQty);
+                    BoxQty = value.Box;
+                    ExcessQty = value.ExcessQty;
+                });
+                                        
+            }
+        });
+
+        if ($("#addtxtWIPQTY").dxTextBox("instance").option("value") == "" || $("#addtxtWIPQTY").dxTextBox("instance").option("value") == 0) {
+            $("#addbtnSave").dxButton({
+                disabled: true
+            });
+        } else {
+            $("#addbtnSave").dxButton({
+                disabled: false
+            });
+        }
+        
+        //if (s >= p) {
+        //    if (s != 0 || p != 0) {
+        //        BoxQty = s / p;
+        //        ExcessQty = s % p;
+        //    }
+        //} else {
+        //    BoxQty = 1;
+        //    ExcessQty = 0;
+        //}
+
+
+        //s = 0;
+        //p = 0;
+
+        return [BoxQty, ExcessQty];
+    }
+
+    function OpenInsert() {
+        
+
+        var model = "";
+        var PartNo = "";
+        var Barcode= "";
+        var Moveticket;
+        var PackingId;//id ของประเภทกล่อง
+        var PartDesType;// id ของ tag ใช้ตอนเวลาออกรายงานของพี่จอม
+        var PackQty = 0;//จำนวนที่บรรจุได้ในแต่ละกล่อง แปรผันตาม ประเภทกล่อง
+        var SumQTYLeft = 0;//จำนวนทั้งหมดที่สามารถนำไปแพ็คลงกล่องได้
+        var BoxQty = 0;//จำนวนกล่องที่ได้
+        var ExcessQty = 0;// จำนวนเศษของสินค้าที่เหลือ
+        var QtyPacked = 0;
+        var StorePackingID= DevExpress.data.AspNet.createStore({
+            "key": "PackID",
+            "loadUrl": "@Url.Action("GetPackingID", "PartDescTagSelect", new { httproute = true })"
+        });
+
+        var StorePartDesType= DevExpress.data.AspNet.createStore({
+            "key": "PackID",
+            "loadUrl": "@Url.Action("GetPackType", "PartDescTagSelect", new { httproute = true })"
+            });
+        var checkmodel;
+
+        $('#AddPopup')
+            .dxPopup({
+                title: "Insert Moveticket",
+                onShowing: function () {  
+                    //$("#addtxtPackingID").dxSelectBox("instance").option("value", '');
+                    //var el = $('.dx-invalid');
+                    //el.addClass('');
+                    //el.removeClass('dx-invalid');
+                    
+                    $('#addtxtModel').removeClass('dx-invalid');
+                    $('#addtxtSerailNoofBarcode').removeClass('dx-invalid');
+                    $("#addtxtPackingID").removeClass("dx-invalid");
+                    //$("#addtxtPackingID").removeClass("dx-invalid");
+                    //$("#addtxtPackingID").removeClass("dx-invalid-message");
+                    //$("#addtxtPackingID").removeClass("dx-validator");
+                    //$("#addtxtPackingID").removeClass("dx-visibility-change-handler");
+                    $('#addtxtPartDesType').removeClass('dx-invalid');
+                    $('#addtxtQtyPacked').removeClass('dx-invalid');
+                    $('#addtxtPackQty').removeClass('dx-invalid');
+                    $('#addtxtWIPQTY').removeClass('dx-invalid');
+                    $('#addtxtBoxQty').removeClass('dx-invalid');
+                    $('#addtxtExcessQty').removeClass('dx-invalid');
+
+                    var element = document.getElementById("addtxtPackingID");
+                    //element.classList.remove("dx-invalid");
+                    //console.log(element);
+                },
+                onShown: function () {
+                    //var el = $('.dx-invalid');
+                    //el.addClass('');
+                    //el.removeClass('dx-invalid');                    
+                    $('#addtxtModel').removeClass('dx-invalid');
+                    $('#addtxtSerailNoofBarcode').removeClass('dx-invalid');
+                    //$("#addtxtPackingID").removeClass("dx-invalid");
+                    $("#addtxtPackingID").removeClass("dx-invalid");
+                    $("#addtxtPackingID").removeClass("dx-invalid-message");
+                    $("#addtxtPackingID").removeClass("dx-validator");
+                    $("#addtxtPackingID").removeClass("dx-visibility-change-handler");
+                    $('#addtxtPartDesType').removeClass('dx-invalid');
+                    $('#addtxtQtyPacked').removeClass('dx-invalid');
+                    $('#addtxtPackQty').removeClass('dx-invalid');
+                    $('#addtxtWIPQTY').removeClass('dx-invalid');
+                    $('#addtxtBoxQty').removeClass('dx-invalid');
+                    $('#addtxtExcessQty').removeClass('dx-invalid');
+
+                    var element = document.getElementById("addtxtPackingID");
+                   // element.classList.remove("dx-invalid");
+                    //console.log(element);
+                    $("#addscrollpop").dxScrollView({
+                        height: '100%',
+                        width: '100%'
+                    });
+
+                    
+                    $("#addtxtModel").dxTextBox({ //ตอนกรอกโมเดล
+                        onValueChanged: function (e) {
+                            PackQty = "";
+                            BoxQty = "";
+                            ExcessQty = "";
+                            if ($("#addtxtModel").dxTextBox("instance").option("value") != "") {
+                                
+                                $.ajax({
+                                    type: 'GET',
+                                    url: '@Url.Action("GetByModel", "PartDescTagSelect")',
+                                    data: { "model": model},
+                                    async: false,
+                                    beforeSend: function () {/*loading*/ },
+                                    //dataType: 'json',
+                                    success: function (result) {
+
+                                        if (result.data.length == 0) {
+
+                                            var customDialog = DevExpress.ui.dialog.custom({
+                                                title: 'can not be added Model:' + model + '!',
+                                                message: 'None of this model in the data. ',
+                                                toolbarItems: [
+                                                    { text: "Close", onClick: function () { return "Ok" } },
+                                                ],
+                                                width: "500px"
+                                            });
+                                            customDialog.show().done(function (dialogResult) {
+                                                $("#addtxtModel").dxTextBox("instance").focus();
+                                                $("#addtxtModel").dxTextBox("instance").option("value", "");
+                                            });
+
+                                        } else { 
+
+                                             $.each(result, function (index, item) {
+                                                 checkmodel = item.length;
+                                                 //SumQTYLeft = item[0].sumpart;
+                                                 for (var i = 0; i < item.length; i++) {
+                                                     SumQTYLeft = item[i].SummaryWIPQty;
+                                                     PartNo = item[i].PartNo;
+                                                     PackQty = item[i].PackQty;
+                                                     PackingId = item[i].PackingId;
+                                                     PartDesType = item[i].TagFormat;
+                                                     
+                                                     
+                                                 }
+                                            });
+                                            [BoxQty, ExcessQty] = calculation(model, PackQty, SumQTYLeft);
+                                            //console.log(BoxQty +"=>"+ ExcessQty)
+                                         }
+                                         //console.log("PackQty:",PackQty);
+                                    }
+                                });                               
+                                
+                            }
+
+                            $("#addtxtWIPQTY").dxTextBox("instance").option("value", SumQTYLeft);
+                            $("#addtxtQtyPacked").dxTextBox("instance").option("value", SumQTYLeft);
+                            $("#addtxtSerailNoofBarcode").dxTextBox("instance").option("value", PartNo);
+                            $("#addtxtPackQty").dxTextBox("instance").option("value", PackQty);
+
+                            $("#addtxtBoxQty").dxTextBox("instance").option("value", Math.ceil(BoxQty));
+                            $("#addtxtExcessQty").dxTextBox("instance").option("value", Math.ceil(ExcessQty));
+
+                            $("#addtxtPackingID").dxSelectBox({
+                                value: PackingId
+                            });
+
+                            $("#addtxtPartDesType").dxSelectBox({
+                                value: PartDesType
+                            });
+
+                        },
+                        onInput: function (e) {
+                            model = e.element.find(":input:not([type=hidden])")[0].value;
+                            //console.log(model);
+                        }
+                    });
+
+                    $("#addtxtQtyPacked").dxTextBox({//จังหวะที่กรอก Packed Qty
+                        onValueChanged: function (e) {
+                            //PackQty = "";                           
+                            //PackQty = $("#addtxtPackQty").dxTextBox("instance").option("value");
+                            QtyPacked = $("#addtxtQtyPacked").dxTextBox("instance").option("value");
+                            var addtxtPackingID = $("#addtxtPackingID").dxSelectBox("instance").option("value");
+                            //console.log(addtxtPackingID);
+                            //var addtxtWIPQTY = $("#addtxtWIPQTY").dxTextBox("instance").option("value");
+                            
+                            $("#addtxtBoxQty").dxTextBox("instance").option("value", Math.ceil(BoxQty));
+                            $("#addtxtExcessQty").dxTextBox("instance").option("value", Math.ceil(ExcessQty));
+                            //var integer = QtyPacked.toString();
+                            //var str = integer.delete_prefix("00");
+                            if (QtyPacked != 0 && QtyPacked != "" && isNaN(QtyPacked) == false) {
+                                $("#addtxtQtyPacked").dxTextBox("instance").option("value", parseInt(QtyPacked));
+
+                                if (addtxtPackingID == null) {
+                                    $("#addbtnSave").dxButton({
+                                        disabled: true
+                                    });
+                                    $("#addtxtPackingID").dxSelectBox("instance").focus();
+                                } else {                                    
+                                    $("#addbtnSave").dxButton({
+                                        disabled: false
+                                    });
+                                }
+
+                            } else {
+                                $("#addtxtQtyPacked").dxTextBox("instance").option("value", "");
+                                $("#addtxtQtyPacked").dxTextBox("instance").focus();
+                                $("#addbtnSave").dxButton({
+                                    disabled: true
+                                });
+                               
+                            }
+
+                            //console.log("amount", addtxtWIPQTY + "<" + PackedQty);
+                            //if (QtyPacked != "") {
+                            //    if (addtxtWIPQTY < QtyPacked) {//ถ้าจำนวน wipqty น้อยกว่า จำนวนที่ต้องการไปแพ็ค
+
+                            //        //var customDialog = DevExpress.ui.dialog.custom({
+                            //        //    title: 'Quantity of too many !',
+                            //        //    message: 'The number of Packed Qty must not exceed the number of WIPQTY. ',
+                            //        //    toolbarItems: [
+                            //        //        { text: "Close", onClick: function () { return "Ok" } },
+                            //        //        //{ text: "Not Ok", onClick: function () { return "Not Ok" } }
+                            //        //    ],
+                            //        //    width: "500px"
+
+                            //        //});
+
+                            //        //customDialog.show().done(function (dialogResult) {
+                            //        //    $("#addtxtQtyPacked").dxTextBox("instance").option("value", SumQTYLeft);
+                            //        //    $("#addtxtQtyPacked").dxTextBox("instance").focus();
+                            //        //});
+
+                            //    } else {
+                                    
+                            //        $("#addtxtBoxQty").dxTextBox("instance").option("value", Math.ceil(BoxQty));
+                            //        $("#addtxtExcessQty").dxTextBox("instance").option("value", Math.ceil(ExcessQty));
+                            //    }                                
+                                
+                            //}
+                           
+                            
+
+                            //console.log("amount", QtyPacked + "<" + packqty + "=" + QtyPacked/packqty);
+                            //if (QtyPacked < packqty) {//ถ้าจำนวนที่ต้องการจะแพ็คมีน้อยกว่าจำนวนitemที่กล่องมีให้
+                            //    //[BoxQty, ExcessQty] = calculation(model, packqty);
+                            //    $("#addtxtBoxQty").dxTextBox("instance").option("value", Math.ceil(BoxQty));
+                            //    $("#addtxtExcessQty").dxTextBox("instance").option("value", Math.ceil(ExcessQty));
+                            //}
+                            //[BoxQty, ExcessQty] = calculation(model, PackQty, QtyPacked);
+                            
+                        },
+                        onInput: function (e) {   
+                            QtyPacked = e.element.find(":input:not([type=hidden])")[0].value.trim();
+                            var integer = parseInt(QtyPacked,10);
+                            SumQTYLeft = $("#addtxtWIPQTY").dxTextBox("instance").option("value");
+                            //console.log("addtxtQtyPacked", 'model=' + model + 'PackQty=' + PackQty + 'QtyPacked=' + integer);
+                            if (integer != 0 && QtyPacked != "" && isNaN(QtyPacked) == false) {
+                                if (SumQTYLeft >= QtyPacked) {
+                                    //console.log("if");
+                                    //console.log(model + "=>" + PackQty + "=>" + QtyPacked);
+                                    [BoxQty, ExcessQty] = calculation(model, PackQty, QtyPacked);
+                                    //$("#addbtnSave").dxButton({
+                                    //    disabled: false
+                                    //});
+                                } else {
+                                    //console.log("else");
+                                    var customDialog = DevExpress.ui.dialog.custom({
+                                        title: 'Quantity of too many !',
+                                        message: 'The number of Packed Qty must not exceed the number of WIPQTY. ',
+                                        toolbarItems: [
+                                            { text: "Close", onClick: function () { return "Ok" } },
+                                            //{ text: "Not Ok", onClick: function () { return "Not Ok" } }
+                                        ],
+                                        width: "500px"
+
+                                    });
+
+                                    customDialog.show().done(function (dialogResult) {
+                                        $("#addtxtQtyPacked").dxTextBox("instance").option("value", "");
+                                        $("#addtxtQtyPacked").dxTextBox("instance").focus();
+
+                                    });
+                                    //$("#addbtnSave").dxButton({
+                                    //    disabled: true
+                                    //});
+
+                                }
+                            }
+                            else {
+                                $("#addtxtQtyPacked").dxTextBox("instance").option("value", "");
+                                $("#addtxtQtyPacked").dxTextBox("instance").focus();
+
+                            }
+                        }
+                    });
+
+                    $("#addtxtPackingID").dxSelectBox({ //จังหวะที่เลือก Packing ID
+                        dataSource: StorePackingID,
+                        valueExpr: 'PackID',
+                        searchEnabled: true,
+                        searchExpr: ["PackID", "PackDesc"],
+                            displayExpr: function (e) {
+                                if (e == null) {
+                                    //console.log(arrMenuIdentityall);
+                                    display = ""
+                                } else {
+                                    display = e.PackID + " - " + e.PackDesc;
+                                }
+                                return display;
+                            },
+                            itemTemplate: function (itemData) {
+                                return $("<div />").append(
+                                    $("<p />").text(itemData.PackID + " - " + itemData.PackDesc)
+                                        .css("display", "inline-block")
+                                );
+                            },
+                            
+                        onItemClick: function (e) {
+                        [BoxQty, ExcessQty] = calculation(model, PackQty, QtyPacked);
+                            $("#addtxtPackQty").dxTextBox("instance").option("value", PackQty);
+                            $("#addtxtBoxQty").dxTextBox("instance").option("value", Math.ceil(BoxQty));
+                            $("#addtxtExcessQty").dxTextBox("instance").option("value", Math.ceil(ExcessQty));
+                        },
+                        onValueChanged: function (e) { 
+                            //console.log(e.value);
+                            
+                                //PackQty = "";
+                                //BoxQty = "";
+                                //ExcessQty = "";
+                                //var packqty = $("#addtxtPackQty").dxTextBox("instance").option("value");
+                                var QtyPacked = $("#addtxtQtyPacked").dxTextBox("instance").option("value");
+                                $.ajax({
+                                    type: 'GET',
+                                    url: '@Url.Action("GetPackingID", "PartDescTagSelect", new { httproute = true })',
+                                    data: { "PackID": e.value},
+                                    async: false,
+                                    beforeSend: function () {/*loading*/ },
+                                    dataType: 'json',
+                                    success: function (result) {
+                                    //console.log(result);
+                                        $.each(result, function (key, value) {
+
+                                            if (value.length==1) {//เงื่อนไขในการที่จะส่งค่าจำนวนให้กับ PackQty คือจะต้องมาจากตอน select เท่านั้นซึ่งจะได้แค่ row เดียว
+                                                PackQty = value[0].PackQty;                                               
+                                            }
+                                        });
+                                        
+                                    }
+
+                            });                           
+                            //[BoxQty, ExcessQty] = calculation(model, PackQty, QtyPacked);  
+                            if (e.value == null) {
+                                $("#addbtnSave").dxButton({
+                                    disabled: true
+                                });
+                            } else {
+                                $("#addbtnSave").dxButton({
+                                    disabled: false
+                                });
+                            }
+
+                        },
+                        onInput: function (e) {
+                            //console.log(e.element.find(":input:not([type=hidden])")[0].value);
+                            if (e.element.find(":input:not([type=hidden])")[0].value == "" || e.element.find(":input:not([type=hidden])")[0].value == null) {
+
+                                var customDialogPacking = DevExpress.ui.dialog.custom({
+                                    title: 'Packing Std. ID error !',
+                                    message: 'Packing Std. ID Must not be empty. ',
+                                    toolbarItems: [
+                                        { text: "Close", onClick: function () { return "Ok" } },
+                                        //{ text: "Not Ok", onClick: function () { return "Not Ok" } }
+                                    ],
+                                    width: "500px"
+
+                                });
+
+                                customDialogPacking.show().done(function (dialogResult) {                                   
+                                    $("#addtxtPackingID").dxSelectBox("instance").focus();
+
+                                });
+
+                            }
+                            
+                        }
+
+                    });
+
+                    $("#addtxtPartDesType").dxSelectBox({ //จังหวะที่เลือก Part Des. Type
+                        dataSource: StorePartDesType,
+                        valueExpr: 'PackID',
+                        searchEnabled: true,
+                        searchExpr: ["PackID", "PackDesc"],
+                            displayExpr: function (e) {
+                                if (e == null) {
+                                    //console.log(arrMenuIdentityall);
+                                    display = ""
+                                } else {
+                                    display = e.PackID + " - " + e.PackDesc;
+                                }
+                                return display;
+                            },
+                            itemTemplate: function (itemData) {
+                                return $("<div />").append(
+                                    $("<p />").text(itemData.PackID + " - " + itemData.PackDesc)
+                                        .css("display", "inline-block")
+                                );
+                            }
+
+                        });
+
+                }, onHiding: function (options) { 
+                    $("#addtxtModel").dxTextBox("instance").option("value",'');
+                    $("#addtxtSerailNoofBarcode").dxTextBox("instance").option("value",'');
+                    $("#addtxtPackingID").dxSelectBox("instance").option("value",0);                    
+                    $("#addtxtPartDesType").dxSelectBox("instance").option("value",0);                    
+                    $("#addtxtQtyPacked").dxTextBox("instance").option("value",'');
+                    $("#addtxtPackQty").dxTextBox("instance").option("value",'');
+                    $("#addtxtWIPQTY").dxTextBox("instance").option("value",'');
+                    $("#addtxtBoxQty").dxTextBox("instance").option("value",'');
+                    $("#addtxtExcessQty").dxTextBox("instance").option("value",''); 
+
+                    $('#addtxtModel').removeClass('dx-invalid');
+                    $('#addtxtSerailNoofBarcode').removeClass('dx-invalid');
+                    $("#addtxtPackingID").removeClass("dx-invalid");
+                    $('#addtxtPartDesType').removeClass('dx-invalid');
+                    $('#addtxtQtyPacked').removeClass('dx-invalid');
+                    $('#addtxtPackQty').removeClass('dx-invalid');
+                    $('#addtxtWIPQTY').removeClass('dx-invalid');
+                    $('#addtxtBoxQty').removeClass('dx-invalid');
+                    $('#addtxtExcessQty').removeClass('dx-invalid');
+
+                   // var element = document.getElementById("addtxtPackingID");
+                    //element.classList.remove("dx-invalid");
+                   
+                    var grid = $('#gridContainer').dxDataGrid('instance');
+                    grid.refresh();
+                },                
+                //closeOnOutsideClick: function (e) {                    
+                   
+                //    $("#addtxtPackingID").removeClass("dx-invalid");                   
+                //    var element = document.getElementById("addtxtPackingID");
+                   
+                //}
+
+
+            }).dxPopup('instance').option('visible', true);
+       
+    }
+
+   
+
+</script>
+
+@using (Html.DevExtreme().NamedTemplate("Add"))
+{
+@await Html.PartialAsync("_Add")
+}
+
+@(Html.DevExtreme().Popup().MaxHeight(500).MaxWidth(1000)
+        .Position(po => po.My(HorizontalAlignment.Center, VerticalAlignment.Center)
+        .At(HorizontalAlignment.Center, VerticalAlignment.Center)
+        .Of(new JS("window"))).ID("AddPopup").Visible(false)
+              .ElementAttr("class", "popup")
+
+              //.DragEnabled(false)
+              //.CloseOnOutsideClick(true)
+              //.ResizeEnabled(true)
+              .ContentTemplate(new TemplateName("Add"))
+)
+
+@(Html.DevExtreme().DataGrid<MCP_WEB.Models.PartDescTagSelect>()
+                .ID("gridContainer")
+                .ShowBorders(true)
+                .OnToolbarPreparing("toolbar_preparing")
+                .Export(e => e.Enabled(true).FileName("PartDescTagSelect-" + DateTime.Now).AllowExportSelectedData(true))
+                .ColumnChooser(c => c.Enabled(true))
+                .Grouping(grouping => grouping.AutoExpandAll(true))
+                .GroupPanel(groupPanel => groupPanel.Visible(true))
+                .AllowColumnResizing(true)
+                .AllowColumnReordering(true)
+                .RemoteOperations(true)
+                .ShowRowLines(true)
+                .ColumnHidingEnabled(true)
+                .ColumnAutoWidth(true)
+                .ColumnMinWidth(100)
+                .Selection(s => s.Mode(SelectionMode.Multiple)
+                    .ShowCheckBoxesMode(GridSelectionShowCheckBoxesMode.Always)
+                    .SelectAllMode(SelectAllMode.Page)
+
+                    )
+
+                .HoverStateEnabled(true)
+                .RowAlternationEnabled(true)
+                .Paging(paging => paging.PageSize(10))
+                .Pager(p => p
+                    .AllowedPageSizes(new int[] { 10, 25, 50, 100 })
+                    .ShowInfo(true)
+                    .ShowNavigationButtons(true)
+                    .ShowPageSizeSelector(true)
+                    .Visible(true))
+
+                .DataSource(d => d.Mvc().Controller("PartDescTagSelect").LoadAction("Get"))
+
+                .FilterPanel(f => f.Visible(true))
+                .HeaderFilter(h => h.Visible(true))
+                .FilterValue(filterValue)
+                .FilterRow(filterRow => filterRow
+                        .Visible(true)
+                        .ApplyFilter(GridApplyFilterMode.Auto)
+                        )
+
+                .SearchPanel(searchPanel => searchPanel
+                    .Visible(true)
+                    .Width(240)
+                    .Placeholder("Search...")
+                )
+                .OnCellPrepared("oncellperparedgridIndex")
+                .OnContentReady("oncontentready")
+                .Columns(columns =>
+                {
+                    columns.Add().DataField("Model");
+                    columns.Add().DataField("SerailNoofBarcode");
+
+                    columns.Add().DataField("PackingID");
+                    columns.Add().DataField("PasrtDesType");
+
+                    columns.Add().DataField("OrderQty").Format("#,##0");
+
+                    columns.Add().DataField("WIPQTY").Format("#,##0");
+
+                    columns.Add().DataField("QtyPacked").Format("#,##0");
+
+                    columns.Add().DataField("QTYLeft").Format("#,##0");
+
+                }) // end .Columns
+                   .Summary(s => s.TotalItems(items =>
+                   {
+                       items.AddFor(m => m.WIPQTY)
+                           .SummaryType(SummaryType.Sum)
+                           .Name("WIPQTY")
+                           .ValueFormat(Format.Decimal).ValueFormat("#,##0").DisplayFormat("Total: {0}");
+
+                       items.AddFor(m => m.QtyPacked)
+                          .SummaryType(SummaryType.Sum)
+                          .Name("QtyPacked")
+                          .ValueFormat(Format.Decimal).ValueFormat("#,##0").DisplayFormat("Total: {0}");
+
+                       items.AddFor(m => m.QTYLeft)
+                          .SummaryType(SummaryType.Sum)
+                          .Name("QTYLeft")
+                          .ValueFormat(Format.Decimal).ValueFormat("#,##0").DisplayFormat("Total: {0}");
+
+                   }))
+
+)
+
+<script>
+    function oncellperparedgridIndex(e) {
+        //console.log(e); 
+        if (e.rowType === "data" && e.column.dataField === "WIPQTY" && e.rowIndex != undefined) {
+            sumWIPQTY.push(e.data.WIPQTY);
+        }
+        if (e.rowType === "data" && e.column.dataField === "QtyPacked" && e.rowIndex != undefined) {
+            sumQtyPacked.push(e.data.QtyPacked);
+        }
+        if (e.rowType === "data" && e.column.dataField === "QTYLeft" && e.rowIndex != undefined) {
+            sumQTYLeft.push(e.data.QTYLeft);
+        }
+    }
+
+    function oncontentready(e) {
+        var gridItems = $("#gridContainer").dxDataGrid('instance');
+
+        var total1 = sumWIPQTY.reduce((a, b) => parseFloat(a) + parseFloat(b), 0);
+        var total2 = sumQtyPacked.reduce((a, b) => parseFloat(a) + parseFloat(b), 0);
+        var total3 = sumQTYLeft.reduce((a, b) => parseFloat(a) + parseFloat(b), 0); 
+
+        //console.log(total1);
+        var summaryCells = e.component.getController('data').footerItems()[0].summaryCells;
+        sumWIPQTY = [];
+        sumQtyPacked = [];
+        sumQTYLeft = [];        
+
+        $.each(summaryCells, function (item, value) {
+            if (value.length > 0) {
+                var name = value[0].name;
+                if (name == "WIPQTY") {
+                    gridItems.getController('data').footerItems()[0].summaryCells[item][0].value = total1;
+                }
+                if (name == "QtyPacked") {
+                    gridItems.getController('data').footerItems()[0].summaryCells[item][0].value = total2;
+                }
+                if (name == "QTYLeft") {
+                    gridItems.getController('data').footerItems()[0].summaryCells[item][0].value = total3;
+                }                
+                gridItems.getView('footerView').render();
+            }
+
+        });
+        NotSelection(gridItems);
+        //console.log(e);
+
+    }
+
+            //myGrid = $("#gridContainer").dxDataGrid({
+            //    allowColumnResizing: true,
+            //    allowColumnReordering: true,
+            //    cellHintEnabled: true,
+            //    columnAutoWidth: true,
+            //    showWhenGrouped: true,
+            //    grouping: {
+            //        contextMenuEnabled: true,
+            //        expandMode: 'buttonClick'
+            //    },
+            //    groupPanel: {
+            //        visible: true // enables grouping using the group panel
+            //    },
+            //    onSelectionChanged: onGridSelectionChanged,
+
+            //    sorting: {
+            //        mode: 'multiple'
+            //    },
+            //    customizeColumns: function (columns) {
+            //        $.each(columns, function (_, element) {
+            //            element.groupCellTemplate = groupCellTemplate;
+            //        });
+            //    }
+            //}).dxDataGrid("instance");
+
+            //var myGrid = null;
+            //window.customSelectionFlag = false;
+            //var groupCellTemplate = function (groupCell, info) {
+
+            //    var colField = info.column.dataField.replace(".", "");
+            //    var editorID = "groupCheckBox" + colField + info.data.key;
+            //    var element = $('<div>')
+            //    var rowKeys = GetKeys(info.data, []);
+            //    $(element).attr("data-keys", rowKeys);
+            //    $(element).attr('id', editorID)
+            //        .appendTo(groupCell)
+            //        .dxCheckBox({
+            //            text: info.text,
+            //            onValueChanged: function (e) {
+            //                if (customSelectionFlag)
+            //                    return;
+            //                customSelectionFlag = true;
+            //                var keys = GetKeys(info.data, []);
+
+            //                if (e.value)
+            //                    myGrid.selectRows(keys, true);
+            //                else
+            //                    myGrid.deselectRows(keys);
+            //            }
+            //        })
+            //};
+            //function GetGroupedColumns(dataGrid) {
+            //    var colNames = [];
+            //    for (i = 0; i < dataGrid.columnCount(); i++) {
+            //        if (dataGrid.columnOption(i, "groupIndex") > -1) {
+
+            //            colNames.push(dataGrid.columnOption(i, "dataField"));
+            //        }
+
+            //    }
+
+            //    return colNames;
+            //}
+            //function GetKeys(data, keys) {
+            //    for (var i = 0; i < data.items.length; i++) {
+            //        if (data.items[i].items) {
+            //            GetKeys(data.items[i], keys)
+            //        } else
+            //            keys.push(data.items[i].ProductID);
+            //    }
+            //    return keys;
+            //}
+            //function CheckIfKeysAreSelected(currentKeys, selectedKeys) {
+            //    var flag = true;
+            //    for (var i = 0; i < currentKeys.length; i++) {
+            //        var keyValue = parseInt(currentKeys[i]);
+            //        if (selectedKeys.indexOf(keyValue) == -1) // key is not selected
+            //        {
+            //            flag = false;
+            //            break;
+            //        }
+            //    }
+            //    return flag;
+            //}
+            //function SynchronizeCheckBoxes(grid, keys, groupedColumnNames, isSelected) {
+            //    for (var i = 0; i < keys.length; i++) {
+            //        var keyValue = keys[i];
+            //        var rowIndex = grid.getRowIndexByKey(keyValue);
+            //        for (var j = 0; j < groupedColumnNames.length; j++) {
+            //            var columnField = groupedColumnNames[j];
+            //            var groupRowValue = grid.cellValue(rowIndex, columnField);
+            //            columnField = columnField.replace(".", "");
+            //            var checkBoxEl = $("#" + "groupCheckBox" + columnField + groupRowValue);
+            //            if (!checkBoxEl)
+            //                return;
+            //            var value = isSelected;
+            //            if (value) {
+            //                var rowKeys = $(checkBoxEl).attr("data-keys")
+            //                if (rowKeys)
+            //                    rowKeys = rowKeys.split(',');
+            //                else
+            //                    debugger;
+            //                value = CheckIfKeysAreSelected(rowKeys, keys);
+            //            }
+            //            var editor = $(checkBoxEl).dxCheckBox("instance");
+            //            if (editor)
+            //                editor.option("value", value);
+            //        }
+
+            //    }
+            //}
+            //function onGridSelectionChanged(args) {
+
+            //    if (window.customSelectionFlag) {
+            //        window.customSelectionFlag = false;
+            //        return;
+            //    }
+            //    console.log("onGridSelectionChanged");
+            //    var keys = args.selectedRowKeys;
+            //    var grid = args.component;
+            //    var groupedColumnNames = GetGroupedColumns(grid);
+            //    if (groupedColumnNames.length == 0)
+            //        return;
+            //    window.customSelectionFlag = true;
+            //    SynchronizeCheckBoxes(grid, args.currentDeselectedRowKeys, groupedColumnNames, false);
+            //    SynchronizeCheckBoxes(grid, args.selectedRowKeys, groupedColumnNames, true);
+            //    window.customSelectionFlag = false;
+
+            //}
+</script>

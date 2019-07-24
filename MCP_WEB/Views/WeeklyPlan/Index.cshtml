@@ -1,0 +1,373 @@
+﻿
+@(Html.DevExtreme().DataGrid<MCP_WEB.Models.WeeklyPlan>()
+                                                                .ID("datagrid")
+                                                                .Selection(s => s.Mode(SelectionMode.Multiple)
+                                                                                .SelectAllMode(SelectAllMode.Page)
+                                                                )
+                                                                .DataSource(ds => ds.Mvc()
+                                                                    .Controller("Api_WeeklyPlans")
+                                                                    .LoadAction("Get")
+                                                                    .InsertAction("Post")
+                                                                    .UpdateAction("Put")
+                                                                    .DeleteAction("Delete")
+                                                                    .Key("BarCode")
+                                                                )
+                                                                .RemoteOperations(true)
+                                                                .ShowColumnLines(true)
+                                                                .ShowRowLines(true)
+                                                                .RowAlternationEnabled(true)
+                                                                .ShowBorders(true)
+                                                                .HeaderFilter(h => h.Visible(true))
+                                                                .FilterRow(f => f.Visible(true))
+                                                                .SearchPanel(p => p.Visible(true))
+                                                                .Pager(p => p
+                                                                .AllowedPageSizes(new int[] { 10, 25, 50, 100 })
+                                                                .ShowInfo(true)
+                                                                .ShowNavigationButtons(true)
+                                                                .ShowPageSizeSelector(true)
+                                                                .Visible(true))
+                                                                .HeaderFilter(h => h.Visible(true))
+                                                                .Paging(p => p.PageSize(10))
+                                                                .ColumnChooser(c => c
+                                                                    .Enabled(true)
+                                                                    .Mode(GridColumnChooserMode.DragAndDrop))
+                                                                .AllowColumnResizing(true)
+                                                                .ColumnMinWidth(100)
+                                                                .ColumnAutoWidth(true)
+                                                                .ColumnHidingEnabled(true)
+                                                                .Export(e => e.Enabled(true).FileName("weeklyPlan - " + DateTime.Now).AllowExportSelectedData(true))
+                                                                .Columns(columns =>
+                                                                {
+
+                                                                    columns.AddFor(m => m.Fcode)
+                                                                    .Caption("FCode")
+                                                                    .DataType(GridColumnDataType.String)
+                                                                    .Alignment(HorizontalAlignment.Left)
+                                                                    .SortOrder(SortOrder.Asc);
+
+                                                                    columns.AddFor(m => m.Model)
+                                                                    .Caption("Model")
+                                                                    .DataType(GridColumnDataType.String)
+                                                                    .Alignment(HorizontalAlignment.Left);
+
+                                                                    columns.AddFor(m => m.ItemCode)
+                                                                    .Caption("Part No")
+                                                                    .DataType(GridColumnDataType.String)
+                                                                    .Alignment(HorizontalAlignment.Left);
+
+                                                                    columns.AddFor(m => m.QtyOrderAll)
+                                                                    .Caption("Qty Order(ALL Lot)")
+                                                                    .DataType(GridColumnDataType.Number)
+                                                                    .Format("#,##0")
+                                                                    .Alignment(HorizontalAlignment.Right);
+
+                                                                    columns.AddFor(m => m.StdLotSize)
+                                                                    .Caption("Std Lot Size")
+                                                                    .Format("#,##0")
+                                                                    .DataType(GridColumnDataType.Number)
+                                                                    .Alignment(HorizontalAlignment.Right);
+
+                                                                    columns.AddFor(m => m.QtyOrder)
+                                                                    .Caption("Qty Order")
+                                                                    .Format("#,##0")
+                                                                    .DataType(GridColumnDataType.Number)
+                                                                    .Alignment(HorizontalAlignment.Right);
+
+                                                                    columns.AddFor(m => m.BarCode)
+                                                                    .Caption("Serial No. of barcode")
+                                                                    .DataType(GridColumnDataType.String)
+                                                                    .Alignment(HorizontalAlignment.Left);
+
+                                                                    columns.AddFor(m => m.SeriesLot)
+                                                                    .Caption("Series Lot")
+                                                                    .DataType(GridColumnDataType.String)
+                                                                    .Alignment(HorizontalAlignment.Right)
+                                                                    .Visible(false);
+
+                                                                    columns.AddFor(m => m.WStatus)
+                                                                    .Caption("Status")
+                                                                    .DataType(GridColumnDataType.String)
+                                                                    .Alignment(HorizontalAlignment.Left)
+                                                                    .Visible(false);
+
+                                                                    columns.AddFor(m => m.CreateDate)
+                                                                    .Caption("Create Date")
+                                                                    .DataType(GridColumnDataType.Date)
+                                                                    .Alignment(HorizontalAlignment.Left)
+                                                                    .Visible(false)
+                                                                    .Format(ViewBag.GlobalDtFormat)
+                                                                    ;
+
+                                                                    columns.AddFor(m => m.UpdateDate)
+                                                                    .Caption("Update Date")
+                                                                    .DataType(GridColumnDataType.Date)
+                                                                    .Alignment(HorizontalAlignment.Left)
+                                                                    .Visible(false)
+                                                                    .Format(ViewBag.GlobalDtFormat)
+                                                                    ;
+
+                                                                    columns.AddFor(m => m.CreateBy)
+                                                                    .Caption("Create By")
+                                                                    .DataType(GridColumnDataType.String)
+                                                                    .Alignment(HorizontalAlignment.Left)
+                                                                    .Visible(false);
+
+                                                                    columns.AddFor(m => m.UpdateBy)
+                                                                    .Caption("Update By")
+                                                                    .DataType(GridColumnDataType.String)
+                                                                    .Alignment(HorizontalAlignment.Left)
+                                                                    .Visible(false);
+                                                                })
+                                                                .Editing(e => e
+                                                                    .AllowAdding(false)
+                                                                    .AllowUpdating(false)
+                                                                    .AllowDeleting(false)
+                                                                )
+                                                                .Summary(s => s.TotalItems(items =>
+                                                                {
+                                                                    items.AddFor(m => m.QtyOrderAll).SummaryType(SummaryType.Sum).ValueFormat(Format.Decimal).ValueFormat("#,##0").DisplayFormat("Total: {0}");
+                                                                    items.AddFor(m => m.SeriesLot).SummaryType(SummaryType.Sum).ValueFormat(Format.Decimal).ValueFormat("#,##0").DisplayFormat("Total: {0}");
+                                                                    items.AddFor(m => m.QtyOrder).SummaryType(SummaryType.Sum).ValueFormat(Format.Decimal).ValueFormat("#,##0").DisplayFormat("Total: {0}");
+                                                                }))
+
+)
+
+@*Uploading small files with model binding*@
+
+<section>
+    <form id="FileUploadForm" method="post" enctype="multipart/form-data" asp-controller="FileUpload" asp-action="Post">
+        <div class="row">
+            <div class="col-md-10">
+                <div class="form-group">
+                    <p>Select weekly plan</p>
+                    <input type="file" id="uploadfile" name="files" multiple maxlength="1000" />
+                    <br />
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-10">
+                <div class="form-group">
+                    <input type="submit" id="btnImport" name="btnImport" class="btn btn-warning" value="Import" />
+                </div>
+            </div>
+        </div>
+    </form>
+</section>
+
+@*Message Popup*@
+@(Html.DevExtreme().Popup().ID("MessagePopup").Title("Information Message").Visible(false)
+                                                                    .ElementAttr("class", "popup")
+                                                                    .DragEnabled(false)
+                                                                    .CloseOnOutsideClick(true)
+                                                                    .ResizeEnabled(true)
+                                                                    .MaxHeight(200)
+                                                                    .MaxWidth(500)
+                                                                    .OnHidden(@<text>function(){
+                                                                        @*setFocusToTextBox();*@
+                                                                            }</text>)
+                                                                                                                                                                                                                                                                                                                                                                                                                                                .ContentTemplate(new TemplateName("SqlExceptionTemplate"))
+)
+
+@using (Html.DevExtreme().NamedTemplate("SqlExceptionTemplate"))
+{
+    @await Html.PartialAsync("_SqlException")
+}
+
+
+    <div id="LogPopup">
+        <div id="scrollView_1">
+            @await Html.PartialAsync("_LogTemplate")
+        </div>
+    </div>
+
+<script>
+
+    $("#LogPopup").dxPopup({
+        title: "Error Log",
+        minwidth: 300,
+        minheight: 300,
+        showCloseButton: true,
+        CloseOnOutsideClick: true,
+        DragEnabled: false,
+        ResizeEnabled: true,
+        buttons: [{
+            toolbar: 'bottom', location: 'center', onClick: function (e) {
+                $("#popupInsert").dxPopup("instance").hide();
+            }, widget: 'button', options: { text: 'Ok' }
+        }],
+        onShowing: function (e) {
+
+        },
+        onHiding: function (e) {
+
+        },
+        closeOnOutsideClick: function (e) {
+            return e.target === $("#someElement").get()[0];
+        }
+    });
+
+    function getFileUploaderInstance() {
+        return $("#file-uploader").dxFileUploader("instance");
+    }
+
+    function fileUploader_valueChanged(e) {
+        var files = e.value;
+        if (files.length > 0) {
+            $("#selected-files .selected-item").remove();
+
+            $.each(files, function (i, file) {
+                var $selectedItem = $("<div />").addClass("selected-item");
+                $selectedItem.append(
+                    $("<span />").html("Name: " + file.name + "<br/>"),
+                    $("<span />").html("Size " + file.size + " bytes" + "<br/>"),
+                    $("<span />").html("Type " + file.type + "<br/>"),
+                    $("<span />").html("Last Modified Date: " + file.lastModifiedDate)
+                );
+                $selectedItem.appendTo($("#selected-files"));
+            });
+            $("#selected-files").show();
+
+        }
+        else
+            $("#selected-files").hide();
+    }
+
+    function RefreshDataSource(e) {
+        var grid = $('#datagrid').dxDataGrid('instance');
+        var keys = grid.refresh();
+
+        var filesUpload = $("#file-uploader").dxFileUploader("instance");
+        filesUpload.reset();
+    }
+
+    //Import
+    $(function () {
+        $("#FileUploadForm").submit(function (e) {
+            e.preventDefault();
+
+            console.log('Doing ajax submit');
+
+            var formAction = $(this).attr("action");
+            var fdata = new FormData();
+
+            var fileInput = $('#uploadfile')[0];
+            var file = fileInput.files[0];
+            fdata.append("files", file);
+
+            $.ajax({
+                type: 'post',
+                url: formAction,
+                data: fdata,
+                processData: false,
+                contentType: false
+            }).done(function (result) {
+                // do something with the result now
+                console.log(result);
+
+                if (result.status === "success") {
+                    console.log("Import ProcessLog");
+                    console.log(result.ProcessLog);
+                    console.log("Import List");
+                    console.log(result.ImportList);
+                    //Show log popup
+                   // $('#LogPopup').dxPopup('instance').option('visible', true);
+                    $("#LogPopup").dxPopup("show");
+                    var store = new DevExpress.data.ArrayStore({
+                        key: "id",
+                        data: result.ImportList
+                    });
+
+                    $("#grdError").dxDataGrid({
+                        dataSource: store,
+                        selection: {
+                            mode: "multiple",
+                            selectAllMode: "all",
+                            recursive: false,
+                            showCheckBoxesInMultipleMode: 'none',
+                            deferred: true
+                        },
+                        headerFilter: {
+                            visible: true
+                        },
+                        editing: { mode: "cell", allowUpdating: true },
+                        columns: [
+                            {
+                                dataField: "id",
+                                caption: "ID"
+                            },
+                            {
+                                dataField: "ErrorKey",
+                                caption: "Error Key"
+                            },
+                            {
+                                dataField: "Msg",
+                                caption: "Message"
+                            },
+                            //{
+                            //    dataField: "Confirm",
+                            //    lookup: {
+                            //        dataSource: [
+                            //            { busID: "Yes", plates: "Yes" },
+                            //            { busID: "No", plates: "No" }
+                            //        ],
+                            //        valueExpr: "busID",
+                            //        displayExpr: "plates"
+                            //    }
+                            //},
+                            {
+                                dataField: "FCode",
+                                caption: "FCode"
+                            },
+                            {
+                                dataField: "ItemCode",
+                                caption: "PartNo"
+                            },
+                            {
+                                dataField: "QtyOrderAll",
+                                caption: "QtyOrderAll",
+                                format: "#,##0"
+                            },
+                            {
+                                dataField: "SeriesLot",
+                                caption: "SeriesLot"
+                            },
+                            {
+                                dataField: "ProcessID",
+                                caption: "Process ID",
+                                visible: false
+                            }
+
+                        ],
+                        onEditingStart: function (e) {
+                            e.component.columnOption("id", "allowEditing", false);
+                            e.component.columnOption("ProcessDate", "allowEditing", false);
+                            e.component.columnOption("Msg", "allowEditing", false);
+                            e.component.columnOption("FCode", "allowEditing", false);
+                            e.component.columnOption("ItemCode", "allowEditing", false);
+                            e.component.columnOption("QtyOrderAll", "allowEditing", false);
+                            e.component.columnOption("SeriesLot", "allowEditing", false);
+                        }
+
+                    });
+
+                    $("#scrollView_1").dxScrollView({
+                        height: '100%',
+                        width: '100%'
+                    }).dxScrollView("instance");
+                    
+                } else {
+                    //Show message popup error execption
+                    $('#MessagePopup').dxPopup('instance').option('visible', true);
+                    $('#desc').html(result.message);
+                }
+            });
+        });
+    })
+   
+    
+
+
+   
+
+</script>
