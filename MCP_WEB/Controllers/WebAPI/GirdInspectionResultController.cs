@@ -42,19 +42,19 @@ namespace MCP_WEB.Controllers.WebAPI
                 //select* from SAP_MET_testcost.dbo.OWOR where DocNum = 100106--'L'=>Closed
                 //select* from SAP_MET_testcost.dbo.OWOR where DocNum = 100105-- 'C'=> Canceled
                 var HRS = from hrs in _context.VW_MFC_Header_Route_stage
-                              where hrs.DocNum == docnum
-                              select new
-                              {
-                                  hrs.DocEntry,
-                                  hrs.Status,
-                                  hrs.DocNum,
-                                  hrs.OriginNum,
-                                  hrs.ItemCode,
-                                  hrs.ProdName,
-                                  hrs.PlannedQty,
-                                  hrs.Uom,
-                                  StartDate = Convert.ToDateTime(hrs.StartDate).ToString("dd/MM/yyyy"),
-                                  DueDate = Convert.ToDateTime(hrs.DueDate).ToString("dd/MM/yyyy")
+                          where hrs.DocNum == docnum
+                          select new
+                          {
+                              hrs.DocEntry,
+                              hrs.DocNum,
+                              hrs.OriginNum,
+                              hrs.ItemCode,
+                              hrs.ProdName,
+                              hrs.PlannedQty,
+                              hrs.Uom,
+                              Status = hrs.Status == "L" ? "Closed" : hrs.Status == "C" ? "Canceled" : hrs.Status == "R" ? "Released" : hrs.Status == "P" ? "Planned" : "",
+                              StartDate = Convert.ToDateTime(hrs.StartDate).ToString("dd/MM/yyyy"),
+                              DueDate = Convert.ToDateTime(hrs.DueDate).ToString("dd/MM/yyyy")
                               };
                     
                     return DataSourceLoader.Load(HRS, loadOptions);

@@ -30,17 +30,17 @@ namespace MCP_WEB.Models
         public string U_MethodDesc { get; set; }
         [Required (ErrorMessage ="RptOrder is Numeric.")]
         //[RegularExpression(@"^[1-9]{4,5}$", ErrorMessage = @"Out of length number.!")]
-        public Int16 ? U_RptOrder { get; set; }
+        public int ? U_RptOrder { get; set; }
 
         public string U_ActiveFlag { get; set; }
         //[Required]
-        public decimal ? U_PassQty { get; set; }
+        //public decimal ? U_PassQty { get; set; }
         //[Required]
-        public decimal? U_RejectQty { get; set; }
+        //public decimal? U_RejectQty { get; set; }
         //[Required]
-        public string U_RejectReason { get; set; }
+       // public string U_RejectReason { get; set; }
         //[Required]
-        public string U_Comment { get; set; }
+        //public string U_Comment { get; set; }
         public string U_Lastupdateby { get; set; }
         public DateTime ? U_Lastupdatedate { get; set; }
         
