@@ -22,9 +22,9 @@
         display: none;
     }*/
 
-    .dx-datagrid-rowsview .dx-data-row .dx-cell-modified .dx-highlight-outline::after {
+    /*.dx-datagrid-rowsview .dx-data-row .dx-cell-modified .dx-highlight-outline::after {
         border-color: transparent;
-    }
+    }*/
 
     .redClass{
         color: red;
@@ -51,13 +51,31 @@
         
         var check = false;
         if (!cellInfo.data.USE) {
-            $('<a/>')
-                .attr('color','red')
-                .addClass("dx-link dx-link-delete dx-icon-trash dx-link-delete-4x redClass")                
-                .on('dxclick', function () {
-                    deleteButtonClick(cellInfo.data);
-                })
-                .appendTo(element);
+
+            //$('<div />').dxButton({
+            //    css:'dx-link dx-link-edit dx-icon-edit dx-link-edit-4x',
+            //    icon: 'trash',
+            //    //type: 'danger',
+            //    onClick: function (e) {
+            //        deleteButtonClick(cellInfo.data);
+            //        //$('#gridContainer').dxDataGrid('instance').deleteRow(cellInfo.rowIndex);
+            //    }
+            //}).appendTo(element);  
+
+            if (stagenew == "new") {
+                $('<a/>')
+                    .attr('color', 'red')
+                    .addClass("dx-link dx-link-delete dx-icon-trash dx-link-delete-4x redClass")                    
+                    .appendTo(element);
+            } else {
+                $('<a/>')
+                    .attr('color', 'red')
+                    .addClass("dx-link dx-link-delete dx-icon-trash dx-link-delete-4x redClass")
+                    .on('dxclick', function () {
+                        deleteButtonClick(cellInfo.data);
+                    })
+                    .appendTo(element);
+            }           
             
         }
         //console.log(cellInfo.data.U_MethodDesc, element);
@@ -68,7 +86,7 @@
 
     function deleteButtonClick(data) {
         var grid = $('#gridInspectionMaintenance').dxDataGrid('instance');
-        var result = ShowConfirmDialog('Are you sure you want to Delete this record ?', 'Delete Inspection Method.');
+        var result = ShowConfirmDialog('Are you sure you want to Delete record Method [<lable style = "color:red;">' + data.U_MethodDesc+'</lable>] ?', 'Delete Inspection Method.');
         //console.log(data)
         result.done(function (dialogResult) {
             if (dialogResult) { // Yes: confirm close
@@ -266,6 +284,7 @@
                                                                                 .Text("Save")
                                                                                 .Disabled(true)
                                                                                 .FocusStateEnabled(true)
+                                                                                //.Icon("save")
                                                                                 .OnClick("SaveInspection"))
                             @*<div style="text-align:left;">*@
                                 @*@(Html.DevExtreme().Button().ID("deletebtnSave").Type(ButtonType.Danger)
@@ -1085,6 +1104,9 @@
                             });
                         } else {
                             grid.option('editing.allowUpdating', true);
+                            grid.clearSorting();
+                            //grid.columns.sortOrder()
+                            grid.columnOption("DocEntry", "sortOrder", "desc");
                             DevExpress.ui.notify("Add data success.", "success", 1500);
                             grid.refresh();
                             stagenew = "";
@@ -1294,9 +1316,9 @@
                 currentStatus = "Editing";
                 console.log(e.row.isEditing);
             }
-            if (stagenew == "new") {
-                e.cellElement.find(".dx-link-delete").remove();
-            }
+            //if (stagenew == "new") {                
+            //    e.cellElement.find(".dx-link-delete").remove();
+            //}
             //if (e.data.__KEY__ === undefined) {
             //    e.component.option('onContextMenuPreparing', false);
             //} else {

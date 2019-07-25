@@ -109,7 +109,7 @@ namespace MCP_WEB.Controllers.WebAPI
                     var RS = from a in _context.VW_MFC_M_INSPECT_RESULT
                              join b in _context.VW_MFC_ROUTEINSPECT on a.U_InspectEntry equals b.DocEntry
                              //join c in _context.VW_MFC_WOR4 on new { StgEntry = b.AbsEntry } equals new { c.StgEntry }
-                             where a.U_StgEntry == U_StgEntry && b.U_ActiveFlag == "Y"
+                             where a.U_StgEntry == U_StgEntry && b.U_ActiveFlag == "Y" && a.U_DocEntry == Docentry
                              select new
                              {
                                  a.Code,

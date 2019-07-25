@@ -397,6 +397,7 @@ var grid = $("#gridInspection").dxDataGrid('instance');
     "loadParams": { "DocEntry": "117"}
 });*@
     $("#txtOriginNum").dxTextBox('instance').option('value', '');
+    $("#txtStatus").dxTextBox('instance').option('value', '');
     $("#txtItemCode").dxTextBox('instance').option('value', '');
     $("#txtProdName").dxTextBox('instance').option('value', '');
     $("#txtPlannedQty").dxTextBox('instance').option('value', '');
@@ -488,6 +489,7 @@ if (!isNaN(txtDocNum)) {
                                             if (Status == "Canceled" || Status == "Closed") {
                                                 console.log("Docstatus",Status);
                                                 allowupdate = false;
+                                               
                                             } else {
                                                 if (keys[0].Status == "Complate" || keys[0].Status == "Planned") {
                                                     allowupdate = false;
@@ -508,23 +510,31 @@ if (!isNaN(txtDocNum)) {
 
                                                         var datasourceR = result_R["items"][0].data;
                                                         type = result_R["items"][0].type;
-                                                        if (result_R["items"][0].data.length > 0) {//check case ที่เลือก route stage มาแล้วมีข้อมูล transection ไหม
-                                                            if (type != undefined || type == "master") {// ถ้าเป็นข้อมูลที่ดึกมาจาก master เพราะยังไม่มี transection
-                                                                $("#addbtnSave").dxButton({
-                                                                    disabled: false
-                                                                });
-                                                            }
-                                                            if (type == undefined || type == "" || type == "transection") {
-                                                                console.log("type", type);
+                                                        if (Status == "Canceled" || Status == "Closed") {
+                                                            $("#addbtnSave").dxButton({
+                                                                disabled: true
+                                                            });
+                                                        } else {
+                                                            if (result_R["items"][0].data.length > 0) {//check case ที่เลือก route stage มาแล้วมีข้อมูล transection ไหม
+                                                                if (type != undefined || type == "master") {// ถ้าเป็นข้อมูลที่ดึกมาจาก master เพราะยังไม่มี transection
+                                                                    $("#addbtnSave").dxButton({
+                                                                        disabled: false
+                                                                    });
+                                                                }
+                                                                if (type == undefined || type == "" || type == "transection") {
+                                                                    console.log("type", type);
+                                                                    $("#addbtnSave").dxButton({
+                                                                        disabled: true
+                                                                    });
+                                                                }
+                                                            } else {
                                                                 $("#addbtnSave").dxButton({
                                                                     disabled: true
                                                                 });
                                                             }
-                                                        } else {
-                                                            $("#addbtnSave").dxButton({
-                                                                disabled: true
-                                                            });
+
                                                         }
+                                                        
                                                        
                                                         $("#gridInspection").dxDataGrid({
                                                             dataSource: datasourceR,
