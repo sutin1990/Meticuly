@@ -1024,6 +1024,7 @@
     }
 
     function SaveInspection(data) {
+       
         
         var grid = $("#gridInspectionMaintenance").dxDataGrid('instance');
          //$("#gridInspectionMaintenance").dxDataGrid("saveEditData");
@@ -1043,88 +1044,111 @@
         console.log(arrdata);
        
         if (arr_add.length > 0) {//add
-
-            var RouteCode_ERROR = arr_add.filter((el) => {//remove ตัวที่
-                return el.U_RouteCode == undefined;
-            });
-            console.log(RouteCode_ERROR);
-            //$.each(arr_add, function (i, v) {
-            //    if (v["U_RouteCode"] != undefined) {
-            //        RouteCode.push(v["U_RouteCode"]);
-            //    }
-            //});
-            if (RouteCode_ERROR.length == 0) { //ถ้าใส่ข้อมูลครบสมบูรณ์
-                //for (var x = 0; x < arr_add.length; x++) { //update ค่า flag ก่อน save อีกครั้ง
-                //    for (var i = 0; i < getdata_on_flag.length; i++) {
-                //        if (arr_add[x].__KEY__ == getdata_on_flag[i].__KEY__) {
-                //            arr_add[x].U_ActiveFlag = getdata_on_flag[i].U_ActiveFlag;
-                //        }
-                //    }
-                //}
-                console.log(arr_add);
-                $.ajax({
-                    type: 'POST',
-                    //contentType: 'application/json',
-                    url: 'api/GirdInspectionMaintenance/UpdateData',
-                    data: { values: JSON.stringify(arr_add), status: "A" },
-                    dataType: 'json',
-                    success: function (result) {
-                        console.log(result);
-                        var status_ERROR = result;
-                        status_ERROR = status_ERROR.filter((el) => {
-                            return el.SqlStatus == "E";
-                        });
-
-                        if (status_ERROR.length > 0) {
-                            var routecodeerror = [];      
-                            $.each(status_ERROR, function (item, value) {   
-                                var code_str_error = "["+value["DocEntry"].toString() + "->" + value["SqlErrtext"].toString()+"]";
-                                routecodeerror.push(code_str_error);                                
-                            });
-                            console.log(routecodeerror);
-                            var customDialog = DevExpress.ui.dialog.custom({
-                                title: 'add data Error',
-                                message: "Can not add data [ " + routecodeerror.join(",") + " ]",
-                                toolbarItems: [
-                                    { text: "Close", onClick: function () { return "Ok" } },
-                                ],
-                                width: "500px"
-                            });
-                            customDialog.show().done(function (dialogResult) {
-                                grid.option("editing.allowUpdating", false);
-                                $("#addbtnSave").dxButton({
-                                    disabled: true
-                                });
-                                //grid.refresh();
-                                //stagenew = "";
-                                //arrdata = [];
-                                //arr_add = [];
-                                //getdata_on_flag = [];
-
-                            });
-                        } else {
-                            grid.option('editing.allowUpdating', true);
-                            grid.clearSorting();
-                            //grid.columns.sortOrder()
-                            grid.columnOption("DocEntry", "sortOrder", "desc");
-                            DevExpress.ui.notify("Add data success.", "success", 1500);
-                            grid.refresh();
-                            stagenew = "";
-                            arrdata = [];
-                            arr_add = [];
-                            getdata_on_flag = [];
-                            //setTimeout(function () { location.reload(); }, 1000);
-                        }                       
-                        //DevExpress.ui.notify("Can not add data Error[ " + result[0].SqlErrtext + " ]", "error", 2000);  
-                    },
-                    error: function (er, msg) {
-                        console.log(er);
+            var checkadd_repeatedly = true;
+            for (var i = 0; i < arr_add.length - 1; i++) {// loop check data ซํ้า
+                var old_RouteCode = arr_add[i].U_RouteCode;
+                var old_MethodDesc = arr_add[i].U_MethodDesc;
+                var old_RptOrder = arr_add[i].U_RptOrder;
+                //console.log(arr_add[i].U_RptOrder + "==" + arr_add[i+1].U_RptOrder);
+                if (old_RouteCode == arr_add[i + 1].U_RouteCode && old_MethodDesc.toLowerCase() == arr_add[i + 1].U_MethodDesc.toLowerCase() && old_RptOrder == arr_add[i + 1].U_RptOrder) {
+                    checkadd_repeatedly = false;
+                    //alert(checkadd_repeatedly);
+                    break;
+                } else {
+                    for (var j = i + 1; j < arr_add.length; j++) {
+                        if (old_RouteCode == arr_add[j].U_RouteCode && old_MethodDesc.toLowerCase() == arr_add[j].U_MethodDesc.toLowerCase() && old_RptOrder == arr_add[j].U_RptOrder) {
+                            checkadd_repeatedly = false;
+                            console.log(old_RouteCode + "==" + arr_add[j].U_RouteCode + "," + old_MethodDesc + "==" + arr_add[j].U_MethodDesc + "," + old_RptOrder + "==" + arr_add[j].U_RptOrder);
+                            break;
+                        }
                     }
+                }
+
+            }
+           // console.log("checkadd_repeatedly", checkadd_repeatedly);
+
+            if (checkadd_repeatedly) {// ข้อมูลที่ input มา ไม่ซํ้า
+                var RouteCode_ERROR = arr_add.filter((el) => {//remove ตัวที่
+                return el.U_RouteCode == undefined;
                 });
-            } else {
+                console.log(RouteCode_ERROR);           
+                if (RouteCode_ERROR.length == 0) { //ถ้าใส่ข้อมูลครบสมบูรณ์               
+                    console.log(arr_add);
+                    $.ajax({
+                        type: 'POST',
+                        //contentType: 'application/json',
+                        url: 'api/GirdInspectionMaintenance/UpdateData',
+                        data: { values: JSON.stringify(arr_add), status: "A" },
+                        dataType: 'json',
+                        success: function (result) {
+                            console.log(result);
+                            var status_ERROR = result;
+                            status_ERROR = status_ERROR.filter((el) => {
+                                return el.SqlStatus == "E";
+                            });
+
+                            if (status_ERROR.length > 0) {
+                                var routecodeerror = [];      
+                                $.each(status_ERROR, function (item, value) {   
+                                    var code_str_error = "["+value["DocEntry"].toString() + "->" + value["SqlErrtext"].toString()+"]";
+                                    routecodeerror.push(code_str_error);                                
+                                });
+                                console.log(routecodeerror);
+                                var customDialog = DevExpress.ui.dialog.custom({
+                                    title: 'add data Error',
+                                    message: "Can not add data [ " + routecodeerror.join(",") + " ]",
+                                    toolbarItems: [
+                                        { text: "Close", onClick: function () { return "Ok" } },
+                                    ],
+                                    width: "500px"
+                                });
+                                customDialog.show().done(function (dialogResult) {
+                                    grid.option("editing.allowUpdating", false);
+                                    $("#addbtnSave").dxButton({
+                                        disabled: true
+                                    });
+                                    //grid.refresh();
+                                    //stagenew = "";
+                                    //arrdata = [];
+                                    //arr_add = [];
+                                    //getdata_on_flag = [];
+
+                                });
+                            } else {
+                                grid.option('editing.allowUpdating', true);
+                                grid.clearSorting();
+                                //grid.columns.sortOrder()
+                                grid.columnOption("DocEntry", "sortOrder", "desc");
+                                DevExpress.ui.notify("Add data success.", "success", 1500);
+                                grid.refresh();
+                                stagenew = "";
+                                arrdata = [];
+                                arr_add = [];
+                                getdata_on_flag = [];
+                                //setTimeout(function () { location.reload(); }, 1000);
+                            }                       
+                            //DevExpress.ui.notify("Can not add data Error[ " + result[0].SqlErrtext + " ]", "error", 2000);  
+                        },
+                        error: function (er, msg) {
+                            console.log(er);
+                        }
+                    });
+                } else {
+                    var customDialog = DevExpress.ui.dialog.custom({
+                        title: 'Add data error',
+                        message: "Can not add data please complete the information.",
+                        toolbarItems: [
+                            { text: "Close", onClick: function () { return "Ok" } },
+                        ],
+                        width: "500px"
+                    });
+                    customDialog.show().done(function (dialogResult) {
+                    });
+                }
+            } else {// ข้อมูลที่ input มาซํ้า
                 var customDialog = DevExpress.ui.dialog.custom({
-                    title: 'add data Error',
-                    message: "Can not add data please complete the information.",
+                    title: 'Add data error',
+                    message: "Can not add data there is a duplicate of this information.",
                     toolbarItems: [
                         { text: "Close", onClick: function () { return "Ok" } },
                     ],
@@ -1133,125 +1157,159 @@
                 customDialog.show().done(function (dialogResult) {
                 });
             }
-            
-            
-        } else { //edit
-
-            //for (var x = 0; x < arrdata.length; x++) { //update ค่า flag ก่อน save อีกครั้ง
-            //    for (var i = 0; i < getdata_on_flag.length; i++) {
-            //        if (arrdata[x].DocEntry == getdata_on_flag[i].DocEntry) {
-            //            arrdata[x].U_ActiveFlag = getdata_on_flag[i].U_ActiveFlag;
-            //        }                    
-            //    }
-            //}
-            console.log(arrdata);
-            $.ajax({
-                type: 'POST',
-                //contentType: 'application/json',
-                url: 'api/GirdInspectionMaintenance/UpdateData',
-                data: { values: JSON.stringify(arrdata),status:"U" },
-                dataType: 'json',
-                success: function (result) {
-                    console.log(result);
-
-                    var status_ERROR = result;
-                    status_ERROR = status_ERROR.filter((el) => {
-                        return el.SqlStatus == "E";
-                    });
-
-                    if (status_ERROR.length > 0) {
-                        var routecodeerror = [];
-                        var sqlmsg = "";
-                        $.each(status_ERROR, function (item, value) {
-                            routecodeerror.push(value["DocEntry"]);                            
-                        });
-                        console.log(routecodeerror);
-                        if (result.length > 1) { //error หลาย row
-                            var customDialog = DevExpress.ui.dialog.custom({
-                                title: 'Edit data Error',
-                                message: "Can not edit data [ " + routecodeerror.join(",") + " ]",
-                                toolbarItems: [
-                                    { text: "Close", onClick: function () { return "Ok" } },
-                                ],
-                                width: "500px"
-                            });
-                            customDialog.show().done(function (dialogResult) {
-                                grid.option("editing.allowUpdating", true);
-                                grid.refresh();
-                                stagenew = "";
-                                arrdata = [];
-                                getdata_on_flag = [];
-
-                            });
-                        } else {
-                            sqlmsg = result[0]["SqlErrtext"];
-                            var customDialog = DevExpress.ui.dialog.custom({
-                                title: 'Edit data Error',
-                                message: sqlmsg,
-                                toolbarItems: [
-                                    { text: "Close", onClick: function () { return "Ok" } },
-                                ],
-                                width: "500px"
-                            });
-                            customDialog.show().done(function (dialogResult) {
-                                grid.option("editing.allowUpdating", true);
-                                grid.refresh();
-                                stagenew = "";
-                                arrdata = [];
-                                getdata_on_flag = [];
-
-                            });
-                        }
                         
-                    } else {
-                        grid.option('editing.allowUpdating', true);
-                        DevExpress.ui.notify("Edit data success.", "success", 1500);
-                        grid.refresh();
-                        stagenew = "";
-                        arrdata = [];                        
-                        getdata_on_flag = [];  
-                        //console.log(grid._options);
-                        $("#gridInspectionMaintenance").dxDataGrid({
-                            onToolbarPreparing: function (e) {
-                                var toolbarItems = e.toolbarOptions.items;
-                                $.each(toolbarItems, function (_, item) {
-                                    //|| item.name == "revertButton"
-                                    if (item.name == "saveButton") {
-                                        item.visible = false;
-                                    }
-                                    if (item.name == 'revertButton') {
-                                        item.options.onClick = function (arg) {
-                                            e.component.cancelEditData();
-                                            e.component.option('editing.allowUpdating', true);
-                                            var gridInstance = $('#gridInspectionMaintenance').dxDataGrid('instance');
-                                            gridInstance.option("allowColumnReordering", true);
-                                            //gridInstance.option("headerFilter", true);
-                                            e.component.refresh();
-                                            stagenew = "";
-                                            arrdata = [];
-                                            arr_add = [];
+            
+        } else { //edit            
+            console.log(arrdata);
+            var checkedit_repeatedly = true;
 
-                                            e.element
-                                                .find(".dx-datagrid-addrow-button") 
-                                                .dxButton("instance")
-                                                .option("disabled", false);
+            for (var i = 0; i < arrdata.length - 1; i++) {// loop check data ซํ้า
+                var old_RouteCode = arrdata[i].U_RouteCode;
+                var old_MethodDesc = arrdata[i].U_MethodDesc;
+                var old_RptOrder = arrdata[i].U_RptOrder;
+                //console.log(arrdata[i].U_RptOrder + "==" + arrdata[i+1].U_RptOrder);
+                if (old_RouteCode == arrdata[i + 1].U_RouteCode && old_MethodDesc.toLowerCase() == arrdata[i + 1].U_MethodDesc.toLowerCase() && old_RptOrder == arrdata[i + 1].U_RptOrder) {
+                    checkedit_repeatedly = false;
+                    //alert(checkadd_repeatedly);
+                    break;
+                } else {
+                    for (var j = i + 1; j < arrdata.length; j++) {
+                        if (old_RouteCode == arrdata[j].U_RouteCode && old_MethodDesc.toLowerCase() == arrdata[j].U_MethodDesc.toLowerCase() && old_RptOrder == arrdata[j].U_RptOrder) {
+                            checkedit_repeatedly = false;
+                            console.log(old_RouteCode + "==" + arrdata[j].U_RouteCode + "," + old_MethodDesc + "==" + arrdata[j].U_MethodDesc + "," + old_RptOrder + "==" + arrdata[j].U_RptOrder);
+                            break;
+                        }
+                    }
+                }
 
-                                        }
-                                    }
+            }
+            //console.log("checkedit_repeatedly", checkedit_repeatedly);
+            if (checkedit_repeatedly) {//ข้อมูลที่ edit มาไม่ซํ้า
+                $.ajax({
+                    type: 'POST',
+                    //contentType: 'application/json',
+                    url: 'api/GirdInspectionMaintenance/UpdateData',
+                    data: { values: JSON.stringify(arrdata), status: "U" },
+                    dataType: 'json',
+                    success: function (result) {
+                        console.log(result);
+
+                        var status_ERROR = result;
+                        status_ERROR = status_ERROR.filter((el) => {
+                            return el.SqlStatus == "E";
+                        });
+
+                        if (status_ERROR.length > 0) {
+                            var routecodeerror = [];
+                            var sqlmsg = "";
+                            $.each(status_ERROR, function (item, value) {
+                                routecodeerror.push(value["DocEntry"]);
+                            });
+                            console.log(routecodeerror);
+                            if (result.length > 1) { //error หลาย row
+                                var customDialog = DevExpress.ui.dialog.custom({
+                                    title: 'Edit data Error',
+                                    message: "Can not edit data [ " + routecodeerror.join(",") + " ]",
+                                    toolbarItems: [
+                                        { text: "Close", onClick: function () { return "Ok" } },
+                                    ],
+                                    width: "500px"
+                                });
+                                customDialog.show().done(function (dialogResult) {
+                                    grid.option("editing.allowUpdating", true);
+                                    grid.refresh();
+                                    stagenew = "";
+                                    arrdata = [];
+                                    getdata_on_flag = [];
 
                                 });
-                                e.element
-                                    .find(".dx-datagrid-addrow-button") 
-                                    .dxButton("instance") 
-                                    .option("disabled", false);
+                            } else {// ข้อมูลซํ้ากัน ใน case แก้ไข record เดียว
+                                sqlmsg = result[0]["SqlErrtext"];
+                                //DevExpress.ui.dialog.alert(sqlmsg, 'Edit data error');
+                                //$(".dx-dialog .dx-popup-title").css("background-color", "#FD0439");
+                                //$(".dx-dialog .dx-popup-bottom .dx-toolbar-items-container .dx-button").css("background-color", "#FD0439");
+                                var customDialog = DevExpress.ui.dialog.custom({
+                                    title: 'Edit data Error',
+                                    message: sqlmsg,
+                                    toolbarItems: [
+                                        { text: "Close", onClick: function () { return "Ok" } },
+                                    ],
+                                    width: "500px"
+                                });
                                 
-                            }
-                        });                    
+                                customDialog.show().done(function (dialogResult) {
+                                    //console.log(dialogResult);
+                                    //grid.option("editing.allowUpdating", true);
+                                    //grid.refresh();
+                                    //stagenew = "";
+                                    //arrdata = [];
+                                    //getdata_on_flag = [];
 
-                        //setTimeout(function () { location.reload(); },1000);
-                    }                   
-                }
-            });
+                                });
+                            }
+
+                        } else {
+                            grid.option('editing.allowUpdating', true);
+                            DevExpress.ui.notify("Edit data success.", "success", 1500);
+                            grid.refresh();
+                            stagenew = "";
+                            arrdata = [];
+                            getdata_on_flag = [];
+                            //console.log(grid._options);
+                            $("#gridInspectionMaintenance").dxDataGrid({
+                                onToolbarPreparing: function (e) {
+                                    var toolbarItems = e.toolbarOptions.items;
+                                    $.each(toolbarItems, function (_, item) {
+                                        //|| item.name == "revertButton"
+                                        if (item.name == "saveButton") {
+                                            item.visible = false;
+                                        }
+                                        if (item.name == 'revertButton') {
+                                            item.options.onClick = function (arg) {
+                                                e.component.cancelEditData();
+                                                e.component.option('editing.allowUpdating', true);
+                                                var gridInstance = $('#gridInspectionMaintenance').dxDataGrid('instance');
+                                                gridInstance.option("allowColumnReordering", true);
+                                                //gridInstance.option("headerFilter", true);
+                                                e.component.refresh();
+                                                stagenew = "";
+                                                arrdata = [];
+                                                arr_add = [];
+
+                                                e.element
+                                                    .find(".dx-datagrid-addrow-button")
+                                                    .dxButton("instance")
+                                                    .option("disabled", false);
+
+                                            }
+                                        }
+
+                                    });
+                                    e.element
+                                        .find(".dx-datagrid-addrow-button")
+                                        .dxButton("instance")
+                                        .option("disabled", false);
+
+                                }
+                            });
+                            //setTimeout(function () { location.reload(); },1000);
+                        }
+                    }
+                });
+            } else {//ข้อมูลที่ edit มามันซํ้า
+                var customDialog = DevExpress.ui.dialog.custom({
+                    title: 'Edit data error',
+                    message: "This data set already exists.",
+                    toolbarItems: [
+                        { text: "Close", onClick: function () { return "Ok" } },
+                    ],
+                    width: "500px"
+                });
+                customDialog.show().done(function (dialogResult) {
+                });
+            }
+
+            
         }                
         
     }
@@ -1426,11 +1484,44 @@
         
 });
     */
+    //var x = document.getElementsByTagName("a");
+    //let link = document.querySelector("a"); // It is the method to access the first matched element
+    //link.addEventListener("click", function (event) {
+    //    alert("Paragraph clicked");
+    //    console.log("Redirecting Stopped");
+    //    //event.preventDefault();
+    //});
+
+    //document.getElementById("link_InspectionMaintenance").addEventListener("mousedown", function (event) {
+    //    alert("Paragraph clicked");
+    //});
+
+
+    
     window.onbeforeunload = function (e) {
         console.log(e);
+        //alert("xx");
         if (arrdata.length > 0 || arr_add.length > 0) {
            //return alert("xxxxx");
-            return "Leaving this page will reset the wizard";
+            e.returnValue = 'You have unfinished changes!';
+
+            //var customDialog = DevExpress.ui.dialog.custom({
+            //    title: 'Edit data Error',
+            //    message: e.returnValue,
+            //    toolbarItems: [
+            //        { text: "Close", onClick: function () { return "Ok" } },
+            //    ],
+            //    width: "500px"
+            //});
+            //customDialog.show().done(function (dialogResult) {
+            //    //grid.option("editing.allowUpdating", true);
+            //    //grid.refresh();
+            //    //stagenew = "";
+            //    //arrdata = [];
+            //    //getdata_on_flag = [];
+
+            //});
+            ////return "Leaving this page will reset the wizard";
            
         } else {
             window.onbeforeunload = null;

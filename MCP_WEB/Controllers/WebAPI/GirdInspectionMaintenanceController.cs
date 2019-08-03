@@ -136,10 +136,9 @@ namespace MCP_WEB.Controllers.WebAPI
                 DataTable dt = (DataTable)JsonConvert.DeserializeObject(values, (typeof(DataTable)));
                 var count = dt.Rows.Count;
                 DataColumnCollection columns = dt.Columns;
-                
+
                 foreach (DataRow row in dt.Rows)
                 {
-                    
 
                     //dt_result = new DataTable();
                     if (columns.Contains("DocEntry") && columns.Contains("U_AbsEntry"))//edit
@@ -151,10 +150,10 @@ namespace MCP_WEB.Controllers.WebAPI
                     {
                         var Code = row["U_RouteCode"];
                         var OSRN = _context.VW_MFC_OSRN.SingleOrDefault(s => s.Code == Code.ToString());
-                        U_AbsEntry =  OSRN.AbsEntry.ToString();
-                       
-                    }                    
-                    
+                        U_AbsEntry = OSRN.AbsEntry.ToString();
+
+                    }
+
                     var U_RouteCode = row["U_RouteCode"];
                     var U_MethodDesc = row["U_MethodDesc"];
                     var U_RptOrder = row["U_RptOrder"];
@@ -172,17 +171,17 @@ namespace MCP_WEB.Controllers.WebAPI
                     {
                         U_ActiveFlag = "N";
                     }
-                    
+
                     //var U_ActiveFlag = row["U_ActiveFlag"].ToString() == "true" ? "Y" : "N" ;
                     var U_Lastupdateby = userLogin.Value;
 
-                    List<VW_MFC_ROUTEINSPECT> newList = _context.VW_MFC_ROUTEINSPECT.Where(m => 
+                    List<VW_MFC_ROUTEINSPECT> newList = _context.VW_MFC_ROUTEINSPECT.Where(m =>
                     m.U_RouteCode.ToString().ToUpper() == U_RouteCode.ToString().ToUpper() &&
                     m.U_MethodDesc.ToString().ToUpper() == U_MethodDesc.ToString().ToUpper() &&
                     m.U_RptOrder == Convert.ToInt16(U_RptOrder)
                     ).ToList();
 
-                   if(status == "A")
+                    if (status == "A")
                     {
                         if (newList.Count > 0)
                         {
@@ -255,15 +254,11 @@ namespace MCP_WEB.Controllers.WebAPI
 
                     if (status == "U")
                     {
-                        if (newList.Count > 1)
-                        {
-                            DataRow dr_e = dt_result.NewRow();
-                            dr_e["SqlStatus"] = "E";
-                            dr_e["SqlErrtext"] = "This data set already exists" + "[" + U_RouteCode.ToString() + "]";
-                            dr_e["DocEntry"] = U_RouteCode;
-                            dt_result.Rows.Add(dr_e);
-                        }
-                        else //ถ้าไม่มีข้อมูลก็ให้ insert/edit ได้เลย
+                        var checkhave = _context.VW_MFC_ROUTEINSPECT.FirstOrDefault(f => f.DocEntry == DocEntry);
+
+                        if (checkhave.U_RouteCode.ToString().ToUpper() == U_RouteCode.ToString().ToUpper() &&
+                            checkhave.U_MethodDesc.ToString().ToUpper() == U_MethodDesc.ToString().ToUpper() &&
+                            checkhave.U_RptOrder == Convert.ToInt16(U_RptOrder))// ถ้ามันเป็นค่าเดิมก็ให้อัพเดดเวลาและuserไปปกติ
                         {
                             using (var cmd = _context.Database.GetDbConnection().CreateCommand())
                             {
@@ -322,10 +317,80 @@ namespace MCP_WEB.Controllers.WebAPI
                                 cmd.Connection.Close();
                             }
                         }
+                        else // แต่ถ้ามันไม่เท่ากับค่าเดิม ก็ให้ไปเช็คว่า มีข้อมูล record U_RouteCode,U_MethodDesc,U_RptOrder เหมือนกันกับที่ใส่มาไหมถ้า newList มีค่ามากว่า 0 แสดงว่า ซํ้า
+                        {
+                            if (newList.Count > 0)// ข้อมูลซํ้า
+                            {
+                                DataRow dr_e = dt_result.NewRow();
+                                dr_e["SqlStatus"] = "E";
+                                dr_e["SqlErrtext"] = "This data set already exists.";
+                                dr_e["DocEntry"] = U_RouteCode;
+                                dt_result.Rows.Add(dr_e);
+                            }
+                            else //ถ้าไม่ซํ้าก็ให้ edit ได้เลย
+                            {
+                                using (var cmd = _context.Database.GetDbConnection().CreateCommand())
+                                {
+                                    cmd.Parameters.Clear();
+                                    cmd.CommandText = "m_sp_MasterData_Manage";
+                                    cmd.CommandType = CommandType.StoredProcedure;
+                                    cmd.Parameters.Add(new SqlParameter("@DocEntry", SqlDbType.Int) { Value = DocEntry });
+                                    cmd.Parameters.Add(new SqlParameter("@U_AbsEntry", SqlDbType.NVarChar) { Value = U_AbsEntry });
+                                    cmd.Parameters.Add(new SqlParameter("@U_RouteCode", SqlDbType.NVarChar) { Value = U_RouteCode });
+                                    cmd.Parameters.Add(new SqlParameter("@U_MethodDesc", SqlDbType.NText) { Value = U_MethodDesc });
+                                    cmd.Parameters.Add(new SqlParameter("@U_RptOrder", SqlDbType.Int) { Value = U_RptOrder });
+                                    cmd.Parameters.Add(new SqlParameter("@U_ActiveFlag", SqlDbType.NVarChar) { Value = U_ActiveFlag });
+                                    cmd.Parameters.Add(new SqlParameter("@U_Lastupdateby", SqlDbType.NVarChar) { Value = U_Lastupdateby });
+                                    cmd.Parameters.Add(new SqlParameter("@TypeProcess", SqlDbType.NVarChar) { Value = status });
+                                    if (cmd.Connection.State != ConnectionState.Open)
+                                    {
+                                        cmd.Connection.Open();
+                                    }
+                                    try
+                                    {
+                                        DbDataReader DbReader = cmd.ExecuteReader();
+
+                                        if (DbReader.HasRows)
+                                        {
+                                            DataTable dt_sp = new DataTable();
+                                            dt_sp.Load(DbReader);
+                                            //dt_result = new DataTable();
+                                            DataRow dr_s = dt_result.NewRow();
+                                            dr_s["SqlStatus"] = "S";
+                                            dr_s["SqlErrtext"] = "";
+                                            dr_s["statuscode"] = dt_sp.Rows[0]["statuscode"];
+                                            dr_s["statusmessage"] = dt_sp.Rows[0]["statusmessage"];
+                                            dr_s["DocEntry"] = dt_sp.Rows[0]["DocEntry"];
+                                            dt_result.Rows.Add(dr_s);
+
+                                            //foreach (DataRow dr in dt_result.Select())
+                                            //{
+                                            //    dr["SqlStatus"] = "S";
+                                            //    dr["SqlErrtext"] = "";
+                                            //    dr["statuscode"] = dt_sp.Rows[0]["statuscode"];
+                                            //    dr["statusmessage"] = dt_sp.Rows[0]["statusmessage"];
+                                            //    dr["DocEntry"] = dt_sp.Rows[0]["DocEntry"];
+                                            //    dt_result.Rows.Add(dr);
+                                            //}
+                                        }
+                                    }
+                                    catch (Exception ex)
+                                    {
+                                        msg = ex.Message;
+                                        DataRow dr_e = dt_result.NewRow();
+                                        dr_e["SqlStatus"] = "E";
+                                        dr_e["SqlErrtext"] = msg;
+                                        dr_e["DocEntry"] = U_RouteCode;
+                                        dt_result.Rows.Add(dr_e);
+                                    }
+                                    cmd.Connection.Close();
+                                }
+
+                            }
+                        }
+                        
+
                     }
-
-
-
                 }
 
                

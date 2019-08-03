@@ -8,124 +8,111 @@
                 @Html.AntiForgeryToken()
                 <form id="form1" name="form1">
                     <div class="form-group">
-
-                        <label class="col-lg-2 " >UserName : <span style="color:red;">*</span></label>
+                        <label class="col-lg-2 ">UserName : <span style="color:red;">*</span></label>
                         <div class="col-lg-4" style="padding-bottom:10px;">
                             @(Html.DevExtreme().TextBox().ID("txtUserName").Name("UserName"))
-
                         </div>
-
                         @*<label class="col-lg-2 " >UserPassword : <span style="color:red;">*</span></label>
-                        <div class="col-lg-4" >
-                            @Html.DevExtreme().TextBox().Mode(TextBoxMode.Password).ID("txtUserPassword").Name("UserPassword")
-                        </div><br>*@
-
-                        <label class="col-lg-2 " >FirstName : </label>
+        <div class="col-lg-4" >
+            @Html.DevExtreme().TextBox().Mode(TextBoxMode.Password).ID("txtUserPassword").Name("UserPassword")
+        </div><br>*@
+                        <label class="col-lg-2 ">FirstName : </label>
                         <div class="col-lg-4" style="padding-bottom:10px;">
                             @Html.DevExtreme().TextBox().ID("txtFirstName").Name("FirstName")
                         </div>
-
-                        <label class="col-lg-2 " >LastName : </label>
+                        <label class="col-lg-2 ">LastName : </label>
                         <div class="col-lg-4" style="padding-bottom:10px;">
                             @Html.DevExtreme().TextBox().ID("txtLastName").Name("LastName")
                         </div>
-
-                        <label class="col-lg-2 " >Email : </label>
+                        <label class="col-lg-2 ">Email : </label>
                         <div class="col-lg-4" style="padding-bottom:10px;">
                             @Html.DevExtreme().TextBox().Mode(TextBoxMode.Email).ID("txtUserEmail").Name("UserEmail")
                         </div>
+                        @*<label class="col-lg-2 " >Shift : </label>
+        <div class="col-lg-4" style="padding-bottom:10px;">*@
+                        @*<div id="txtShiftType"></div>*@
+                        @*@(Html.DevExtreme().SelectBox().ID("txtShiftType").Name("ShiftID"))*@
 
-                        <label class="col-lg-2 " >Shift : </label>
-                        <div class="col-lg-4" style="padding-bottom:10px;">
-                            @*<div id="txtShiftType"></div>*@
-                            @(Html.DevExtreme().SelectBox().ID("txtShiftType").Name("ShiftID")
-                            )
-                            @*<div class="dx-texteditor-container">
-                                    <div class="form-group">
-                                        <select id="shifttest" class="form-control">
+                        @*<div class="dx-texteditor-container">
+            <div class="form-group">
+                <select id="shifttest" class="form-control">
 
-                                        </select>
-                                        <script>
-                                            function lookup_valueChanged(e) {
-                                                var x = e.ShiftID;
-                                                //alert(x);
-                                                //$(".selected").show();
-                                                //$("#selected-employee-img").attr("src", e.value.Picture);
-                                                //$("#selected-employee-notes").text(e.value.Notes);
-                                            }
+                </select>
+                <script>
+                    function lookup_valueChanged(e) {
+                        var x = e.ShiftID;
+                        //alert(x);
+                        //$(".selected").show();
+                        //$("#selected-employee-img").attr("src", e.value.Picture);
+                        //$("#selected-employee-notes").text(e.value.Notes);
+                    }
 
-                                            $.ajax({
-                                        url: "@Url.Action("ShiftLookup", "m_UserMaster")",
-                                        //data: {selectedValue:selectedValue},
-                                        dataType: "json",
-                                        type: "GET",
-                                        error: function () {
-                                            alert(" An error occurred.");
-                                        },
-                                        success: function (data) {
-                                            //var optionhtml1 = '<option value="' +
-                                            // 0 + '">' + "--Select Shift...--" + '</option>';
-                                            //$("#shifttest").append(optionhtml1);
+                    $.ajax({
+                url: "@Url.Action("ShiftLookup", "m_UserMaster")",
+                //data: {selectedValue:selectedValue},
+                dataType: "json",
+                type: "GET",
+                error: function () {
+                    alert(" An error occurred.");
+                },
+                success: function (data) {
+                    //var optionhtml1 = '<option value="' +
+                    // 0 + '">' + "--Select Shift...--" + '</option>';
+                    //$("#shifttest").append(optionhtml1);
 
-                                            $.each(data, function (j,k) {
-                                                for (var i = 0; i < k.length; i++) {
-                                                    var optionhtml = '<option value="' +
-                                                        k[i].ShiftID + '">' + k[i].ShiftType + '</option>';
-                                                    $("#shifttest").append(optionhtml);
-                                                }
+                    $.each(data, function (j,k) {
+                        for (var i = 0; i < k.length; i++) {
+                            var optionhtml = '<option value="' +
+                                k[i].ShiftID + '">' + k[i].ShiftType + '</option>';
+                            $("#shifttest").append(optionhtml);
+                        }
 
-                                            });
-                                        }
-                                    });
-                                        </script>
-                                    </div>
-                                </div>*@
+                    });
+                }
+            });
+                </script>
+            </div>
+        </div>*@
+                        @*</div>*@
 
-                        </div>
-
-
-                        <label class="col-lg-2 " >Department : </label>
+                        <label class="col-lg-2 ">Department : </label>
                         <div class="col-lg-4" style="padding-bottom:10px;">
                             @*<div id="txtDepID"></div>*@
                             @(Html.DevExtreme().SelectBox().ID("txtDepID").Name("DepID")
                             )
                         </div>
-
-                        <label class="col-lg-2 " >Status : </label>
+                        <label class="col-lg-2 ">Status : </label>
                         <div class="col-lg-4" style="padding-bottom:10px;">
                             @(Html.DevExtreme().SelectBox().ID("txtStatus").Name("Status")
-                                        .DataSource(new string[] { "Active", "Inactive" })
-                                    .SearchEnabled(true)
+                                                        .DataSource(new string[] { "Active", "Inactive" })
+                                                    .SearchEnabled(true)
 
                             )
                         </div>
-                        <label class="col-lg-2 " >MenuIdentity : </label>
+                        <label class="col-lg-2 ">MenuIdentity : </label>
                         <div class="col-lg-4" style="padding-bottom:10px;">
                             <div id="scrolllist" class="dxlist-scroll">
-                                
-                                    @(Html.DevExtreme().List()
-                                                        //.SelectionMode(ListSelectionMode.All)
-                                                        .ID("listMenuIdentity")
-                                                        .ShowSelectionControls(true)
-                                                        .SearchEnabled(true).SearchExpr(new string[] { "MenuName" })
-                                    )
-                                   
-                                </div>
-                            </div>
 
+                                @(Html.DevExtreme().List()
+                                                                    //.SelectionMode(ListSelectionMode.All)
+                                                                    .ID("listMenuIdentity")
+                                                                    .ShowSelectionControls(true)
+                                                                    .SearchEnabled(true).SearchExpr(new string[] { "MenuName" })
+                                )
+
+                            </div>
+                        </div>
                         <div class="col-sm-offset-2 col-sm-10" style="text-align:right; padding-bottom:10px;">
                             <div id="selection-treeview"></div>
                             <div class="selected-data">
-
                                 <div id="checked-items"></div>
                             </div>
                             @(Html.DevExtreme().Button().ID("btnSave").Disabled(false)
-                                        .Text("Save")
-                                        .OnClick("function (e) { if(e.validationGroup.validate().isValid){SaveEdit(e);} else{e.stopPropagation();}}"))
-
+                                                        .Text("Save")
+                                                        .OnClick("function (e) { if(e.validationGroup.validate().isValid){SaveEdit(e);} else{e.stopPropagation();}}"))
                             @(Html.DevExtreme().Button().Type(ButtonType.Normal)
-                                        .Text("Cancel")
-                                        .OnClick("function (e) { canselButtonClick() }"))
+                                                        .Text("Cancel")
+                                                        .OnClick("function (e) { canselButtonClick() }"))
                         </div>
                     </div>
                 </form>
@@ -175,7 +162,7 @@
                     "FirstName": FirstName,
                     "LastName": LastName,
                     "UserEmail": UserEmail,
-                    "ShiftID": selectedShift ,
+                    //"ShiftID": selectedShift ,
                     "DepID": selectedDep,
                     "Status": $("#Status").val()
                     },

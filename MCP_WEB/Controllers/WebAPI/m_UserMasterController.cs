@@ -145,7 +145,7 @@ namespace MCP_WEB.Models.Controllers
         }
 
         [HttpPost]
-        public IActionResult Insert(string[] getitem, string UserName, string UserPassword, string FirstName, string LastName, string UserEmail, string ShiftID, string DepID, string Status)
+        public IActionResult Insert(string[] getitem, string UserName, string UserPassword, string FirstName, string LastName, string UserEmail,string DepID, string Status)
         {
             var identity = (ClaimsIdentity)User.Identity;
             IEnumerable<Claim> claims = identity.Claims;
@@ -184,8 +184,7 @@ namespace MCP_WEB.Models.Controllers
                     UserPassword = HelperClass.EncodePassword(UserPassword, "P@ssw0rd"),
                     FirstName = FirstName,
                     LastName = LastName,
-                    UserEmail = UserEmail,
-                    ShiftID = Convert.ToInt32(ShiftID),
+                    UserEmail = UserEmail,                   
                     DepID = DepID,
                     Status = Status,
                     TransDate = Convert.ToDateTime(DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss")),
@@ -201,18 +200,18 @@ namespace MCP_WEB.Models.Controllers
                 result = 1;
                 //end check insert m_UserMaster
 
-                //default insert m_UserPermiss
-                var dashboard = _context.MenuMaster.SingleOrDefault(d => d.MenuID == "DashBoard" && d.Parent_MenuID == "*");
-                var defaultinsertper = new m_UserPermiss //default view dashboard
-                {
-                    UserId = UserId,
-                    MenuIdentity = dashboard.MenuIdentity,
-                    TransDate = Convert.ToDateTime(DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss")),
-                    CreateDate = Convert.ToDateTime(DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss")),
-                    ModifyBy = userLogin.Value
-                };
-                _context.m_UserPermiss.Add(defaultinsertper);
-                _context.SaveChanges();
+                //default insert m_UserPermiss dashboard
+                //var dashboard = _context.MenuMaster.SingleOrDefault(d => d.MenuID == "DashBoard" && d.Parent_MenuID == "*");
+                //var defaultinsertper = new m_UserPermiss //default view dashboard
+                //{
+                //    UserId = UserId,
+                //    MenuIdentity = dashboard.MenuIdentity,
+                //    TransDate = Convert.ToDateTime(DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss")),
+                //    CreateDate = Convert.ToDateTime(DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss")),
+                //    ModifyBy = userLogin.Value
+                //};
+                //_context.m_UserPermiss.Add(defaultinsertper);
+                //_context.SaveChanges();
 
                 //check insert m_UserPermiss
                 for (var a = 0; a < getitem.Length; a++)
@@ -237,7 +236,7 @@ namespace MCP_WEB.Models.Controllers
 
 
         [HttpPost]
-        public IActionResult update(string[] getitem, int getuserid, string UserName, string UserPassword, string FirstName, string LastName, string UserEmail, string ShiftID, string DepID, string Status)
+        public IActionResult update(string[] getitem, int getuserid, string UserName, string UserPassword, string FirstName, string LastName, string UserEmail, string DepID, string Status)
         {
             var identity = (ClaimsIdentity)User.Identity;
             IEnumerable<Claim> claims = identity.Claims;
@@ -270,8 +269,7 @@ namespace MCP_WEB.Models.Controllers
                 //usermaster.UserPassword = HelperClass.EncodePassword(UserPassword, "P@ssw0rd");
                 usermaster.FirstName = FirstName;
                 usermaster.LastName = LastName;
-                usermaster.UserEmail = UserEmail;
-                usermaster.ShiftID = Convert.ToInt32(ShiftID);
+                usermaster.UserEmail = UserEmail;              
                 usermaster.DepID = DepID;
                 usermaster.Status = Status;
                 usermaster.TransDate = Convert.ToDateTime(DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss"));

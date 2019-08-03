@@ -191,19 +191,19 @@
             /**/
             /**/
             /**/
-            @*.OnSelectionChanged(@<text>
+            
+@*.OnSelectionChanged(@<text>
                 function(data) {
                 var deleteButton = $("#gridDeleteSelected").dxButton("instance");
                 deleteButton.option("disabled", !data.selectedRowsData.length);
                 }
-                </text>)*@
-            /**/
+                </text>)*@            /**/
             /**/
             /**/
             .Paging(paging => paging.Enabled(true))
             .RemoteOperations(true)
             .AllowColumnReordering(true)
-            .AllowColumnResizing(true)            
+            .AllowColumnResizing(true)
             //.HeaderFilter(headerFilter => headerFilter.Visible(true))
 
             .Export(e => e.Enabled(true).FileName("UserMaster" + DateTime.Now).AllowExportSelectedData(true))
@@ -214,49 +214,50 @@
             .Grouping(grouping => grouping.AutoExpandAll(true))
             .GroupPanel(groupPanel => groupPanel.Visible(true))
             //.OnRowPrepared("rowcolor")
-            .OnToolbarPreparing("toolbar_preparing")            
+            .OnToolbarPreparing("toolbar_preparing")
             .ColumnMinWidth(100)
             .ColumnAutoWidth(true)
             .ColumnHidingEnabled(true)
             .Columns(columns =>
             {
-                columns.Add().Caption("Edit or Delete").Width(125).Alignment(HorizontalAlignment.Center)
-        .CellTemplate(new JS("cellTemplate")).AllowExporting(false);
+            columns.Add().Caption("Edit or Delete").Width(125).Alignment(HorizontalAlignment.Center)
+    .CellTemplate(new JS("cellTemplate")).AllowExporting(false);
 
-                columns.Add().DataField("UserId").Caption("User Id").ShowInColumnChooser(false).Visible(false);                
+            columns.Add().DataField("UserId").Caption("User Id").ShowInColumnChooser(false).Visible(false);
 
-                columns.Add().DataField("UserName").Caption("User Name");
-    //.GroupIndex(0);
-    columns.Add().DataField("UserPassword").Caption("User Password").Visible(false);
-                columns.Add().DataField("FirstName").Caption("First Name").Visible(false);
-                columns.Add().DataField("LastName").Caption("Last Name").Visible(false);
-                columns.Add().DataField("UserEmail").Caption("Email").Visible(false);
-                columns.Add().DataField("ClusterCode").Caption("Cluster Code").Visible(false);
-                columns.Add().DataField("MenuName").Caption("Menu Name");
+            columns.Add().DataField("UserName").Caption("User Name");
+            //.GroupIndex(0);
+            columns.Add().DataField("UserPassword").Caption("User Password").Visible(false);
+            columns.Add().DataField("FirstName").Caption("First Name").Visible(false);
+            columns.Add().DataField("LastName").Caption("Last Name").Visible(false);
+            columns.Add().DataField("UserEmail").Caption("Email").Visible(false);
+            columns.Add().DataField("ClusterCode").Caption("Cluster Code").Visible(false);
+            columns.Add().DataField("MenuName").Caption("Menu Name");
 
-                columns.Add().DataField("DepID").Caption("Department").Visible(false)
-        .Width(125)
-        .Lookup(lookup => lookup
-        .DataSource(d => d.Mvc().Controller("m_UserMaster").LoadAction("DepartmentLookup"))
-        .DisplayExpr("DepDesc")
-        .ValueExpr("DepID"));
+            columns.Add().DataField("DepID").Caption("Department").Visible(false)
+    .Width(125)
+    .Lookup(lookup => lookup
+    .DataSource(d => d.Mvc().Controller("m_UserMaster").LoadAction("DepartmentLookup"))
+    .DisplayExpr("DepDesc")
+    .ValueExpr("DepID"));
 
-                columns.Add().DataField("ShiftID").Caption("Shift")
-        .Width(125)
-        .Lookup(lookup => lookup
-        .DataSource(d => d.Mvc().Controller("m_UserMaster").LoadAction("ShiftLookup").Key("ShiftID"))
-        .DisplayExpr("ShiftType")
-        .ValueExpr("ShiftID"));
+            //        columns.Add().DataField("ShiftID").Caption("Shift")
+            //.Width(125)
+            //.Lookup(lookup => lookup
+            //.DataSource(d => d.Mvc().Controller("m_UserMaster").LoadAction("ShiftLookup").Key("ShiftID"))
+            //.DisplayExpr("ShiftType")
+            //.ValueExpr("ShiftID"));
 
-                columns.Add().DataField("Status").Caption("Status");
-                columns.Add().DataField("EmployeeCode").Caption("Employee Code").Visible(false);
-                columns.Add().DataField("CompanyCode").Caption("Company Code").Visible(false);
-                columns.Add().DataField("LocationCode").Caption("Location Code").Visible(false);
-                columns.Add().DataField("UserLocationId").Caption("User LocationId").Visible(false);
-                columns.Add().DataField("UserImage").Caption("User Image").Visible(false);
-                columns.Add().DataField("UserExpireDate").Caption("User ExpireDate").Visible(false);
-                columns.Add().DataField("CreateDate").Caption("Create Date").DataType(GridColumnDataType.Date).Format(ViewBag.GlobalDtFormat).AllowSearch(true)
-        @*.CustomizeText(@<text>
+            columns.Add().DataField("Status").Caption("Status");
+            columns.Add().DataField("EmployeeCode").Caption("Employee Code").Visible(false);
+            columns.Add().DataField("CompanyCode").Caption("Company Code").Visible(false);
+            columns.Add().DataField("LocationCode").Caption("Location Code").Visible(false);
+            columns.Add().DataField("UserLocationId").Caption("User LocationId").Visible(false);
+            columns.Add().DataField("UserImage").Caption("User Image").Visible(false);
+            columns.Add().DataField("UserExpireDate").Caption("User ExpireDate").Visible(false);
+            columns.Add().DataField("CreateDate").Caption("Create Date").DataType(GridColumnDataType.Date).Format(ViewBag.GlobalDtFormat).AllowSearch(true)
+        
+@*.CustomizeText(@<text>
             function(e){
 
             var datetime = "";
@@ -267,12 +268,12 @@
             }
             return datetime;
             }
-        </text>)*@
-                .Visible(false);
+        </text>)*@                .Visible(false);
                     columns.Add().DataField("UserCreated").Caption("User Created").Visible(false);
                     columns.Add().DataField("TransDate").Caption("Trans Date")
                     .DataType(GridColumnDataType.Date).Format(ViewBag.GlobalDtFormat).AllowSearch(true)
-        @*.CustomizeText(@<text>
+        
+@*.CustomizeText(@<text>
             function(e){
 
             var datetime = "";
@@ -284,8 +285,7 @@
 
             return datetime;
             }
-        </text>)*@
-                    .Visible(false);
+        </text>)*@                    .Visible(false);
 
                     columns.Add()
                     .DataField("LastSignedin").Caption("Last Signed in")
@@ -293,6 +293,7 @@
                     .DataType(GridColumnDataType.DateTime)
                     .Format(ViewBag.GlobalDtFormat)
                     //.CalculateCellValue("calculateCellValue")
+
 @*.CustomizeText(@<text>
     function(e){
 
@@ -305,8 +306,7 @@
 
     return datetime;
     }
-</text>)*@
-;
+</text>)*@;
                         columns.Add().DataField("ModifyBy").Caption("Modify By").Visible(false);
 
             //columns.AddFor(c => c.CreateDate).FormItem(f => f.Visible(false));
@@ -609,11 +609,11 @@
                     });
                 }
             });
-            var storeShift= DevExpress.data.AspNet.createStore({
+            @*var storeShift= DevExpress.data.AspNet.createStore({
                 "key": "ShiftID",
                 "loadUrl": "@Url.Action("ShiftLookup", "m_UserMaster", new { httproute = true })",
                 "loadParams": {ShiftID:data.ShiftID}
-        });
+        });*@
 
         var storeDep= DevExpress.data.AspNet.createStore({
                 "key": "DepID",
@@ -636,25 +636,25 @@
                         $('#txtLastName').dxTextBox('instance').option('value', data.LastName);
                         $('#txtUserEmail').dxTextBox('instance').option('value', data.UserEmail);
 
-                        $("#txtShiftType").dxSelectBox({
-                            dataSource: storeShift,
-                            valueExpr: 'ShiftID',
-                            displayExpr: 'ShiftType',
-                            searchEnabled: true,
-                            searchExpr: ["ShiftID", "ShiftType"],
-                            itemTemplate: function (itemData) {
-                                return $("<div />").append(
-                                    $("<p />").text(itemData.ShiftType)
-                                        .css("display", "inline-block")
-                                );
-                            },
-                            onValueChanged: function (e) {
-                                selectedShift = e.value;
-                                //var item = e.component.option('selectedItem');
-                            },
-                            value: data.ShiftID
+                        //$("#txtShiftType").dxSelectBox({
+                        //    dataSource: storeShift,
+                        //    valueExpr: 'ShiftID',
+                        //    displayExpr: 'ShiftType',
+                        //    searchEnabled: true,
+                        //    searchExpr: ["ShiftID", "ShiftType"],
+                        //    itemTemplate: function (itemData) {
+                        //        return $("<div />").append(
+                        //            $("<p />").text(itemData.ShiftType)
+                        //                .css("display", "inline-block")
+                        //        );
+                        //    },
+                        //    onValueChanged: function (e) {
+                        //        selectedShift = e.value;
+                        //        //var item = e.component.option('selectedItem');
+                        //    },
+                        //    value: data.ShiftID
 
-                        });
+                        //});
 
 
                         $("#txtDepID").dxSelectBox({
@@ -794,10 +794,10 @@
             "key": "MenuIdentity",
             "loadUrl": "@Url.Action("MenuMasterLookup", "m_UserMaster",new { httproute = true })"
         });
-        var storeShift= DevExpress.data.AspNet.createStore({
+        @*var storeShift= DevExpress.data.AspNet.createStore({
             "key": "ShiftID",
             "loadUrl": "@Url.Action("ShiftLookup", "m_UserMaster",new { httproute = true })"
-        });
+        });*@
 
         var storeDep = DevExpress.data.AspNet.createStore({
                 "key": "DepID",
@@ -815,7 +815,7 @@
                     $('#addtxtFirstName').removeClass('dx-invalid');
                     $('#addtxtLastName').removeClass('dx-invalid');
                     $('#addtxtUserEmail').removeClass('dx-invalid');
-                    $('#addtxtShiftType').removeClass('dx-invalid');
+                    //$('#addtxtShiftType').removeClass('dx-invalid');
                     $('#addtxtDepID').removeClass('dx-invalid');
                     $('#addtxtStatus').removeClass('dx-invalid');
                 },
@@ -859,22 +859,22 @@
                             value: "Active"
                         });
 
-                        $("#addtxtShiftType").dxSelectBox({
-                            dataSource: storeShift,
-                            valueExpr: 'ShiftID',
-                            displayExpr: 'ShiftType',
-                            searchEnabled: true,
-                            searchExpr: ["ShiftID", "ShiftType"],
-                            itemTemplate: function (itemData) {
-                                return $("<div />").append(
-                                    $("<p />").text(itemData.ShiftType)
-                                        .css("display", "inline-block")
-                                );
-                            },
-                            onValueChanged: function (e) {
-                                selectedShift=e.value;
-                            }
-                        });
+                        //$("#addtxtShiftType").dxSelectBox({
+                        //    dataSource: storeShift,
+                        //    valueExpr: 'ShiftID',
+                        //    displayExpr: 'ShiftType',
+                        //    searchEnabled: true,
+                        //    searchExpr: ["ShiftID", "ShiftType"],
+                        //    itemTemplate: function (itemData) {
+                        //        return $("<div />").append(
+                        //            $("<p />").text(itemData.ShiftType)
+                        //                .css("display", "inline-block")
+                        //        );
+                        //    },
+                        //    onValueChanged: function (e) {
+                        //        selectedShift=e.value;
+                        //    }
+                        //});
 
                         $("#addtxtDepID").dxSelectBox({
                             dataSource: storeDep,
@@ -937,7 +937,7 @@
                     $('#addtxtFirstName').removeClass('dx-invalid');
                     $('#addtxtLastName').removeClass('dx-invalid');
                     $('#addtxtUserEmail').removeClass('dx-invalid');
-                    $('#addtxtShiftType').removeClass('dx-invalid');
+                    //$('#addtxtShiftType').removeClass('dx-invalid');
                     $('#addtxtDepID').removeClass('dx-invalid');
                     $('#addtxtStatus').removeClass('dx-invalid');
 
@@ -951,7 +951,7 @@
                         $("#addtxtFirstName").dxTextBox("instance").option("value", '');
                         $("#addtxtLastName").dxTextBox("instance").option("value", '');
                         $("#addtxtUserEmail").dxTextBox("instance").option("value", '');
-                        $("#addtxtShiftType").dxSelectBox("instance").option("value", '');
+                        //$("#addtxtShiftType").dxSelectBox("instance").option("value", '');
                         $("#addtxtDepID").dxSelectBox("instance").option("value", '');
                         $("#addtxtStatus").dxSelectBox("instance").option("value", '');
                         $("#addlistMenuIdentity").dxList("instance").reload();
@@ -963,7 +963,7 @@
                         $('#addtxtFirstName').removeClass('dx-invalid');
                         $('#addtxtLastName').removeClass('dx-invalid');
                         $('#addtxtUserEmail').removeClass('dx-invalid');
-                        $('#addtxtShiftType').removeClass('dx-invalid');
+                        //$('#addtxtShiftType').removeClass('dx-invalid');
                         $('#addtxtDepID').removeClass('dx-invalid');
                         $('#addtxtStatus').removeClass('dx-invalid');
                 },

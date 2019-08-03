@@ -19,8 +19,23 @@
     .dx-datagrid-rowsview .dx-data-row .dx-cell-modified .dx-highlight-outline::after {
         border-color: transparent;
     }
+
+    .dx-scrollview-content {
+        height: 300px;
+        /*overflow: auto;*/
+    }
+    #Choose {
+        background-color: #fe7515;
+        /*border-color: aliceblue;*/
+        color: white !important;
+    }
+
+    #Choose:hover {
+        background-color: #ff6a00; /* Green */
+    }
+
 </style>
-<div id="addscrollpop" class="scrollpop">
+<div id="GridDocNum_scrollpop" class="scrollpop">
     <div class="addcontentpop">
       
         @using (Html.BeginForm())
@@ -31,8 +46,17 @@
                 <form id="form1" name="form1">
                     <div class="form-group">
                         <label class="col-lg-2">Production Order No.<span style="color:red;">*</span></label>
-                        <div class="col-lg-4" style="padding-bottom:10px;">
+                        <div class="col-lg-3" style="padding-bottom:10px;">
                             @(Html.DevExtreme().TextBox().ID("txtDocNum").Name("DocNum").OnChange("docnum_changed").Placeholder("100116"))
+                           
+                        </div>
+                        <div class="col-lg-1">
+                            @(Html.DevExtreme().Button()
+                                 .Icon("find")
+                                 //.Text("Done")
+                                 .Type(ButtonType.Default)
+                                   .OnClick("FindDocNum")
+                            )
                         </div>
                         <label class="col-lg-2">Status.</label>
                         <div class="col-lg-4" style="padding-bottom:10px;">
@@ -170,12 +194,12 @@
 
 
                                                                      .Paging(paging => paging.PageSize(10))
-                                                                            .Pager(p => p
-                                                                            .AllowedPageSizes(new int[] { 10, 25, 50, 100 })
-                                                                            .ShowInfo(true)
-                                                                            .ShowNavigationButtons(true)
-                                                                            .ShowPageSizeSelector(true)
-                                                                            .Visible(true))
+                                                                        .Pager(p => p
+                                                                        .AllowedPageSizes(new int[] { 10, 25, 50, 100 })
+                                                                        .ShowInfo(true)
+                                                                        .ShowNavigationButtons(true)
+                                                                        .ShowPageSizeSelector(true)
+                                                                        .Visible(true))
                                                                     .HeaderFilter(h => h.Visible(true))
                                                                     //.FilterPanel(f => f.Visible(true))
                                                                     //.FilterValue(filterValue)
@@ -197,20 +221,80 @@
                                     <div id="checked-items"></div>
                                 </div>
                                 @(Html.DevExtreme().Button().ID("addbtnSave")
-                                                                                            .Text("Save").Type(ButtonType.Success)
-                                                                                            .Disabled(true).FocusStateEnabled(true)
-                                                                                            .OnClick("SaveInspection"))
+                                                            .Text("Save").Type(ButtonType.Success)
+                                                            .Disabled(true).FocusStateEnabled(true)
+                                                            .OnClick("SaveInspection"))
                                 @(Html.DevExtreme().Button().Type(ButtonType.Normal).ID("addbtnCancel")
-                                                                                            .Text("Cancel")
-                                                                                            .OnClick("function (e) { location.reload(); }"))
+                                                            .Text("Cancel")
+                                                            .OnClick("function (e) { location.reload(); }"))
                             </div>
                         </div>
+                     @(Html.DevExtreme().Popup()
+        .ID("PopupDocNum")
+    .Title("Production Order")
+    .Visible(false)
+    //.Height(300)
+    .MaxHeight(500)
+    .MaxWidth(500)
+    .Position(po => po.My(HorizontalAlignment.Center, VerticalAlignment.Center)
+    .At(HorizontalAlignment.Center, VerticalAlignment.Center)
+    .Of(new JS("window")))
+    .ElementAttr("class", "popup")
+    .ContentTemplate(@<text>
+        
+       @(Html.DevExtreme().DataGrid<MCP_WEB.Models.VW_MFC_OWOR>()
+           .ID("gridProduction")
+           .DataSource(ds => ds.Mvc()
+           .Controller("GirdInspectionResult")
+           .LoadAction("Get_OWOR")
+           )
+           .Selection(s => s.Mode(SelectionMode.Single))
+           .HoverStateEnabled(true)
+           .OnSelectionChanged("selection_changed")
+           .ColumnAutoWidth(true)
+           .RemoteOperations(true)
+           .ShowBorders(true)
+           .ShowRowLines(true)
+           .Height(300)
+           .OnRowClick("onRowClick")
+           .LoadPanel(loadPanel => loadPanel.Enabled(true))
+           .Scrolling(scrolling => scrolling.Mode(GridScrollingMode.Virtual))
+
+           //.Paging(paging => paging.PageSize(10))
+           .SearchPanel(searchPanel => searchPanel
+            .Visible(true)
+            .Width(185)
+            .Placeholder("Search...")
+            )
+            .Columns(columns =>
+            {
+                columns.Add().DataField("DocNum");
+                columns.Add().DataField("ItemCode");
+                //columns.Add().DataField("Status");
+            }
+             )
+
+       )<br />
+@(Html.DevExtreme().Button().ID("Choose")
+                            .Text("Choose")
+                            //.Type(ButtonType.Success)
+                            //.Disabled(true).FocusStateEnabled(true)
+                            .OnClick("ChooseDocNum"))
+@(Html.DevExtreme().Button().Type(ButtonType.Normal).ID("addbtnCancel")
+                            .Text("Cancel")
+                            .OnClick("ClosePopup"))
+
+    </text>)
+) 
+
 </form>
             }
         }
     </div>
-</div>
-               
+
+
+   
+</div>         
 <script>
 
     var arrdata = [];
@@ -220,7 +304,68 @@
     var type = "";
     var Entry_docnum = 0;
     var U_DocNum = 0;
-    var Status = "";
+    var Status = ""; 
+    var Choose_docnum;
+
+    function ChooseDocNum() {
+        if (Choose_docnum != null) {
+            $("#txtDocNum").dxTextBox('instance').option('value', Choose_docnum[0].DocNum);
+            docnum_changed();
+            ClosePopup();
+        } else {
+            DevExpress.ui.notify("Please click row data for choose.", "warning", 2000);
+        }
+    }
+
+    function ClosePopup() {
+        //arrgetitem = [];
+        //e.validationGroup.reset();
+        $('#PopupDocNum').dxPopup('instance').option('visible', false);
+
+    }
+    function onRowClick(e) {
+        var component = e.component,
+            prevClickTime = component.lastClickTime;
+        component.lastClickTime = new Date();
+        if (prevClickTime && (component.lastClickTime - prevClickTime < 300)) {
+            //Double click code  
+            console.log('double click', e);
+            $("#txtDocNum").dxTextBox('instance').option('value', e.data.DocNum);
+            docnum_changed();
+            ClosePopup();
+        }
+        else {
+            //Single click code  
+            console.log('single click');
+        }  
+    }
+
+    function selection_changed(e) {
+        //console.log(e);        
+        Choose_docnum = e.selectedRowsData;
+    }
+
+    function FindDocNum(e) {
+        Choose_docnum = null;
+        $("#PopupDocNum").dxPopup({
+            onShown: function () {
+                $("#GridDocNum_scrollpop").dxScrollView({
+                    height: '100%',
+                    width: '100%',
+                    direction: "both"
+                });
+            },
+            onContentReady: function (e) {
+                //alert(checkDepIDitem);
+                $("#GridDocNum_scrollpop").dxScrollView({
+                    height: '100%',
+                    width: '100%'
+                });
+            },
+
+        }).dxPopup('instance').option('visible', true);
+    }
+
 function SaveInspection(data) {
 var grid = $("#gridInspection").dxDataGrid('instance');
 //$("#gridInspection").dxDataGrid("saveEditData");
@@ -246,11 +391,11 @@ console.log(arrdata);
             data: { values: JSON.stringify(arrdata), "type": type, "U_DocEntry": Entry_docnum, "U_DocNum": U_DocNum},
             dataType: 'json',
             success: function (result) {
-                console.log(result[0].U_AbsEntry);
+                //console.log(result[0].U_AbsEntry);
                 $.ajax({
                     type: 'GET',
                     url: '@Url.Action("Get_RoutestageSUB", "GirdInspectionResult")',
-                    data: { "U_StgEntry": result[0].U_StgEntry,"Docentry":Entry_docnum },
+                    data: { "U_StgEntry": arrdata[0].U_StgEntry,"Docentry":Entry_docnum },
                     dataType: 'json',
                     success: function (result_R) {
                         console.log(result_R["items"][0].status);
@@ -287,13 +432,13 @@ function ontoolbarItem(e) {
 }
 
 function editstart(e) {
-$("#addbtnSave").dxButton({
-    disabled: false
-    //elementAttr: {
-    //    id: "elementId",
-    //    class: "class-name"
-    //}
-});
+    $("#addbtnSave").dxButton({
+        disabled: false
+        //elementAttr: {
+        //    id: "elementId",
+        //    class: "class-name"
+        //}
+    });
 }
 function onEditorPrepared(e) {
     if (e.parentType === "dataRow") {
@@ -365,7 +510,7 @@ function onCellPrepared(e) {
         if (e.column.dataField == "U_InspectMethod" || e.column.dataField == "U_UpdateBy" || e.column.dataField == "U_UpdateDate") {
             e.cellElement.css("background-color", "lightgray");
         }
-        console.log(type);
+        //console.log(type);
         if (type == "master") {
             //arrdata = [];
             arrdata.push(e.data);
@@ -374,7 +519,7 @@ function onCellPrepared(e) {
             });
             arrdata.push(e.data);
         }
-        console.log(arrdata);
+        //console.log(arrdata);
 
         //console.log(e.column.command);
         //console.log(e.data);
@@ -465,9 +610,10 @@ if (!isNaN(txtDocNum)) {
                                         columns: [{ dataField: "Code", caption: "No." }, { dataField: "Name", caption: "Description" }, { dataField: "Status", caption: "Status" }],
                                         hoverStateEnabled: true,
                                         showRowLines: true,
-                                        paging: { enabled: true, pageSize: 10 },
+                                        //showBorders: true,
+                                        paging: { enabled: true, pageSize: 4 },
                                         filterRow: { visible: true },
-                                        scrolling: { mode: "infinite" },
+                                        //scrolling: { mode: "infinite" },
                                         selection: { mode: "single" },
                                         //selectedRowKeys: [value],
                                         height: "100%",
@@ -537,7 +683,7 @@ if (!isNaN(txtDocNum)) {
                                                         
                                                        
                                                         $("#gridInspection").dxDataGrid({
-                                                            dataSource: datasourceR,
+                                                            dataSource: datasourceR,                                                            
                                                             columns: [{
                                                                 dataField: "U_InspectMethod",
                                                                 caption: "Inspection Method",
@@ -579,29 +725,39 @@ if (!isNaN(txtDocNum)) {
                                                                             var U_PassQty = gridInspection.cellValue(rowIndex, 'U_PassQty');
                                                                             //console.log(U_PassQty);
                                                                             if (U_PassQty == undefined || U_PassQty == null) {
-                                                                                options.rule.message = "Pass Qty is required.";
-                                                                                $("#addbtnSave").dxButton({
-                                                                                    disabled: true
-                                                                                });
-                                                                                //gridInspection.cellValue(rowIndex, "U_PassQty", 0);
+                                                                                //options.rule.message = "Pass Qty is required.";
+                                                                                //$("#addbtnSave").dxButton({
+                                                                                //    disabled: true
+                                                                                //});
+                                                                                gridInspection.cellValue(rowIndex, "U_PassQty", 0);
                                                                             } else {
-                                                                                if (parseFloat(total) > parseFloat(txtPlannedQty)) {
-                                                                                    options.rule.message = "Please input [PassQty, RejectQty] Must not be over To PlannedQty.";
-                                                                                    $("#addbtnSave").dxButton({
-                                                                                        disabled: true
-                                                                                    });
-                                                                                } else {
-                                                                                    flag = true;
-                                                                                    if (arr_INOUT == "out") {
-                                                                                        $("#addbtnSave").dxButton({
-                                                                                            disabled: false
-                                                                                        });
-                                                                                    } else {
+                                                                                if (!Number.isInteger(U_PassQty)) {//ถ้าไม่เป็นจำนวนเต็ม
+                                                                                    //options.rule.message = "Pass Qty is not Integer.";
+                                                                                    //$("#addbtnSave").dxButton({
+                                                                                    //    disabled: true
+                                                                                    //});
+                                                                                    gridInspection.cellValue(rowIndex, "U_PassQty", 0);
+                                                                                } else {//ถ้าเป็นจำนวนเต็ม
+                                                                                    if (parseFloat(total) > parseFloat(txtPlannedQty)) {// ถ้าผลลัพธ์ที่รวมกันมันมากกว่า PlannedQty
+                                                                                        options.rule.message = "Please input [PassQty, RejectQty] Must not be over To PlannedQty.";
                                                                                         $("#addbtnSave").dxButton({
                                                                                             disabled: true
                                                                                         });
+                                                                                    } else {
+                                                                                        flag = true;
+                                                                                        if (arr_INOUT == "out") {//ถ้าเอา cursor ออกมาจาก textbox แล้วให้ enable ปุ่ม save
+                                                                                            $("#addbtnSave").dxButton({
+                                                                                                disabled: false
+                                                                                            });
+                                                                                        } else {
+                                                                                            $("#addbtnSave").dxButton({
+                                                                                                disabled: true
+                                                                                            });
+                                                                                        }
                                                                                     }
+
                                                                                 }
+                                                                                
                                                                             }
                                                                             return flag;
 
@@ -649,24 +805,33 @@ if (!isNaN(txtDocNum)) {
                                                                                 //    disabled: true
                                                                                 //});
                                                                             } else {
-                                                                                if (parseFloat(total1) > parseFloat(txtPlannedQty)) {
-                                                                                    options.rule.message = "Please input [PassQty, RejectQty] Must not be over To PlannedQty.";
-                                                                                    $("#addbtnSave").dxButton({
-                                                                                        disabled: true
-                                                                                    });
-                                                                                } else {
-                                                                                    flag = true;
-                                                                                    if (arr_INOUT == "out") {
-                                                                                        $("#addbtnSave").dxButton({
-                                                                                            disabled: false
-                                                                                        });
-                                                                                    } else {
+                                                                                if (!Number.isInteger(U_RejQty)) {//ถ้าไม่เป็นจำนวนเต็ม
+                                                                                    //options.rule.message = "Reject Qty is not Integer.";
+                                                                                    //$("#addbtnSave").dxButton({
+                                                                                    //    disabled: true
+                                                                                    //});
+                                                                                    gridInspection.cellValue(rowIndex, 'U_RejQty', 0);
+                                                                                } else {//ถ้าเป็นจำนวนเต็ม
+                                                                                    if (parseFloat(total1) > parseFloat(txtPlannedQty)) {
+                                                                                        options.rule.message = "Please input [PassQty, RejectQty] Must not be over To PlannedQty.";
                                                                                         $("#addbtnSave").dxButton({
                                                                                             disabled: true
                                                                                         });
-                                                                                    }
+                                                                                    } else {
+                                                                                        flag = true;
+                                                                                        if (arr_INOUT == "out") {
+                                                                                            $("#addbtnSave").dxButton({
+                                                                                                disabled: false
+                                                                                            });
+                                                                                        } else {
+                                                                                            $("#addbtnSave").dxButton({
+                                                                                                disabled: true
+                                                                                            });
+                                                                                        }
 
+                                                                                    }
                                                                                 }
+                                                                                
 
                                                                             }
                                                                             // console.log("total", total1 + "<=" + txtPlannedQty);
@@ -771,19 +936,20 @@ if (!isNaN(txtDocNum)) {
                                                                         item.visible = false;
                                                                     }
                                                                     if (item.name == 'revertButton') {
-                                                                        item.options.onClick = function (arg) {
-                                                                            e.component.cancelEditData();
-                                                                            //e.component.option('editing.allowUpdating', true);
-                                                                            //var gridInstance = $('#gridInspectionMaintenance').dxDataGrid('instance');
-                                                                            //gridInstance.option("allowColumnReordering", true);
-                                                                            //gridInstance.option("headerFilter", true);
-                                                                            //e.component.refresh();
-                                                                            //stagenew = "";
-                                                                            arrdata = [];
+                                                                        item.visible = false;
+                                                                        //item.options.onClick = function (arg) {
+                                                                        //    e.component.cancelEditData();
+                                                                        //    //e.component.option('editing.allowUpdating', true);
+                                                                        //    //var gridInstance = $('#gridInspectionMaintenance').dxDataGrid('instance');
+                                                                        //    //gridInstance.option("allowColumnReordering", true);
+                                                                        //    //gridInstance.option("headerFilter", true);
+                                                                        //    //e.component.refresh();
+                                                                        //    //stagenew = "";
+                                                                        //    arrdata = [];
 
 
 
-                                                                        }
+                                                                        //}
                                                                     }
 
                                                                 });

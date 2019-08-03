@@ -39,11 +39,11 @@
                                 @Html.DevExtreme().TextBox().Mode(TextBoxMode.Email).ID("addtxtUserEmail").Name("UserEmail")
                             </div>
 
-                            <label class="col-lg-2 " >Shift : </label>
-                            <div class="col-lg-4" style="padding-bottom:10px;">
+                            @*<label class="col-lg-2 " >Shift : </label>
+                            <div class="col-lg-4" style="padding-bottom:10px;">*@
                                 @*<div id="txtShiftType"></div>*@
-                                @(Html.DevExtreme().SelectBox().ID("addtxtShiftType").Name("ShiftID")
-                                )
+                                @*@(Html.DevExtreme().SelectBox().ID("addtxtShiftType").Name("ShiftID"))*@
+                                
                                 @*<div class="dx-texteditor-container">
                                         <div class="form-group">
                                             <select id="shifttest" class="form-control">
@@ -85,7 +85,7 @@
                                         </div>
                                     </div>*@
 
-                            </div>
+                            @*</div>*@
 
 
                             <label class="col-lg-2 " >Department : </label>
@@ -199,7 +199,7 @@
                     "FirstName": FirstName,
                     "LastName": LastName,
                     "UserEmail": UserEmail,
-                    "ShiftID": selectedShift,
+                    //"ShiftID": selectedShift,
                     "DepID": selectedDep,
                     "Status": Status
                     },

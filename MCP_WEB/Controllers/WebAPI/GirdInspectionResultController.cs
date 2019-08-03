@@ -68,6 +68,29 @@ namespace MCP_WEB.Controllers.WebAPI
         }
 
         [HttpGet]
+        public object Get_OWOR(DataSourceLoadOptions loadOptions)
+        {
+            try
+            {                
+                var OWOR = from owor in _context.VW_MFC_OWOR
+                           where owor.Status != "C" && owor.Status != "L"
+                          select new
+                          {
+                              owor.DocEntry,
+                              owor.DocNum,
+                              owor.ItemCode,
+                              owor.Status
+                          };
+                return DataSourceLoader.Load(OWOR, loadOptions);
+            }
+            catch (Exception ex)
+            {
+                return false;
+            }
+
+        }
+
+        [HttpGet]
         public IActionResult Get_Routestage(DataSourceLoadOptions loadOptions, string DocEntry)
         {
             //DocEntry = "117";

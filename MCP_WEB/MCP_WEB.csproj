@@ -1969,6 +1969,9 @@
     <PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="2.1.9" />
     <PackageReference Include="System.Data.DataSetExtensions" Version="4.5.0" />
     <PackageReference Include="System.Drawing.Common" Version="4.5.0" />
+    <PackageReference Include="vue" Version="2.5.17" />
+    <PackageReference Include="Vue.js.Developers.Version" Version="2.4.2" />
+    <PackageReference Include="Vue.Net.WebComponents" Version="0.1.12" />
     <PackageReference Include="ZXing.Net" Version="0.16.4" />
 	<PackageReference Include="DotNetCore.NPOI" Version="1.2.0" />
   </ItemGroup>

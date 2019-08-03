@@ -1,4 +1,9 @@
-﻿
+﻿<style>
+    #menu-main-menu > li, #top-area .menu > ul > li {
+        word-wrap: break-word;
+        max-width: 100px;
+    }
+</style>
 
 <aside class="main-sidebar">
     <!-- sidebar: style can be found in sidebar.less -->
@@ -22,7 +27,7 @@
                 if (menuNames.MenuID == "MasterData") { icon = "fa fa-edit"; }
                 if (menuNames.MenuID == "ReportingProcess") { icon = "fa  fa-files-o"; }
                 if (menuNames.MenuID == "Isonite") { icon = "fa fa-th"; }
-                if (menuNames.MenuID == "Productions") { icon = "fa fa-laptop"; }
+                if (menuNames.MenuID == "Productions") { icon = "fa fa-check-square-o"; }
                 if (menuNames.MenuID == "ReceiptStockFG") { icon = "fa fa-mail-forward"; }
                 if (menuNames.MenuID == "FinanceReport") { icon = "fa fa-book"; }
                 if (menuNames.MenuID == "DashBoard") { icon = "fa fa-dashboard"; }
@@ -38,11 +43,12 @@
                     <ul class="treeview-menu">
                         @foreach (var subMenu in menus.GetMenuMaster(@User.FindFirst("ContactName").Value).Where(n => n.Parent_MenuID == @menuNames.MenuID))
                         {
-                            <li class="@(Html.IsMenuActive(@Url.Action(@subMenu.MenuFileName,@subMenu.MenuURL)) ? "active" : "")">
-                                <a href="@Url.Action(@subMenu.MenuFileName,@subMenu.MenuURL)">
-                                    <i class="fa fa-circle-o"></i>@subMenu.MenuName
-                                </a>
-                            </li>
+                        <li class="@(Html.IsMenuActive(@Url.Action(@subMenu.MenuFileName,@subMenu.MenuURL)) ? "active" : "")">                            
+                            <a id="link_@subMenu.MenuID" href="@Url.Action(@subMenu.MenuFileName,@subMenu.MenuURL)">
+
+                                <i class="fa fa-circle-o"></i> @subMenu.MenuID
+                            </a>
+                        </li>
                         }
                     </ul>
                 </li>

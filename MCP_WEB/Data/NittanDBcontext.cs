@@ -19,6 +19,7 @@ namespace MCP_WEB.Data
         public virtual DbSet<VW_MFC_ROUTEINSPECT> VW_MFC_ROUTEINSPECT { get; set; }
         public virtual DbSet<VW_MFC_ROUTEINSPECT_SUB> VW_MFC_ROUTEINSPECT_SUB { get; set; }
         public virtual DbSet<VW_MFC_OSRN> VW_MFC_OSRN { get; set; }
+        public virtual DbSet<VW_MFC_OWOR> VW_MFC_OWOR { get; set; }
         public virtual DbSet<VW_MFC_WOR4> VW_MFC_WOR4 { get; set; }
         public virtual DbSet<VW_MFC_M_INSPECT_RESULT> VW_MFC_M_INSPECT_RESULT { get; set; }
    
