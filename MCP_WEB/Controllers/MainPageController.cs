@@ -1,18 +1,19 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
-namespace MCP_WEB.Controllers.FrontEnd
+namespace MCP_WEB.Controllers
 {
     [Authorize]
-    public class InspectionMaintenanceController : Controller
+    public class MainPageController : Controller
     {
         public IActionResult Index()
         {
             return View();
-        }
+        }       
+
     }
 }

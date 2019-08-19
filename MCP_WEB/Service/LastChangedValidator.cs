@@ -14,9 +14,10 @@ namespace MCP_WEB.Service
     {
         public static async Task ValidateAsync(CookieValidatePrincipalContext context)
         {
+            var ToKen = Guid.NewGuid();
             // Pull database from registered DI services.
             var userRepository = context.HttpContext.RequestServices.GetRequiredService<IUserRepository>();
-            var userPrincipal = context.Principal;
+            var userPrincipal = context.Principal;// get user login
 
             var _context = context.HttpContext.RequestServices.GetRequiredService<NittanDBcontext>();
 
@@ -27,8 +28,12 @@ namespace MCP_WEB.Service
                            select c.Value).FirstOrDefault();
 
 
-            if (string.IsNullOrEmpty(lastChanged))
+            if (string.IsNullOrEmpty(lastChanged))// cookie หมดไปแล้ว
             {
+                var model_1 = _context.UserTransaction.FirstOrDefault(x => x.UserName == lastChanged);
+                _context.UserTransaction.Remove(model_1);
+                _context.SaveChanges();
+
                 context.RejectPrincipal();
 
                 await context.HttpContext.SignOutAsync(
@@ -42,9 +47,9 @@ namespace MCP_WEB.Service
 
                     var model1 = _context.UserTransaction.Where(x => x.UserName == lastChanged).FirstOrDefault();
 
-                    int Minute = (DateTime.Now - model1.DateExprie).Minutes;
+                    int Minute = (DateTime.Now - model1.DateExprie).Days;
 
-                    if (Minute <= 10)
+                    if (Minute <= 1)
                     {
                         var model_1 = _context.UserTransaction.FirstOrDefault(x => x.UserName == lastChanged);
                         model1.DateExprie = DateTime.Now;
@@ -60,21 +65,30 @@ namespace MCP_WEB.Service
                         DeleteDataRefresh(lastChanged, _context);
 
 
-                        var ToKen = Guid.NewGuid();
+                        //var ToKen = Guid.NewGuid();
 
-                        var Model_Tran = new UserTransaction
-                        {
-                            UserName = lastChanged,
-                            Token = ToKen.ToString(),
-                            SessionKey = "",
-                            DateExprie = DateTime.Now
-                        };
-                        _context.UserTransaction.AddRange(Model_Tran);
-                        _context.SaveChanges();
+                        //var Model_Tran = new UserTransaction
+                        //{
+                        //    UserName = lastChanged,
+                        //    Token = ToKen.ToString(),
+                        //    SessionKey = "",
+                        //    DateExprie = DateTime.Now
+                        //};
+                        //_context.UserTransaction.AddRange(Model_Tran);
+                        //_context.SaveChanges();
+
+                        //redirec logout
+                        context.RejectPrincipal();
+                        await context.HttpContext.SignOutAsync(
+                      CookieAuthenticationDefaults.AuthenticationScheme);
                     }
                 }
                 else
                 {
+
+                    //var model_1 = _context.UserTransaction.FirstOrDefault(x => x.UserName == lastChanged);
+                    //_context.UserTransaction.Remove(model_1);
+                    //_context.SaveChanges();
 
                     context.RejectPrincipal();
 

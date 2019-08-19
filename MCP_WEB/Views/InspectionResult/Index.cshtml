@@ -1,4 +1,5 @@
 ﻿@model MCP_WEB.Models.VW_MFC_Header_Route_stage
+@*@using Microsoft.AspNetCore.Http;*@
 <style>
 
     a {
@@ -24,20 +25,20 @@
         height: 300px;
         /*overflow: auto;*/
     }
+
     #Choose {
         background-color: #fe7515;
         /*border-color: aliceblue;*/
         color: white !important;
     }
 
-    #Choose:hover {
-        background-color: #ff6a00; /* Green */
-    }
-
+        #Choose:hover {
+            background-color: #ff6a00; /* Green */
+        }
 </style>
 <div id="GridDocNum_scrollpop" class="scrollpop">
     <div class="addcontentpop">
-      
+
         @using (Html.BeginForm())
         {
             using (Html.DevExtreme().ValidationGroup())
@@ -46,256 +47,304 @@
                 <form id="form1" name="form1">
                     <div class="form-group">
                         <label class="col-lg-2">Production Order No.<span style="color:red;">*</span></label>
-                        <div class="col-lg-3" style="padding-bottom:10px;">
-                            @(Html.DevExtreme().TextBox().ID("txtDocNum").Name("DocNum").OnChange("docnum_changed").Placeholder("100116"))
-                           
+                        <div class="col-lg-5" style="padding-bottom:10px;">
+                            @(Html.DevExtreme().TextBox().ID("txtDocNum").Name("DocNum").OnChange("docnum_changed"))
+
                         </div>
                         <div class="col-lg-1">
                             @(Html.DevExtreme().Button()
-                                 .Icon("find")
-                                 //.Text("Done")
-                                 .Type(ButtonType.Default)
-                                   .OnClick("FindDocNum")
+                                .Icon("find")
+                                //.Text("Done")
+                                .Type(ButtonType.Default)
+                                .OnClick("FindDocNum")
                             )
                         </div>
                         <label class="col-lg-2">Status.</label>
-                        <div class="col-lg-4" style="padding-bottom:10px;">
+                        <div class="col-lg-2" style="padding-bottom:10px;">
                             @(Html.DevExtreme().TextBox().ID("txtStatus").Name("Status").Disabled(true).InputAttr("style", "background-color: lightgray; color:black; font-weight: bold;"))
                         </div>
-                        <label class="col-lg-2">Sale Order No.</label>
-                        <div class="col-lg-4" style="padding-bottom:10px;">
-                            @(Html.DevExtreme().TextBox().ID("txtOriginNum").Name("OriginNum").Disabled(true).InputAttr("style", "background-color: lightgray; color:black; font-weight: bold;"))
-                        </div>
                         <label class="col-lg-2">Product No.</label>
-                        <div class="col-lg-4" style="padding-bottom:10px;">
+                        <div class="col-lg-6" style="padding-bottom:10px;">
                             @(Html.DevExtreme().TextBox().ID("txtItemCode").Name("ItemCode").Disabled(true).InputAttr("style", "background-color: lightgray; color:black; font-weight: bold;"))
                         </div>
-                        <label class="col-lg-2">Product Description</label>
-                        <div class="col-lg-4" style="padding-bottom:10px;">
-                            @(Html.DevExtreme().TextBox().ID("txtProdName").Name("ProdName").Disabled(true).InputAttr("style", "background-color: lightgray; color:black; font-weight: bold;"))
-                        </div>
-                        <label class="col-lg-2">Planed Quantity</label>
-                        <div class="col-lg-4" style="padding-bottom:10px;">
-                            @(Html.DevExtreme().TextBox().ID("txtPlannedQty").Name("PlannedQty").Disabled(true).InputAttr("style", "background-color: lightgray; color:black; font-weight: bold;"))
-                        </div>
-                        <label class="col-lg-2">UOM</label>
-                        <div class="col-lg-4" style="padding-bottom:10px;">
-                            @(Html.DevExtreme().TextBox().ID("txtUom").Name("Uom").Disabled(true).InputAttr("style", "background-color: lightgray; color:black; font-weight: bold;"))
-                        </div>
                         <label class="col-lg-2">Start Date</label>
-                        <div class="col-lg-4" style="padding-bottom:10px;">
+                        <div class="col-lg-2" style="padding-bottom:10px;">
                             @(Html.DevExtreme().TextBox().ID("txtStartDate").Name("StartDate").Disabled(true).InputAttr("style", "background-color: lightgray; color:black; font-weight: bold;"))
                         </div>
+
+
+
+                        <label class="col-lg-2">Product Description</label>
+                        <div class="col-lg-6" style="padding-bottom:10px;">
+                            @(Html.DevExtreme().TextBox().ID("txtProdName").Name("ProdName").Disabled(true).InputAttr("style", "background-color: lightgray; color:black; font-weight: bold;"))
+                        </div>
+
                         <label class="col-lg-2">Due Date</label>
-                        <div class="col-lg-4" style="padding-bottom:10px;">
+                        <div class="col-lg-2" style="padding-bottom:10px;">
                             @(Html.DevExtreme().TextBox().ID("txtDueDate").Name("DueDate").Disabled(true).InputAttr("style", "background-color: lightgray; color:black; font-weight: bold;"))
                         </div>
-                                                
+
+                        <label class="col-lg-2">Planed Quantity</label>
+                        <div class="col-lg-3" style="padding-bottom:10px;">
+                            @(Html.DevExtreme().TextBox().ID("txtPlannedQty").Name("PlannedQty").Disabled(true).InputAttr("style", "background-color: lightgray; color:black; font-weight: bold;"))
+
+                        </div>
+                        <label class="col-lg-1">UOM</label>
+                        <div class="col-lg-2" style="padding-bottom:10px;">
+                            @(Html.DevExtreme().TextBox().ID("txtUom").Name("Uom").Disabled(true).InputAttr("style", "background-color: lightgray; color:black; font-weight: bold;"))
+                        </div>
+
+
+                        <label class="col-lg-2">Sale Order No.</label>
+                        <div class="col-lg-2" style="padding-bottom:10px;">
+                            @(Html.DevExtreme().TextBox().ID("txtOriginNum").Name("OriginNum").Disabled(true).InputAttr("style", "background-color: lightgray; color:black; font-weight: bold;"))
+                        </div>
+
+
                         <label class="col-lg-8"></label>
                         <div class="col-lg-4" style="padding-bottom:10px;">
                         </div>
-                            <label class="col-lg-2">Route Stage</label>
-                            <div class="col-lg-10" style="padding-bottom:10px;">
-                                @*<div id="gridBox"></div>*@
-                                @(Html.DevExtreme().DropDownBox()
-                                                    .Value("")
-                                                    .ID("gridBox")
-                                                    //.ValueExpr("Code")
-                                                    //.DisplayExpr("Name")
-                                                    .Width("100%")
-                                        //.DataSource(d => d.Mvc()
-                                        //.Controller("GirdInspectionResult")
-                                        //.LoadAction("Get_Routestage"))
-                                        //.Placeholder("Select a value...")
-                                        //.ShowClearButton(true)
-                                        //.OnValueChanged("gridBox_valueChanged")
-                                        //.ContentTemplate(new TemplateName("EmbeddedDataGridSingle"))
+                        <label class="col-lg-2">Route Stage</label>
+                        <div class="col-lg-10" style="padding-bottom:10px;">
+                            @*<div id="gridBox"></div>*@
+                            @(Html.DevExtreme().DropDownBox()
+                                            .Value("")
+                                            .ID("gridBox")
+                                            //.ValueExpr("Code")
+                                            //.DisplayExpr("Name")
+                                            .Width("100%")
+                                    //.DataSource(d => d.Mvc()
+                                    //.Controller("GirdInspectionResult")
+                                    //.LoadAction("Get_Routestage"))
+                                    //.Placeholder("Select a value...")
+                                    //.ShowClearButton(true)
+                                    //.OnValueChanged("gridBox_valueChanged")
+                                    //.ContentTemplate(new TemplateName("EmbeddedDataGridSingle"))
 
-                                )
+                            )
 
-                            </div>
-                            <div class="col-lg-12" style="padding-bottom:10px;">
-                                @(Html.DevExtreme().DataGrid<MCP_WEB.Models.VW_MFC_M_INSPECT_RESULT>()
-                                                                .ID("gridInspection")
-                                                                //.DataSource(ds => ds.Mvc()
-                                                                //.Controller("GirdInspectionResult")
-                                                                //.LoadAction("Get_RoutestageSUB")
-                                                                //.LoadParams(new { DocEntry = "117" })
-                                                                //.Key("U_AbsEntry")
-                                                                //)
-                                                                //.Editing(editing =>
-                                                                //{
-                                                                //    editing.Mode(GridEditMode.Batch);
-                                                                //    editing.AllowUpdating(true);
-
-                                                                //})
-                                                                //.OnToolbarPreparing("ontoolbarItem")
-                                                                .OnCellPrepared("onCellPrepared")
-                                                                .RowAlternationEnabled(true)
-                                                                .Selection(s => s.Mode(SelectionMode.Multiple)
-                                                                .ShowCheckBoxesMode(GridSelectionShowCheckBoxesMode.Always)
-                                                                .SelectAllMode(SelectAllMode.Page))
-                                                                .Paging(paging => paging.Enabled(true))
-                                                                .RemoteOperations(true)
-                                                                .AllowColumnReordering(true)
-                                                                .AllowColumnResizing(true)
-                                                                //.HeaderFilter(headerFilter => headerFilter.Visible(true))
-
-                                                                .Export(e => e.Enabled(true).FileName("Route_stage_SUB" + DateTime.Now).AllowExportSelectedData(true))
-
-                                                                //.ColumnChooser(c => c.Enabled(true))
-                                                                .ShowBorders(true)
-                                                                .ShowRowLines(true)
-                                                                //.Grouping(grouping => grouping.AutoExpandAll(true))
-                                                                //.GroupPanel(groupPanel => groupPanel.Visible(true))
-                                                                //.OnRowPrepared("rowcolor")
-                                                                //.OnToolbarPreparing("toolbar_preparing")
-                                                                .ColumnMinWidth(100)
-                                                                .ColumnAutoWidth(true)
-                                                                .ColumnHidingEnabled(true)
-                                                                .Columns(columns =>
-                                                                {
-                                                                        //columns.Add().Caption("Edit or Delete").Width(125).Alignment(HorizontalAlignment.Center)
-                                                                        //.CellTemplate(new JS("cellTemplate")).AllowExporting(false);
-
-                                                                        //columns.Add().DataField("UserId").Caption("User Id").ShowInColumnChooser(false).Visible(false);
-
-                                                                        //columns.Add().DataField("U_AbsEntry").Caption("DocEntry IN");
-                                                                        columns.Add().DataField("Code").Visible(false);
-                                                                        columns.Add().DataField("U_StgEntry").Visible(false);
-                                                                        columns.Add().DataField("U_InspectEntry").Visible(false);
-                                                                        columns.Add().DataField("U_RptOrdering").Visible(false);
-                                                                    columns.Add().DataField("U_InspectMethod").Caption("Method Desc");
-                                                                    columns.Add().DataField("U_PassQty").Caption("Pass Qty");
-                                                                    columns.Add().DataField("U_RejQty").Caption("Reject Qty");
-                                                                    columns.Add().DataField("U_Reason").Caption("Reject Reason");
-                                                                    columns.Add().DataField("U_Comment").Caption("Comment");
-                                                                    columns.Add().DataField("U_UpdateBy").Caption("Last update by");
-                                                                    columns.Add().DataField("U_UpdateDate").Caption("Last update date").DataType(GridColumnDataType.DateTime).Format("dd/MM/yyyy");
-                                                                        //.GroupIndex(0);
-
-                                                                        //columns.Add().DataField("CreateDate").Caption("Create Date").DataType(GridColumnDataType.Date).Format(ViewBag.GlobalDtFormat).AllowSearch(true)
-
-                                                                        //.Visible(false);
-                                                                        //columns.Add().DataField("UserCreated").Caption("User Created").Visible(false);
-                                                                        //columns.Add().DataField("TransDate").Caption("Trans Date")
-                                                                        //.DataType(GridColumnDataType.Date).Format(ViewBag.GlobalDtFormat).AllowSearch(true)
-
-                                                                        //.Visible(false);
-
-                                                                        //columns.Add()
-                                                                        //.DataField("LastSignedin").Caption("Last Signed in")
-                                                                        //.AllowSearch(true)
-                                                                        //.DataType(GridColumnDataType.DateTime)
-                                                                        //.Format(ViewBag.GlobalDtFormat);
-                                                                        //columns.Add().DataField("ModifyBy").Caption("Modify By").Visible(false);
-
-                                                                    })
-
-
-                                                                     .Paging(paging => paging.PageSize(10))
-                                                                        .Pager(p => p
-                                                                        .AllowedPageSizes(new int[] { 10, 25, 50, 100 })
-                                                                        .ShowInfo(true)
-                                                                        .ShowNavigationButtons(true)
-                                                                        .ShowPageSizeSelector(true)
-                                                                        .Visible(true))
-                                                                    .HeaderFilter(h => h.Visible(true))
-                                                                    //.FilterPanel(f => f.Visible(true))
-                                                                    //.FilterValue(filterValue)
-                                                                    .FilterRow(filterRow => filterRow
-                                                                    .Visible(true)
-                                                                    .ApplyFilter(GridApplyFilterMode.Auto)
-                                                                    )
-                                                                    .SearchPanel(searchPanel => searchPanel
-                                                                    .Visible(true)
-                                                                    .Width(185)
-                                                                    .Placeholder("Search...")
-                                                                    ).OnEditingStart("editstart").OnEditorPrepared("onEditorPrepared")
-                                )
-                            </div>
-
-                            <div class="col-sm-offset-2 col-sm-10" style="text-align:right; padding-bottom:10px;">
-                                <div id="selection-treeview"></div>
-                                <div class="selected-data">
-                                    <div id="checked-items"></div>
-                                </div>
-                                @(Html.DevExtreme().Button().ID("addbtnSave")
-                                                            .Text("Save").Type(ButtonType.Success)
-                                                            .Disabled(true).FocusStateEnabled(true)
-                                                            .OnClick("SaveInspection"))
-                                @(Html.DevExtreme().Button().Type(ButtonType.Normal).ID("addbtnCancel")
-                                                            .Text("Cancel")
-                                                            .OnClick("function (e) { location.reload(); }"))
-                            </div>
                         </div>
-                     @(Html.DevExtreme().Popup()
-        .ID("PopupDocNum")
-    .Title("Production Order")
-    .Visible(false)
-    //.Height(300)
-    .MaxHeight(500)
-    .MaxWidth(500)
-    .Position(po => po.My(HorizontalAlignment.Center, VerticalAlignment.Center)
-    .At(HorizontalAlignment.Center, VerticalAlignment.Center)
-    .Of(new JS("window")))
-    .ElementAttr("class", "popup")
-    .ContentTemplate(@<text>
-        
-       @(Html.DevExtreme().DataGrid<MCP_WEB.Models.VW_MFC_OWOR>()
-           .ID("gridProduction")
-           .DataSource(ds => ds.Mvc()
-           .Controller("GirdInspectionResult")
-           .LoadAction("Get_OWOR")
-           )
-           .Selection(s => s.Mode(SelectionMode.Single))
-           .HoverStateEnabled(true)
-           .OnSelectionChanged("selection_changed")
-           .ColumnAutoWidth(true)
-           .RemoteOperations(true)
-           .ShowBorders(true)
-           .ShowRowLines(true)
-           .Height(300)
-           .OnRowClick("onRowClick")
-           .LoadPanel(loadPanel => loadPanel.Enabled(true))
-           .Scrolling(scrolling => scrolling.Mode(GridScrollingMode.Virtual))
+                        <div class="col-lg-12" style="padding-bottom:10px;">
+                            @(Html.DevExtreme().DataGrid<MCP_WEB.Models.VW_MFC_M_INSPECT_RESULT>()
+                                .ID("gridInspection")
+                                //.DataSource(ds => ds.Mvc()
+                                //.Controller("GirdInspectionResult")
+                                //.LoadAction("Get_RoutestageSUB")
+                                //.LoadParams(new { DocEntry = "117" })
+                                //.Key("U_AbsEntry")
+                                //)
+                                //.Editing(editing =>
+                                //{
+                                //    editing.Mode(GridEditMode.Batch);
+                                //    editing.AllowUpdating(true);
 
-           //.Paging(paging => paging.PageSize(10))
-           .SearchPanel(searchPanel => searchPanel
-            .Visible(true)
-            .Width(185)
-            .Placeholder("Search...")
-            )
-            .Columns(columns =>
-            {
-                columns.Add().DataField("DocNum");
-                columns.Add().DataField("ItemCode");
-                //columns.Add().DataField("Status");
-            }
-             )
+                                //})
+                                //.OnToolbarPreparing("ontoolbarItem")
+                                .OnCellPrepared("onCellPrepared")
+                                .RowAlternationEnabled(true)
+                                .Selection(s => s.Mode(SelectionMode.Multiple)
+                                .ShowCheckBoxesMode(GridSelectionShowCheckBoxesMode.Always)
+                                .SelectAllMode(SelectAllMode.Page))
+                                .Paging(paging => paging.Enabled(true))
+                                .RemoteOperations(true)
+                                .AllowColumnReordering(true)
+                                .AllowColumnResizing(true)
+                                //.HeaderFilter(headerFilter => headerFilter.Visible(true))
 
-       )<br />
-@(Html.DevExtreme().Button().ID("Choose")
-                            .Text("Choose")
-                            //.Type(ButtonType.Success)
-                            //.Disabled(true).FocusStateEnabled(true)
-                            .OnClick("ChooseDocNum"))
-@(Html.DevExtreme().Button().Type(ButtonType.Normal).ID("addbtnCancel")
-                            .Text("Cancel")
-                            .OnClick("ClosePopup"))
+                                .Export(e => e.Enabled(true).FileName("Route_stage_SUB" + DateTime.Now).AllowExportSelectedData(true))
 
-    </text>)
-) 
+                                //.ColumnChooser(c => c.Enabled(true))
+                                .ShowBorders(true)
+                                .ShowRowLines(true)
+                                //.Grouping(grouping => grouping.AutoExpandAll(true))
+                                //.GroupPanel(groupPanel => groupPanel.Visible(true))
+                                //.OnRowPrepared("rowcolor")
+                                //.OnToolbarPreparing("toolbar_preparing")
+                                .ColumnMinWidth(100)
+                                .ColumnAutoWidth(true)
+                                .ColumnHidingEnabled(true)
+                                .Columns(columns =>
+                                {
+                                        //columns.Add().Caption("Edit or Delete").Width(125).Alignment(HorizontalAlignment.Center)
+                                        //.CellTemplate(new JS("cellTemplate")).AllowExporting(false);
 
-</form>
+                                        //columns.Add().DataField("UserId").Caption("User Id").ShowInColumnChooser(false).Visible(false);
+
+                                        //columns.Add().DataField("U_AbsEntry").Caption("DocEntry IN");
+                                        columns.Add().DataField("Code").Visible(false);
+                                    columns.Add().DataField("U_StgEntry").Visible(false);
+                                    columns.Add().DataField("U_InspectEntry").Visible(false);
+                                    columns.Add().DataField("U_RptOrdering").Visible(false);
+                                    columns.Add().DataField("U_InspectMethod").Caption("Method Desc");
+                                    columns.Add().DataField("U_PassQty").Caption("Pass Qty");
+                                    columns.Add().DataField("U_RejQty").Caption("Reject Qty");
+                                    columns.Add().DataField("U_Reason").Caption("Reject Reason");
+                                    columns.Add().DataField("U_Comment").Caption("Comment");
+                                    columns.Add().DataField("U_UpdateBy").Caption("Last updated by");
+                                    columns.Add().DataField("U_UpdateDate").Caption("Last updated date").DataType(GridColumnDataType.DateTime).Format("dd/MM/yyyy");
+                                        //.GroupIndex(0);
+
+                                        //columns.Add().DataField("CreateDate").Caption("Create Date").DataType(GridColumnDataType.Date).Format(ViewBag.GlobalDtFormat).AllowSearch(true)
+
+                                        //.Visible(false);
+                                        //columns.Add().DataField("UserCreated").Caption("User Created").Visible(false);
+                                        //columns.Add().DataField("TransDate").Caption("Trans Date")
+                                        //.DataType(GridColumnDataType.Date).Format(ViewBag.GlobalDtFormat).AllowSearch(true)
+
+                                        //.Visible(false);
+
+                                        //columns.Add()
+                                        //.DataField("LastSignedin").Caption("Last Signed in")
+                                        //.AllowSearch(true)
+                                        //.DataType(GridColumnDataType.DateTime)
+                                        //.Format(ViewBag.GlobalDtFormat);
+                                        //columns.Add().DataField("ModifyBy").Caption("Modify By").Visible(false);
+
+                                    })
+
+
+                                        .Paging(paging => paging.PageSize(10))
+                                        .Pager(p => p
+                                        .AllowedPageSizes(new int[] { 10, 25, 50, 100 })
+                                        .ShowInfo(true)
+                                        .ShowNavigationButtons(true)
+                                        .ShowPageSizeSelector(true)
+                                        .Visible(true))
+                                    .HeaderFilter(h => h.Visible(true))
+                                    //.FilterPanel(f => f.Visible(true))
+                                    //.FilterValue(filterValue)
+                                    .FilterRow(filterRow => filterRow
+                                    .Visible(true)
+                                    .ApplyFilter(GridApplyFilterMode.Auto)
+                                    )
+                                    .SearchPanel(searchPanel => searchPanel
+                                    .Visible(true)
+                                    .Width(185)
+                                    .Placeholder("Search...")
+                                    ).OnEditingStart("editstart").OnEditorPrepared("onEditorPrepared")
+        )
+                        </div>
+
+                        <div class="col-sm-offset-2 col-sm-10" style="text-align:right; padding-bottom:10px;">
+                            <div id="selection-treeview"></div>
+                            <div class="selected-data">
+                                <div id="checked-items"></div>
+                            </div>
+                            @(Html.DevExtreme().Button().ID("addbtnSave")
+                                                    .Text("Save").Type(ButtonType.Success)
+                                                    .Disabled(true).FocusStateEnabled(true)
+                                                    .OnClick("SaveInspection"))
+                            @(Html.DevExtreme().Button().Type(ButtonType.Normal).ID("addbtnCancel")
+                                                    .Text("Cancel")
+                                                    .OnClick("function (e) { location.reload(); }"))
+                        </div>
+                    </div>
+                    @(Html.DevExtreme().Popup()
+                       .ID("PopupDocNum")
+                   .Title("Production Order")
+                   .Visible(false)
+                   //.Height(300)
+                   .MaxHeight(500)
+                   .MaxWidth(500)
+                   .Position(po => po.My(HorizontalAlignment.Center, VerticalAlignment.Center)
+                   .At(HorizontalAlignment.Center, VerticalAlignment.Center)
+                   .Of(new JS("window")))
+                   .ElementAttr("class", "popup")
+                   .ContentTemplate(@<text>
+
+                    @(Html.DevExtreme().DataGrid<MCP_WEB.Models.VW_MFC_OWOR>()
+                                .ID("gridProduction")
+                                .DataSource(ds => ds.Mvc()
+                                .Controller("GirdInspectionResult")
+                                .LoadAction("Get_OWOR")
+                                )
+                                .Selection(s => s.Mode(SelectionMode.Single))
+                                .HoverStateEnabled(true)
+                                .OnSelectionChanged("selection_changed")
+                                .ColumnAutoWidth(true)
+                                .RemoteOperations(true)
+                                .ShowBorders(true)
+                                .ShowRowLines(true)
+                                .Height(300)
+                                .OnRowClick("onRowClick")
+                                .LoadPanel(loadPanel => loadPanel.Enabled(true))
+                                .Scrolling(scrolling => scrolling.Mode(GridScrollingMode.Virtual))
+
+                                //.Paging(paging => paging.PageSize(10))
+                                .SearchPanel(searchPanel => searchPanel
+                                 .Visible(true)
+                                 .Width(185)
+                                 .Placeholder("Search...")
+                                 )
+                                 .Columns(columns =>
+                                 {
+                                  columns.Add().DataField("DocNum");
+                                  columns.Add().DataField("ItemCode");
+                              //columns.Add().DataField("Status");
+                          }
+                                  )
+
+                    )<br />
+                    @(Html.DevExtreme().Button().ID("Choose")
+                                                    .Text("Choose")
+                                                    //.Type(ButtonType.Success)
+                                                    //.Disabled(true).FocusStateEnabled(true)
+                                                    .OnClick("ChooseDocNum"))
+                    @(Html.DevExtreme().Button().Type(ButtonType.Normal).ID("addbtnCancel")
+                                                    .Text("Cancel")
+                                                    .OnClick("ClosePopup"))
+
+                </text>)
+                    )
+
+                </form>
             }
         }
     </div>
 
 
-   
-</div>         
+
+</div>
+
 <script>
+    @*var getCookies=  @HttpContext.Current.Request.Cookies["CartCookie"].Value;*@
+    //var stop = setInterval(function () {
+    //    $.ajax({
+    //        type: 'GET',
+    //        url: "api/TimeLogin/GetTime",
+    //        async: false,
+    //        //beforeSend: function () {/*loading*/ },
+    //        //dataType: 'json',
+    //        success: function (result) {
+    //            console.log(result);
+    //        }
+    //    });
+    //}, 10000);
+
+    //alert(MinuteTimeLogin);
+    //while (1<2) {
+    //    setTimeout(function () {
+    //        console.log(MinuteTimeLogin);
+    //    }, 5000);
+    //}
+
+    //if (MinuteTimeLogin >= 1) {
+    //    setTimeout(function () {
+    //        $.ajax({
+    //            type: 'GET',
+    //            url: "api/Login/Logout",
+    //            async: false,
+    //            //beforeSend: function () {/*loading*/ },
+    //            //dataType: 'json',
+    //            success: function (result) {
+    //                window.open("Login/Logout", '_self');
+    //            }
+    //        });
+
+
+    //    }, 5000);
+    //}
+
 
     var arrdata = [];
     var allowupdate = true;
@@ -304,7 +353,7 @@
     var type = "";
     var Entry_docnum = 0;
     var U_DocNum = 0;
-    var Status = ""; 
+    var Status = "";
     var Choose_docnum;
 
     function ChooseDocNum() {
@@ -328,20 +377,20 @@
             prevClickTime = component.lastClickTime;
         component.lastClickTime = new Date();
         if (prevClickTime && (component.lastClickTime - prevClickTime < 300)) {
-            //Double click code  
+            //Double click code
             console.log('double click', e);
             $("#txtDocNum").dxTextBox('instance').option('value', e.data.DocNum);
             docnum_changed();
             ClosePopup();
         }
         else {
-            //Single click code  
+            //Single click code
             console.log('single click');
-        }  
+        }
     }
 
     function selection_changed(e) {
-        //console.log(e);        
+        //console.log(e);
         Choose_docnum = e.selectedRowsData;
     }
 
@@ -391,8 +440,22 @@ console.log(arrdata);
             data: { values: JSON.stringify(arrdata), "type": type, "U_DocEntry": Entry_docnum, "U_DocNum": U_DocNum},
             dataType: 'json',
             success: function (result) {
-                //console.log(result[0].U_AbsEntry);
-                $.ajax({
+                console.log("result0",result[0]);
+                if (result[0] == "U") {
+                    var customDialog = DevExpress.ui.dialog.custom({
+                        title: 'Login time exprie',
+                        message: 'Please login again.',
+                        toolbarItems: [
+                            { text: "Close", onClick: function () { return "Ok" } },
+                        ],
+                        width: "500px"
+                    });
+                    customDialog.show().done(function (dialogResult) {
+                        window.open("Login/Logout", '_self');
+                    });
+
+                } else {
+                    $.ajax({
                     type: 'GET',
                     url: '@Url.Action("Get_RoutestageSUB", "GirdInspectionResult")',
                     data: { "U_StgEntry": arrdata[0].U_StgEntry,"Docentry":Entry_docnum },
@@ -410,6 +473,8 @@ console.log(arrdata);
                         }
                     }
                 });
+                }
+
             }
         });
     } else {
@@ -525,10 +590,15 @@ function onCellPrepared(e) {
         //console.log(e.data);
 
     }
+
+
 }
 
 function docnum_changed() {
-var grid = $("#gridInspection").dxDataGrid('instance');
+        $("#addbtnSave").dxButton({
+            disabled: true
+        });
+    var grid = $("#gridInspection").dxDataGrid('instance');
 //grid.getController("editing").isEditing()
 //$("#txtOriginNum").find("input").css({ "background": "lightgray", "color": "black"});
     var txtDocNum = $("#txtDocNum").dxTextBox('instance').option('value');
@@ -607,7 +677,7 @@ if (!isNaN(txtDocNum)) {
                                     console.log(e.component.option("dataSource"));
                                     $dataGrid = $("<div>").dxDataGrid({
                                         dataSource: e.component.option("dataSource"),
-                                        columns: [{ dataField: "Code", caption: "No." }, { dataField: "Name", caption: "Description" }, { dataField: "Status", caption: "Status" }],
+                                        columns: [{ dataField: "Code", caption: "Route Stage" }, { dataField: "Name", caption: "Description" }, { dataField: "Status", caption: "Status" }],
                                         hoverStateEnabled: true,
                                         showRowLines: true,
                                         //showBorders: true,
@@ -617,7 +687,7 @@ if (!isNaN(txtDocNum)) {
                                         selection: { mode: "single" },
                                         //selectedRowKeys: [value],
                                         height: "100%",
-                                        onSelectionChanged: function (selectedItems) {                                            
+                                        onSelectionChanged: function (selectedItems) {
                                             arrdata = [];
                                             //console.log("arrdata",arrdata);
                                             var gridItems = $("#gridInspection").dxDataGrid('instance');
@@ -631,18 +701,17 @@ if (!isNaN(txtDocNum)) {
                                                 "loadParams": { "DocEntry": keys[0].DocEntry, "Code": keys[0].Code}
                                             });*@
                                             console.log(keys[0].Status);
-                                           
-                                            if (Status == "Canceled" || Status == "Closed") {
-                                                console.log("Docstatus",Status);
-                                                allowupdate = false;
-                                               
-                                            } else {
-                                                if (keys[0].Status == "Complate" || keys[0].Status == "Planned") {
+
+                                            if (Status == "Released") {//check status เอกสารก่อน
+                                                if (keys[0].Status == "Complate" || keys[0].Status == "Planned") {// แล้วcheck status route stage
                                                     allowupdate = false;
                                                 } else { allowupdate = true; }
-                                               
+
+                                            } else {
+                                                console.log("Docstatus", Status);
+                                                allowupdate = false;
                                             }
-                                            
+
 
                                             //console.log(allowupdate);
                                             $.ajax({
@@ -651,18 +720,19 @@ if (!isNaN(txtDocNum)) {
                                                 data: { "U_StgEntry": keys[0].AbsEntry, "Docentry": docentry },
                                                 dataType: 'json',
                                                 success: function (result_R) {
-                                                    console.log(result_R["items"][0].data.length);
+                                                    console.log(result_R["items"][0].data);
                                                     if (result_R["items"][0].status) {
 
                                                         var datasourceR = result_R["items"][0].data;
                                                         type = result_R["items"][0].type;
-                                                        if (Status == "Canceled" || Status == "Closed") {
+                                                        if (allowupdate==false) {//เช็ค status หลัก
                                                             $("#addbtnSave").dxButton({
                                                                 disabled: true
                                                             });
                                                         } else {
-                                                            if (result_R["items"][0].data.length > 0) {//check case ที่เลือก route stage มาแล้วมีข้อมูล transection ไหม
+                                                            if (result_R["items"][0].data.length > 0) {//check case ที่เลือก route stage มาแล้วมีข้อมูล master หรือ transection ไหม
                                                                 if (type != undefined || type == "master") {// ถ้าเป็นข้อมูลที่ดึกมาจาก master เพราะยังไม่มี transection
+                                                                    //alert(allowupdate);
                                                                     $("#addbtnSave").dxButton({
                                                                         disabled: false
                                                                     });
@@ -680,10 +750,10 @@ if (!isNaN(txtDocNum)) {
                                                             }
 
                                                         }
-                                                        
-                                                       
+
+
                                                         $("#gridInspection").dxDataGrid({
-                                                            dataSource: datasourceR,                                                            
+                                                            dataSource: datasourceR,
                                                             columns: [{
                                                                 dataField: "U_InspectMethod",
                                                                 caption: "Inspection Method",
@@ -724,13 +794,15 @@ if (!isNaN(txtDocNum)) {
                                                                             var flag = false;
                                                                             var U_PassQty = gridInspection.cellValue(rowIndex, 'U_PassQty');
                                                                             //console.log(U_PassQty);
-                                                                            if (U_PassQty == undefined || U_PassQty == null) {
+                                                                            if (U_PassQty == undefined || U_PassQty == null || parseFloat(U_PassQty) < 0 ) {
                                                                                 //options.rule.message = "Pass Qty is required.";
                                                                                 //$("#addbtnSave").dxButton({
                                                                                 //    disabled: true
                                                                                 //});
                                                                                 gridInspection.cellValue(rowIndex, "U_PassQty", 0);
                                                                             } else {
+                                                                                //console.log(U_PassQty);
+
                                                                                 if (!Number.isInteger(U_PassQty)) {//ถ้าไม่เป็นจำนวนเต็ม
                                                                                     //options.rule.message = "Pass Qty is not Integer.";
                                                                                     //$("#addbtnSave").dxButton({
@@ -757,7 +829,7 @@ if (!isNaN(txtDocNum)) {
                                                                                     }
 
                                                                                 }
-                                                                                
+
                                                                             }
                                                                             return flag;
 
@@ -798,7 +870,7 @@ if (!isNaN(txtDocNum)) {
                                                                             //console.log(options.rule.validator._validationGroup.isValid);
                                                                             var U_RejQty = gridInspection.cellValue(rowIndex, 'U_RejQty');
                                                                             var flag = false;
-                                                                            if (U_RejQty == undefined || U_RejQty == null) {
+                                                                            if (U_RejQty == undefined || U_RejQty == null || parseFloat(U_RejQty) < 0) {
                                                                                 gridInspection.cellValue(rowIndex, 'U_RejQty',0);
                                                                                 //options.rule.message = "Reject Qty is required.";
                                                                                 //$("#addbtnSave").dxButton({
@@ -831,7 +903,7 @@ if (!isNaN(txtDocNum)) {
 
                                                                                     }
                                                                                 }
-                                                                                
+
 
                                                                             }
                                                                             // console.log("total", total1 + "<=" + txtPlannedQty);
@@ -865,6 +937,7 @@ if (!isNaN(txtDocNum)) {
                                                                 startEditAction: "dblClick"
                                                             },
                                                             onEditorPreparing: function (e) {
+                                                                //console.log(e.parentType);
                                                                 if (e.parentType === "dataRow") {
 
                                                                     if (e.dataField === "U_Comment") {
@@ -880,21 +953,21 @@ if (!isNaN(txtDocNum)) {
                                                                         //oldOnValueChanged = () => console.log('change value');
 
                                                                     }
+                                                                    e.editorElement.focusout(function (e) {
+                                                                        arr_INOUT = "out";
+                                                                        //console.log("out");
+                                                                        $("#addbtnSave").dxButton({
+                                                                            disabled: false
+                                                                        });
+                                                                    });
+                                                                    e.editorElement.focusin(function (i) {
+                                                                        arr_INOUT = "in";
+                                                                        $("#addbtnSave").dxButton({
+                                                                            disabled: true
+                                                                        });
+                                                                    });
                                                                 }
-                                                                e.editorElement.focusout(function (e) {
-                                                                    arr_INOUT = "out";
-                                                                    //console.log("out");
-                                                                    $("#addbtnSave").dxButton({
-                                                                        disabled: false
-                                                                    });
-                                                                });
-                                                                e.editorElement.focusin(function (i) {
-                                                                    //console.log("in");
-                                                                    arr_INOUT = "in";
-                                                                    $("#addbtnSave").dxButton({
-                                                                        disabled: true
-                                                                    });
-                                                                });
+
 
                                                                 //if (e.parentType === "dataRow") {// return;
 

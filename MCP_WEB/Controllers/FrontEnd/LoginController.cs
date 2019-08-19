@@ -21,6 +21,7 @@ namespace MCP_WEB.Controllers.FrontEnd
     {
         public readonly NittanDBcontext _context;
         public HttpContext _session;
+        
         public LoginController(NittanDBcontext context)
         {
             _context = context;
@@ -32,14 +33,22 @@ namespace MCP_WEB.Controllers.FrontEnd
             //    //Response.Cookies.Delete(cookieKey);
             //}
 
+            var identity = (ClaimsIdentity)User.Identity;
+
+            string lastChanged;
+            lastChanged = (from c in identity.Claims
+                           where c.Type == "ContactName"
+                           select c.Value).FirstOrDefault();
+
             int a = Request.Cookies.Keys.Count();
-            if (a <= 1)
+            //if (a <= 1)
+            if (string.IsNullOrEmpty(lastChanged))
             {
                 return View();
             }
             else
             {
-                return RedirectToAction("Index", "InspectionMaintenance");
+                return RedirectToAction("Index", "MainPage");
             }
 
         }
@@ -53,6 +62,7 @@ namespace MCP_WEB.Controllers.FrontEnd
             ViewData["ReturnUrl"] = returnUrl;
             try
             {
+                string sessionID = HttpContext.Session.Id.ToString();
                 if (ModelState.IsValid)
                 {
                     ModelState.Remove("FirstName");
@@ -70,6 +80,7 @@ namespace MCP_WEB.Controllers.FrontEnd
                         }
                         else
                         {
+
                             var identity = (ClaimsIdentity)User.Identity;
 
                             string lastChanged;
@@ -77,79 +88,81 @@ namespace MCP_WEB.Controllers.FrontEnd
                                            where c.Type == "ContactName"
                                            select c.Value).FirstOrDefault();
 
-
-                            //CheckTransacTion(model.Username);
-
-                            //var claims = new List<Claim> { new Claim("ContactName", model.Username ?? "") };
-                            //ClaimsIdentity userIdentity = new ClaimsIdentity(claims, "login");
-                            //ClaimsPrincipal principal = new ClaimsPrincipal(userIdentity);
-
-                            //await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, user);
-
-                            if (string.IsNullOrEmpty(lastChanged))
+                            if (_context.UserTransaction.Any(x => x.UserName == model.Username)) //มี user ในtable UserTransaction
                             {
-                                // return RedirectToAction("Index", "Login");
-
-                            }
-                            else
-                            {
-                                return RedirectToAction("Index", "InspectionMaintenance");
-                            }
-
-
-                            // HttpContext.Session.SetString("Username", model.Username);
-
-                            //DbFunctions dfunc = null;
-                            if (_context.UserTransaction.Any(x => x.UserName == model.Username))
-                            {
-                                //         var model1 = _context.UserTransaction.Where(x => SqlServerDbFunctionsExtensions
+                                // var model1 = _context.UserTransaction.Where(x => SqlServerDbFunctionsExtensions
                                 //.DateDiffMinute(dfunc, Convert.ToDateTime(x.DateExprie), Convert.ToDateTime(DateTime.Now)) <= 10 && x.UserName == model.Username).FirstOrDefault();
                                 var model1 = _context.UserTransaction.Where(x => x.UserName == model.Username).FirstOrDefault();
 
-                                double Minute = (DateTime.Now - model1.DateExprie).TotalMinutes;
-
-                                if (Minute <= 3)
+                                double Minute = (DateTime.Now - model1.DateExprie).Days;//login นานเท่าไหร่
+                                if(Minute <= 1)//เวลายังไม่หมด
                                 {
-                                    ViewBag.UserLoginFailed = "Login Failed.Please enter correct credentials";
-                                    return View();
+                                    //if (string.IsNullOrEmpty(lastChanged))//เข้ามาในระบบ อีก browser หรือ อีกเครื่อง แต่มี login ค้างอยู่อีก browser
+                                    //{
+                                    //ViewBag.UserLoginFailed = "time:" + Minute.ToString();
+                                    //    return View();
+                                    //}
+                                    //else
+                                    //{
+                                    //    return RedirectToAction("Index", "MainPage");
+                                    //}
+
+                                    ClaimsPrincipal user = new ClaimsPrincipal(new ClaimsIdentity(new[]
+                                   {new Claim("ContactName", model.Username ?? "")}, CookieAuthenticationDefaults.AuthenticationScheme));
+
+                                    await HttpContext.SignInAsync(
+                                    CookieAuthenticationDefaults.AuthenticationScheme,
+                                    new ClaimsPrincipal(user),
+                                    new AuthenticationProperties
+                                    {
+                                        //CookiePath = new PathString("/Login/Logout"),
+                                        IsPersistent = true,
+                                        ExpiresUtc = DateTime.UtcNow.AddDays(1)
+                                    });
+
+                                    var model_1 = _context.UserTransaction.FirstOrDefault(x => x.UserName == model.Username);
+                                    model1.DateExprie = DateTime.Now;
+                                    _context.SaveChanges();
+                                    return RedirectToAction("Index", "MainPage");
                                 }
                                 else
                                 {
-
                                     ClaimsPrincipal user = new ClaimsPrincipal(new ClaimsIdentity(new[]
-                                    {new Claim("ContactName", model.Username ?? "")}, CookieAuthenticationDefaults.AuthenticationScheme));
+                                   {new Claim("ContactName", model.Username ?? "")}, CookieAuthenticationDefaults.AuthenticationScheme));
 
                                     await HttpContext.SignInAsync(
-                                CookieAuthenticationDefaults.AuthenticationScheme,
-                                new ClaimsPrincipal(user),
-                                new AuthenticationProperties
-                                {
+                                    CookieAuthenticationDefaults.AuthenticationScheme,
+                                    new ClaimsPrincipal(user),
+                                    new AuthenticationProperties
+                                    {
                                     //CookiePath = new PathString("/Login/Logout"),
                                     IsPersistent = true,
-                                    ExpiresUtc = DateTime.UtcNow.AddMinutes(10)
-                                });
+                                        ExpiresUtc = DateTime.UtcNow.AddDays(1)
+                                    });
 
-                                    var model_1 = _context.UserTransaction.FirstOrDefault(x => x.UserName == model.Username);
-                                    _context.UserTransaction.Remove(model_1);
+                                    var model_2 = _context.UserTransaction.FirstOrDefault(x => x.UserName == model.Username);
+                                    _context.UserTransaction.Remove(model_2);
                                     _context.SaveChanges();
 
                                     DeleteDataRefresh(model.Username);
 
                                     TempData["UserName"] = model.Username;
-                                    var ToKen = Guid.NewGuid();
+                                    var ToKen1 = Guid.NewGuid();
 
-                                    var Model_Tran = new UserTransaction
+                                    var Model_Tran1 = new UserTransaction
                                     {
                                         UserName = model.Username,
-                                        Token = ToKen.ToString(),
+                                        Token = ToKen1.ToString(),
                                         SessionKey = "",
                                         DateExprie = DateTime.Now
                                     };
-                                    _context.UserTransaction.AddRange(Model_Tran);
+                                    _context.UserTransaction.AddRange(Model_Tran1);
                                     _context.SaveChanges();
-                                }
+                                    return RedirectToAction("Index", "MainPage");
+                                }                                
+
                             }
-                            else
+                            else // ไม่มี user ในtable UserTransaction
                             {
 
                                 var ToKen = Guid.NewGuid();
@@ -175,17 +188,21 @@ namespace MCP_WEB.Controllers.FrontEnd
                                 new ClaimsPrincipal(user),
                                 new AuthenticationProperties
                                 {
-                                    //CookiePath = new PathString("/Login/Logout"),
+                                        //CookiePath = new PathString("/Login/Logout"),
                                     IsPersistent = true,
-                                    ExpiresUtc = DateTime.UtcNow.AddMinutes(10)
+                                    ExpiresUtc = DateTime.UtcNow.AddDays(1)
                                 });
+                                //var identity1 = (ClaimsIdentity)User.Identity;
+                                //string lastChanged1;
+                                //lastChanged1 = (from c in identity1.Claims
+                                //                where c.Type == "ContactName"
+                                //                select c.Value).FirstOrDefault();
 
-                            }
+                                return RedirectToAction("Index", "MainPage");
 
+                            }                            
 
-                            // await HttpContext.SignInAsync(principal);
-
-                            return RedirectToAction("Index", "InspectionMaintenance");
+                            
                         }
                     }
 
@@ -199,11 +216,6 @@ namespace MCP_WEB.Controllers.FrontEnd
             {
                 return View(model);
             }
-
-        }
-
-        private void CheckTransacTion(string Username)
-        {
 
         }
 
@@ -325,7 +337,7 @@ namespace MCP_WEB.Controllers.FrontEnd
 
                             // await HttpContext.SignInAsync(principal);
 
-                            return RedirectToAction("Index", "InspectionMaintenance");
+                            return RedirectToAction("Index", "MainPage");
                         }
 
                     }

@@ -21,5 +21,6 @@ namespace MCP_WEB.Models
         public string MenuURL { get; set; }
         public string USE_YN { get; set; }
         public DateTime CreatedDate { get; set; }
+        public int ? Ordering { get; set; }
     }
 }

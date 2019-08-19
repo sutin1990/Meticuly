@@ -18,9 +18,9 @@
                 <a asp-controller="ResetPassword"><i class="fa fa-circle text-success"></i> Online</a>
             </div>*@
         </div>
-        <ul class="sidebar-menu" data-widget="tree">
-            <li class="header">MAIN Menu</li>
-            @foreach (var menuNames in menus.GetMenuMasterParent("ADMIN").Where(n => n.Parent_MenuID == "*"))
+        <ul class="sidebar-menu" data-widget="tree">           
+
+            @foreach (var menuNames in menus.GetMenuMasterParent("ADMIN").Where(n => n.Parent_MenuID == "*").OrderBy(o=>o.Ordering))
             {
                 var icon = "fa fa-gear";
                 var MenuID = menuNames.MenuID;
@@ -32,6 +32,7 @@
                 if (menuNames.MenuID == "FinanceReport") { icon = "fa fa-book"; }
                 if (menuNames.MenuID == "DashBoard") { icon = "fa fa-dashboard"; }
                 if (menuNames.MenuID == "AdjustStockWIP") { icon = "fa fa-check-square-o"; }
+                if (menuNames.MenuID == "MainPage") { icon = "fa fa-home"; }
                 <li id="@menuNames.MenuID" class="treeview ">
                     <a href="#">
                         <i class="@icon"></i>

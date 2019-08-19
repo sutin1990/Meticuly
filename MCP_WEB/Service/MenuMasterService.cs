@@ -35,7 +35,7 @@ namespace MCP_WEB.Services
             var result = (from a in _dbContext.m_UserMaster
                           join b in _dbContext.m_UserPermiss on a.UserId equals Int32.Parse(b.UserId)
                           join c in _dbContext.MenuMaster on b.MenuIdentity equals c.MenuIdentity
-                          where a.UserName == UserRole
+                          where a.UserName == UserRole                          
                           select c
                     );
 

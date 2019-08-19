@@ -51,7 +51,7 @@ namespace MCP_WEB
             services.AddSession(options =>
             {
                 // Set a short timeout for easy testing.
-                options.IdleTimeout = TimeSpan.FromSeconds(30);
+                options.IdleTimeout = TimeSpan.FromDays(1);
                 options.Cookie.HttpOnly = true;
             });
 
@@ -60,7 +60,7 @@ namespace MCP_WEB
 
             services.ConfigureApplicationCookie(options =>
             {
-                options.ExpireTimeSpan = TimeSpan.FromSeconds(30);
+                options.ExpireTimeSpan = TimeSpan.FromDays(1);
             });
 
             services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
@@ -71,11 +71,12 @@ namespace MCP_WEB
                         options.LogoutPath = new PathString("/Login/Logout");
                         options.AccessDeniedPath = new PathString("/Login/Logout");
                         options.Cookie.SecurePolicy = CookieSecurePolicy.SameAsRequest;
-                        options.Cookie.Expiration = TimeSpan.FromMinutes(30);
-                        options.ExpireTimeSpan = TimeSpan.FromMinutes(30);
+                        options.Cookie.Expiration = TimeSpan.FromDays(1);
+                        options.ExpireTimeSpan = TimeSpan.FromDays(1);
                         options.Events = new CookieAuthenticationEvents
                         {
-                            OnValidatePrincipal = LastChangedValidator.ValidateAsync
+                            OnValidatePrincipal = LastChangedValidator.ValidateAsync                           
+                            
                         };
 
                     });

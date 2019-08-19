@@ -19,7 +19,7 @@ using Newtonsoft.Json.Linq;
 
 namespace MCP_WEB.Controllers.WebAPI
 {
-    [Produces("application/json")]
+    //[Produces("application/json")]
     [Route("api/[controller]/[action]")]
     //[ApiController]
     public class GirdInspectionResultController : Controller
@@ -73,7 +73,8 @@ namespace MCP_WEB.Controllers.WebAPI
             try
             {                
                 var OWOR = from owor in _context.VW_MFC_OWOR
-                           where owor.Status != "C" && owor.Status != "L"
+                          // where owor.Status != "C" && owor.Status != "L"
+                          where owor.Status == "R"
                           select new
                           {
                               owor.DocEntry,
@@ -130,9 +131,10 @@ namespace MCP_WEB.Controllers.WebAPI
                 if (VRS.Count > 0)
                 {
                     var RS = from a in _context.VW_MFC_M_INSPECT_RESULT
-                             join b in _context.VW_MFC_ROUTEINSPECT on a.U_InspectEntry equals b.DocEntry
+                             //join b in _context.VW_MFC_ROUTEINSPECT on a.U_InspectEntry equals b.DocEntry
                              //join c in _context.VW_MFC_WOR4 on new { StgEntry = b.AbsEntry } equals new { c.StgEntry }
-                             where a.U_StgEntry == U_StgEntry && b.U_ActiveFlag == "Y" && a.U_DocEntry == Docentry
+                             where a.U_StgEntry == U_StgEntry  && a.U_DocEntry == Docentry
+                             orderby a.U_RptOrdering
                              select new
                              {
                                  a.Code,
@@ -144,8 +146,8 @@ namespace MCP_WEB.Controllers.WebAPI
                                  a.U_RejQty,
                                  a.U_Reason,
                                  a.U_Comment,
-                                 a.U_UpdateBy,
-                                 a.U_UpdateDate
+                                 U_UpdateBy = a.U_UpdateBy == null ? a.U_CreateBy : a.U_UpdateBy,
+                                 U_UpdateDate = a.U_UpdateDate == null ? a.U_CreateDate : a.U_UpdateDate
 
                              };
 
@@ -160,8 +162,9 @@ namespace MCP_WEB.Controllers.WebAPI
                 else
                 {
                     var RS = from a in _context.VW_MFC_ROUTEINSPECT 
-                             join b in _context.VW_MFC_M_INSPECT_RESULT on a.DocEntry equals b.U_InspectEntry into bs from b in bs.DefaultIfEmpty()
-                             where a.U_AbsEntry == U_StgEntry && a.U_ActiveFlag == "Y"
+                             //join b in _context.VW_MFC_M_INSPECT_RESULT on a.DocEntry equals b.U_InspectEntry into bs from b in bs.DefaultIfEmpty()
+                             where a.U_AbsEntry == U_StgEntry && a.U_ActiveFlag == "Y" 
+                             orderby a.U_RptOrder //descending มากไปน้อย
                              select new
                              {
                                  Code = a.DocEntry,
@@ -169,12 +172,12 @@ namespace MCP_WEB.Controllers.WebAPI
                                  U_InspectMethod = a.U_MethodDesc,
                                  U_InspectEntry = a.DocEntry,
                                  U_RptOrdering = a.U_RptOrder,
-                                 U_PassQty = b.U_PassQty == null ? 0 : b.U_PassQty,
-                                 U_RejQty =  b.U_RejQty == null ? 0: b.U_RejQty,
-                                 U_Reason = b.U_Reason == null ?"":b.U_Reason,
-                                 U_Comment = b.U_Comment == null ? "" : b.U_Comment,                             
-                                 b.U_UpdateBy,
-                                 b.U_UpdateDate
+                                 U_PassQty = 0,//b.U_PassQty == null ? 0 : b.U_PassQty,
+                                 U_RejQty =  0,//b.U_RejQty == null ? 0: b.U_RejQty,
+                                 U_Reason = "",//b.U_Reason == null ?"":b.U_Reason,
+                                 U_Comment = ""//b.U_Comment == null ? "" : b.U_Comment,                             
+                                 //U_UpdateBy  = "",//b.U_UpdateBy,
+                                 //U_UpdateDate = "" //b.U_UpdateDate
                              };
 
                     var result = new
@@ -208,6 +211,11 @@ namespace MCP_WEB.Controllers.WebAPI
             var identity = (ClaimsIdentity)User.Identity;
             IEnumerable<Claim> claims = identity.Claims;
             var userLogin = claims.FirstOrDefault();
+            //string isnulluser = userLogin;
+            if (userLogin == null)
+            {
+                return  Json("UserExprie");
+            }
             DataTable dt_result = new DataTable();           
             dt_result.Columns.Add("SqlStatus", typeof(System.String));
             dt_result.Columns.Add("SqlErrtext", typeof(System.String));

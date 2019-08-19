@@ -41,7 +41,7 @@ namespace MCP_WEB.Controllers.FrontEnd
 
                 context.SaveChanges();
 
-                return RedirectToAction("Index", "Home");
+                return RedirectToAction("Index", "MainPage");
             }
             else
             {

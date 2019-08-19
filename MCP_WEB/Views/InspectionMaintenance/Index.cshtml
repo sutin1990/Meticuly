@@ -1,4 +1,5 @@
 ﻿@model MCP_WEB.Models.VW_MFC_ROUTEINSPECT
+@using System.Security.Claims;
 <style>
 
     a {
@@ -40,7 +41,17 @@
         font-weight: bold;
     }*/
 </style>
+
+@{ 
+    var identity = (ClaimsIdentity)User.Identity;
+    string lastChanged;
+    lastChanged = (from c in identity.Claims
+                   where c.Type == "ContactName"
+                   select c.Value).FirstOrDefault();
+}
 <script>
+    var username = "@lastChanged";
+    console.log(username);
     function cellTemplate_btnDelete(element, cellInfo) {
         //$('<a/>')
         //    .addClass('dx-link dx-link-edit dx-icon-edit dx-link-edit-4x ')
@@ -86,7 +97,7 @@
 
     function deleteButtonClick(data) {
         var grid = $('#gridInspectionMaintenance').dxDataGrid('instance');
-        var result = ShowConfirmDialog('Are you sure you want to Delete record Method [<lable style = "color:red;">' + data.U_MethodDesc+'</lable>] ?', 'Delete Inspection Method.');
+        var result = ShowConfirmDialog('Are you sure you want to delete - inspection method [<lable style = "color:red;">' + data.U_MethodDesc+'</lable>] ?', 'Delete Inspection Method.');
         //console.log(data)
         result.done(function (dialogResult) {
             if (dialogResult) { // Yes: confirm close
@@ -101,7 +112,14 @@
                         if (result.length > 0) {
                             if (result[0].SqlStatus == "S") {
                                 DevExpress.ui.notify("Delete success.", "success", 1000);
-                                grid.refresh();
+                                grid.refresh();                               
+                                grid.clearSorting();
+                                grid.columnOption('U_RouteCode', 'sortOrder', 'asc');
+                                grid.columnOption('U_RptOrder', 'sortOrder', 'asc');
+                                grid.columnOption('U_MethodDesc', 'sortOrder', 'asc');
+                                //grid.refresh();
+                                //OnInitialized();
+
                             } else {
                                 DevExpress.ui.notify(result[0].SqlErrtext, "warning", 2000);
                                 grid.refresh();
@@ -141,13 +159,13 @@
                     <div class="form-group">
                         
                         <div class="col-lg-12" style="padding-bottom:10px;">                           
-
+                            
                             @(Html.DevExtreme().DataGrid<MCP_WEB.Models.VW_MFC_ROUTEINSPECT>()
                                                     .ID("gridInspectionMaintenance")
                                                     .DataSource(ds => ds.Mvc()
                                                     .Controller("GirdInspectionMaintenance")
                                                     .LoadAction("Get")
-                                                    
+
                                                     //.LoadParams(new { DocEntry = "117" })
                                                     //.Key("U_AbsEntry")
                                                     )
@@ -164,9 +182,9 @@
                                                     .OnCellPrepared("onCellPrepared")
                                                     .OnContentReady("onContentReady")
                                                     .RowAlternationEnabled(true)
-                                                    .Selection(s => s.Mode(SelectionMode.Multiple)
-                                                    .ShowCheckBoxesMode(GridSelectionShowCheckBoxesMode.Always)
-                                                    .SelectAllMode(SelectAllMode.Page))
+                                                    //.Selection(s => s.Mode(SelectionMode.Multiple)
+                                                    //.ShowCheckBoxesMode(GridSelectionShowCheckBoxesMode.Always)
+                                                    //.SelectAllMode(SelectAllMode.Page))
                                                     .Paging(paging => paging.Enabled(true))
                                                     //.RemoteOperations(true)
                                                     .AllowColumnReordering(true)
@@ -174,7 +192,7 @@
 
                                                     .HeaderFilter(headerFilter => headerFilter.Visible(true))
 
-                                                    .Export(e => e.Enabled(true).FileName("InspectionMaintenance" + DateTime.Now).AllowExportSelectedData(true))
+                                                    .Export(e => e.Enabled(true).FileName("InspectionMaintenance" + DateTime.Now).AllowExportSelectedData(false))
 
                                                     // .ColumnChooser(c => c.Enabled(true))
                                                     .ShowBorders(true)
@@ -196,9 +214,7 @@
 
                                                         //columns.Add().DataField("UserId").Caption("User Id").ShowInColumnChooser(false).Visible(false);
 
-                                                        //columns.Add().DataField("U_AbsEntry").Caption("DocEntry IN");
-                                                        columns.Add().Caption("Delete").Alignment(HorizontalAlignment.Center)
-                                                        .CellTemplate(new JS("cellTemplate_btnDelete")).AllowExporting(false);
+                                                        //columns.Add().DataField("U_AbsEntry").Caption("DocEntry IN");                                                       
                                                         columns.Add().DataField("USE").Visible(false);
                                                         columns.Add().DataField("Code").Visible(false);
                                                         columns.Add().DataField("DocEntry").Visible(false);
@@ -211,19 +227,21 @@
                                                                .DisplayExpr("Code")
                                                                .ValueExpr("Code"))
                                                             //.CellTemplate("cellTemplate")
-                                                            .ValidationRules(r => r.AddCustom().ValidationCallback("validationCallback_U_RouteCode").Message("Route Code is required.")).SortOrder(SortOrder.Asc);
+                                                            .ValidationRules(r => r.AddCustom().ValidationCallback("validationCallback_U_RouteCode").Message("Route Code is required."))//.SortOrder(SortOrder.Asc)
+                                                            ;
                                                         columns.Add().DataField("Desc").Caption("Route Description");//.AllowSorting(false);
-                                                        columns.Add().DataField("U_MethodDesc").Caption("Inspection Method Description").SortOrder(SortOrder.Asc)//.AllowSorting(false)
+                                                        columns.Add().DataField("U_MethodDesc").Caption("Inspection Method Description")//.SortOrder(SortOrder.Asc)//.AllowSorting(false)
                                                         .ValidationRules(m => m.AddCustom().ValidationCallback("validationCallback_U_MethodDesc").Message("Inspection Method Description is required."));
 
-                                                        columns.Add().DataField("U_RptOrder").Caption("Report Ordering").SortOrder(SortOrder.Asc)//.AllowSorting(false)
+                                                        columns.Add().DataField("U_RptOrder").Caption("Report Ordering")//.SortOrder(SortOrder.Asc)//.AllowSorting(false)
                                                         .ValidationRules(r => r.AddCustom().ValidationCallback("validationCallback_U_RptOrder"));
                                                         columns.Add().DataField("U_ActiveFlag").Caption("Active").ValidationRules(m => m.AddCustom()
                                                         .ValidationCallback("validationCallback_U_ActiveFlag").Message("Active is required.")).DataType(GridColumnDataType.Boolean)//.AllowSorting(false)//.DataType(GridColumnDataType.Boolean)
                                                         ;
                                                         columns.Add().DataField("U_Lastupdateby").Caption("Updated By");
                                                         columns.Add().DataField("U_Lastupdatedate").Caption("Updated Date").DataType(GridColumnDataType.DateTime).Format("dd/MM/yyyy H:m:s");
-
+                                                        columns.Add().Caption("Delete").Alignment(HorizontalAlignment.Center)
+                                                       .CellTemplate(new JS("cellTemplate_btnDelete")).AllowExporting(false);
                                                         //.GroupIndex(0);
 
                                                         //columns.Add().DataField("CreateDate").Caption("Create Date").DataType(GridColumnDataType.Date).Format(ViewBag.GlobalDtFormat).AllowSearch(true)
@@ -272,6 +290,7 @@
                                                         .OnContextMenuPreparing("onContextMenuPreparing")
                                                         .OnRowPrepared("onRowPrepared")
                                                         .OnSelectionChanged("onSelectionChanged")
+                                                        .OnInitialized("OnInitialized")
                             //.OnRowRemoving()
                             //.OnRowInserting("onRowInserting")
                             //.OnRowUpdating("onRowUpdating")
@@ -312,6 +331,37 @@
     var stagenew = "";
     var statusinsert = "";
     var getdata_on_flag = [];
+    //var gridInspectionMaintenance = $('#gridInspectionMaintenance').dxDataGrid('instance');
+    //gridInspectionMaintenance.option('dataSource', []);
+
+    //var datasourcegridInspectionMaintenance = "";
+    //$.ajax({
+    //    url: "api/GirdInspectionMaintenance/Get",
+    //    dataType: "json",
+    //    success: function (result) {
+    //        console.log(result.items);
+    //        if (result.items[0].data.statuserror == true) {
+    //            datasourcegridInspectionMaintenance = "";
+    //            $("#gridInspectionMaintenance").dxDataGrid({
+    //                dataSource: ""
+    //            });
+    //        } else {//success
+    //            if (result.items[0].data.length == 0) {
+    //                $("#gridInspectionMaintenance").dxDataGrid({
+    //                    dataSource: ""
+    //                });
+    //            } else {
+    //                console.log(result);
+    //                $("#gridInspectionMaintenance").dxDataGrid({
+    //                    dataSource: result.items[0].data
+    //                });
+    //            }
+
+    //        }
+    //    },
+
+    //});
+   
     //$("#gridInspectionMaintenance").dxDataGrid({                
     //    onEditorPreparing: function (e) {
     //        if (e.parentType === "dataRow") {
@@ -340,7 +390,7 @@
     function cellTemplate(container, options) {
         source_Routestage = DevExpress.data.AspNet.createStore({
                 //"key": "ID",
-            "loadUrl": "@Url.Action("Get_OSRN", "GirdInspectionMaintenance", new { httproute = true })",
+            "loadUrl": "@Url.Action("Get_OSRN", "m_UserMaster", new { httproute = true })",
             //"loadParams": { "DocEntry": "117"}
         });
         container.append(
@@ -482,7 +532,7 @@
         var type = ea.rule.validator._validationGroup.type;
         statusinsert = type;
         var Vgroup3 = ea.rule.validator._validationGroup.isValid;
-        validationCallback("", "", "",ea, Vgroup3, type);
+        //validationCallback("", "", "",ea, Vgroup3, type);
         //console.log(el);
         var flag = false;
 
@@ -501,7 +551,7 @@
         var Vgroup0 = er.rule.validator._validationGroup.isValid;
         var type = er.rule.validator._validationGroup.type;
         statusinsert = type;
-        validationCallback(er,"", "","", Vgroup0,type);
+        //validationCallback(er,"", "","", Vgroup0,type);
         //console.log(e);
         //console.log("U_MethodDesc", e.rule);
        
@@ -530,7 +580,7 @@
         var type = el.rule.validator._validationGroup.type;
         statusinsert = type;
         var Vgroup2 = el.rule.validator._validationGroup.isValid;
-        validationCallback("","", el,"", Vgroup2,type);
+        //validationCallback("","", el,"", Vgroup2,type);
         //console.log(el);
         var flag = false;
         
@@ -563,7 +613,7 @@
         var type = e.rule.validator._validationGroup.type;
         statusinsert = type;     
         var Vgroup1 = e.rule.validator._validationGroup.isValid;
-        validationCallback("", e,"","", Vgroup1,type);
+        //validationCallback("", e,"","", Vgroup1,type);
         //console.log(e);
         //console.log("U_MethodDesc", e.rule);
             
@@ -836,28 +886,62 @@
             
 
             if (e.dataField == "U_RptOrder") {
-                if (stagenew != "new") {
-                    e.editorElement.dxNumberBox('instance').option('onValueChanged', args => {
-                        e.setValue(args.value);
+                if (stagenew != "new") {//update
+                    if (e.editorElement[0].classList[0] == "dx-numberbox") {//check type dx number box or dx text box
+                        e.editorElement.dxNumberBox('instance').option('onValueChanged', args => {
+                            e.setValue(args.value);
                             //update
-                        arrdata.push(e.row.data);
-                        arrdata = arrdata.filter((el) => {
-                            return el.DocEntry !== e.row.data.DocEntry;
+                            arrdata.push(e.row.data);
+                            arrdata = arrdata.filter((el) => {
+                                return el.DocEntry !== e.row.data.DocEntry;
+                            });
+                            arrdata.push(e.row.data)
+                            console.log(arrdata);
                         });
-                        arrdata.push(e.row.data)                        
-                        console.log(arrdata);
-                    });
-                } else {
-                    e.editorElement.dxNumberBox('instance').option('onValueChanged', args => {
-                        e.setValue(args.value);
+                    }
+
+                    if (e.editorElement[0].classList[0] == "dx-textbox") {
+                        e.editorElement.dxTextBox('instance').option('onValueChanged', args => {
+                            e.setValue(args.value);
+                            //update
+                            arrdata.push(e.row.data);
+                            arrdata = arrdata.filter((el) => {
+                                return el.DocEntry !== e.row.data.DocEntry;
+                            });
+                            arrdata.push(e.row.data)
+                            console.log(arrdata);
+                        });
+                    }
+                    
+                } else {//insert
+                    
+                    if (e.editorElement[0].classList[0] == "dx-numberbox") {//check type dx number box or dx text box
+                        e.editorElement.dxNumberBox('instance').option('onValueChanged', args => {
+                            e.setValue(args.value);
                             //insert
-                        arr_add.push(e.row.data);
-                        arr_add = arr_add.filter((el) => {
-                            return el.__KEY__ !== e.row.data.__KEY__;
+                            arr_add.push(e.row.data);
+                            arr_add = arr_add.filter((el) => {
+                                return el.__KEY__ !== e.row.data.__KEY__;
+                            });
+                            arr_add.push(e.row.data)
+                            console.log(arr_add);
                         });
-                        arr_add.push(e.row.data)                        
-                        console.log(arr_add);
-                    });
+                    }
+
+                    if (e.editorElement[0].classList[0] == "dx-textbox") {
+                        e.editorElement.dxTextBox('instance').option('onValueChanged', args => {
+                            e.setValue(args.value);
+                            //insert
+                            arr_add.push(e.row.data);
+                            arr_add = arr_add.filter((el) => {
+                                return el.__KEY__ !== e.row.data.__KEY__;
+                            });
+                            arr_add.push(e.row.data)
+                            console.log(arr_add);
+                        });
+                    }
+
+                    
                 }
                 
             }
@@ -874,7 +958,7 @@
                         arrdata.push(e.row.data)                        
                         console.log(arrdata);
                     });
-                } else {
+                } else {                    
                     e.editorElement.dxTextBox('instance').option('onValueChanged', args => {
                         e.setValue(args.value);
                        //insert
@@ -1044,6 +1128,24 @@
         console.log(arrdata);
        
         if (arr_add.length > 0) {//add
+            var Datanotcomplate = arr_add.filter((el) => {//remove ตัวที่
+                return el.U_RouteCode == undefined || el.U_MethodDesc == undefined || el.U_RptOrder == undefined;
+            });
+            console.log("Datanotcomplate", Datanotcomplate);
+            if (Datanotcomplate.length > 0) {
+                var customDialog = DevExpress.ui.dialog.custom({
+                    title: 'Add data error',
+                    message: "Cannot Add. Please complete the information.",
+                    toolbarItems: [
+                        { text: "Close", onClick: function () { return "Ok" } },
+                    ],
+                    width: "500px"
+                });
+                customDialog.show().done(function (dialogResult) {
+                    //return;
+                });
+                return;
+            }
             var checkadd_repeatedly = true;
             for (var i = 0; i < arr_add.length - 1; i++) {// loop check data ซํ้า
                 var old_RouteCode = arr_add[i].U_RouteCode;
@@ -1068,10 +1170,10 @@
            // console.log("checkadd_repeatedly", checkadd_repeatedly);
 
             if (checkadd_repeatedly) {// ข้อมูลที่ input มา ไม่ซํ้า
-                var RouteCode_ERROR = arr_add.filter((el) => {//remove ตัวที่
-                return el.U_RouteCode == undefined;
+                var RouteCode_ERROR = arr_add.filter((el) => {//ค้นหาrowที่ใส่ข้อมูลไม่ครบถ้วน
+                    return el.U_RouteCode == undefined || el.U_MethodDesc == undefined || el.U_RptOrder == undefined;
                 });
-                console.log(RouteCode_ERROR);           
+                console.log("RouteCode_ERROR",RouteCode_ERROR);           
                 if (RouteCode_ERROR.length == 0) { //ถ้าใส่ข้อมูลครบสมบูรณ์               
                     console.log(arr_add);
                     $.ajax({
@@ -1081,52 +1183,95 @@
                         data: { values: JSON.stringify(arr_add), status: "A" },
                         dataType: 'json',
                         success: function (result) {
-                            console.log(result);
-                            var status_ERROR = result;
-                            status_ERROR = status_ERROR.filter((el) => {
-                                return el.SqlStatus == "E";
-                            });
 
-                            if (status_ERROR.length > 0) {
-                                var routecodeerror = [];      
-                                $.each(status_ERROR, function (item, value) {   
-                                    var code_str_error = "["+value["DocEntry"].toString() + "->" + value["SqlErrtext"].toString()+"]";
-                                    routecodeerror.push(code_str_error);                                
-                                });
-                                console.log(routecodeerror);
+                            if (result[0] == "U") {// cookie exprie
                                 var customDialog = DevExpress.ui.dialog.custom({
-                                    title: 'add data Error',
-                                    message: "Can not add data [ " + routecodeerror.join(",") + " ]",
+                                    title: 'Login time exprie',
+                                    message: 'Please login again.',
                                     toolbarItems: [
                                         { text: "Close", onClick: function () { return "Ok" } },
                                     ],
                                     width: "500px"
                                 });
                                 customDialog.show().done(function (dialogResult) {
-                                    grid.option("editing.allowUpdating", false);
-                                    $("#addbtnSave").dxButton({
-                                        disabled: true
-                                    });
-                                    //grid.refresh();
-                                    //stagenew = "";
-                                    //arrdata = [];
-                                    //arr_add = [];
-                                    //getdata_on_flag = [];
-
+                                    window.open("Login/Logout", '_self');
                                 });
-                            } else {
-                                grid.option('editing.allowUpdating', true);
-                                grid.clearSorting();
-                                //grid.columns.sortOrder()
-                                grid.columnOption("DocEntry", "sortOrder", "desc");
-                                DevExpress.ui.notify("Add data success.", "success", 1500);
-                                grid.refresh();
-                                stagenew = "";
-                                arrdata = [];
-                                arr_add = [];
-                                getdata_on_flag = [];
-                                //setTimeout(function () { location.reload(); }, 1000);
-                            }                       
+
+                            } else {// cookie not exprie
+                                console.log(result);
+                                var status_ERROR = result;
+                                status_ERROR = status_ERROR.filter((el) => {
+                                    return el.SqlStatus == "E";
+                                });
+
+                                if (status_ERROR.length > 0) {
+
+                                    if (status_ERROR.length > 1) {
+                                        var routecodeerror = [];
+                                        $.each(status_ERROR, function (item, value) {
+                                            var code_str_error = "[" + value["DocEntry"].toString() + "->" + value["SqlErrtext"].toString() + "]";
+                                            routecodeerror.push(code_str_error);
+                                        });
+                                        console.log(routecodeerror);
+                                        var customDialog = DevExpress.ui.dialog.custom({
+                                            title: 'add data Error',
+                                            message: "Can not add data [ " + routecodeerror.join(",") + " ]",
+                                            //message: "This entry already exists.",
+                                            toolbarItems: [
+                                                { text: "Close", onClick: function () { return "Ok" } },
+                                            ],
+                                            width: "500px"
+                                        });
+                                        customDialog.show().done(function (dialogResult) {
+                                            grid.option("editing.allowUpdating", false);
+                                            $("#addbtnSave").dxButton({
+                                                disabled: true
+                                            });
+                                            //grid.refresh();
+                                            //stagenew = "";
+                                            //arrdata = [];
+                                            //arr_add = [];
+                                            //getdata_on_flag = [];
+
+                                        });
+                                    } else {
+                                        var SqlErrtext = result[0]["SqlErrtext"];
+                                        var customDialog = DevExpress.ui.dialog.custom({
+                                            title: 'add data Error',
+                                            message: SqlErrtext,
+                                            toolbarItems: [
+                                                { text: "Close", onClick: function () { return "Ok" } },
+                                            ],
+                                            width: "500px"
+                                        });
+                                        customDialog.show().done(function (dialogResult) {
+                                            grid.option("editing.allowUpdating", false);
+                                            $("#addbtnSave").dxButton({
+                                                disabled: true
+                                            });
+                                            //grid.refresh();
+                                            //stagenew = "";
+                                            //arrdata = [];
+                                            //arr_add = [];
+                                            //getdata_on_flag = [];
+
+                                        });
+                                    }
+
+                                } else {
+                                    grid.option('editing.allowUpdating', true);
+                                    grid.clearSorting();
+                                    //grid.columns.sortOrder()
+                                    grid.columnOption("DocEntry", "sortOrder", "desc");
+                                    DevExpress.ui.notify("Add data success.", "success", 1500);
+                                    grid.refresh();
+                                    stagenew = "";
+                                    arrdata = [];
+                                    arr_add = [];
+                                    getdata_on_flag = [];
+                                    //setTimeout(function () { location.reload(); }, 1000);
+                                }
+                            }                 
                             //DevExpress.ui.notify("Can not add data Error[ " + result[0].SqlErrtext + " ]", "error", 2000);  
                         },
                         error: function (er, msg) {
@@ -1136,7 +1281,7 @@
                 } else {
                     var customDialog = DevExpress.ui.dialog.custom({
                         title: 'Add data error',
-                        message: "Can not add data please complete the information.",
+                        message: "Cannot Add. Please complete the information.",
                         toolbarItems: [
                             { text: "Close", onClick: function () { return "Ok" } },
                         ],
@@ -1148,7 +1293,7 @@
             } else {// ข้อมูลที่ input มาซํ้า
                 var customDialog = DevExpress.ui.dialog.custom({
                     title: 'Add data error',
-                    message: "Can not add data there is a duplicate of this information.",
+                    message: "This entry already exists.",
                     toolbarItems: [
                         { text: "Close", onClick: function () { return "Ok" } },
                     ],
@@ -1192,114 +1337,131 @@
                     data: { values: JSON.stringify(arrdata), status: "U" },
                     dataType: 'json',
                     success: function (result) {
-                        console.log(result);
-
-                        var status_ERROR = result;
-                        status_ERROR = status_ERROR.filter((el) => {
-                            return el.SqlStatus == "E";
-                        });
-
-                        if (status_ERROR.length > 0) {
-                            var routecodeerror = [];
-                            var sqlmsg = "";
-                            $.each(status_ERROR, function (item, value) {
-                                routecodeerror.push(value["DocEntry"]);
+                        if (result[0] == "U") {// cookie exprie
+                            var customDialog = DevExpress.ui.dialog.custom({
+                                title: 'Login time exprie',
+                                message: 'Please login again.',
+                                toolbarItems: [
+                                    { text: "Close", onClick: function () { return "Ok" } },
+                                ],
+                                width: "500px"
                             });
-                            console.log(routecodeerror);
-                            if (result.length > 1) { //error หลาย row
-                                var customDialog = DevExpress.ui.dialog.custom({
-                                    title: 'Edit data Error',
-                                    message: "Can not edit data [ " + routecodeerror.join(",") + " ]",
-                                    toolbarItems: [
-                                        { text: "Close", onClick: function () { return "Ok" } },
-                                    ],
-                                    width: "500px"
+                            customDialog.show().done(function (dialogResult) {
+                                window.open("Login/Logout", '_self');
+                            });
+
+                        } else {// cookie not exprie
+                            console.log(result);
+
+                            var status_ERROR = result;
+                            status_ERROR = status_ERROR.filter((el) => {
+                                return el.SqlStatus == "E";
+                            });
+
+                            if (status_ERROR.length > 0) {
+                                var routecodeerror = [];
+                                var SqlErrtext = "";
+                                $.each(status_ERROR, function (item, value) {
+                                    routecodeerror.push(value["DocEntry"]);
                                 });
-                                customDialog.show().done(function (dialogResult) {
-                                    grid.option("editing.allowUpdating", true);
-                                    grid.refresh();
-                                    stagenew = "";
-                                    arrdata = [];
-                                    getdata_on_flag = [];
-
-                                });
-                            } else {// ข้อมูลซํ้ากัน ใน case แก้ไข record เดียว
-                                sqlmsg = result[0]["SqlErrtext"];
-                                //DevExpress.ui.dialog.alert(sqlmsg, 'Edit data error');
-                                //$(".dx-dialog .dx-popup-title").css("background-color", "#FD0439");
-                                //$(".dx-dialog .dx-popup-bottom .dx-toolbar-items-container .dx-button").css("background-color", "#FD0439");
-                                var customDialog = DevExpress.ui.dialog.custom({
-                                    title: 'Edit data Error',
-                                    message: sqlmsg,
-                                    toolbarItems: [
-                                        { text: "Close", onClick: function () { return "Ok" } },
-                                    ],
-                                    width: "500px"
-                                });
-                                
-                                customDialog.show().done(function (dialogResult) {
-                                    //console.log(dialogResult);
-                                    //grid.option("editing.allowUpdating", true);
-                                    //grid.refresh();
-                                    //stagenew = "";
-                                    //arrdata = [];
-                                    //getdata_on_flag = [];
-
-                                });
-                            }
-
-                        } else {
-                            grid.option('editing.allowUpdating', true);
-                            DevExpress.ui.notify("Edit data success.", "success", 1500);
-                            grid.refresh();
-                            stagenew = "";
-                            arrdata = [];
-                            getdata_on_flag = [];
-                            //console.log(grid._options);
-                            $("#gridInspectionMaintenance").dxDataGrid({
-                                onToolbarPreparing: function (e) {
-                                    var toolbarItems = e.toolbarOptions.items;
-                                    $.each(toolbarItems, function (_, item) {
-                                        //|| item.name == "revertButton"
-                                        if (item.name == "saveButton") {
-                                            item.visible = false;
-                                        }
-                                        if (item.name == 'revertButton') {
-                                            item.options.onClick = function (arg) {
-                                                e.component.cancelEditData();
-                                                e.component.option('editing.allowUpdating', true);
-                                                var gridInstance = $('#gridInspectionMaintenance').dxDataGrid('instance');
-                                                gridInstance.option("allowColumnReordering", true);
-                                                //gridInstance.option("headerFilter", true);
-                                                e.component.refresh();
-                                                stagenew = "";
-                                                arrdata = [];
-                                                arr_add = [];
-
-                                                e.element
-                                                    .find(".dx-datagrid-addrow-button")
-                                                    .dxButton("instance")
-                                                    .option("disabled", false);
-
-                                            }
-                                        }
+                                console.log(routecodeerror);
+                                if (result.length > 1) { //error หลาย row
+                                    var customDialog = DevExpress.ui.dialog.custom({
+                                        title: 'Edit data Error',
+                                        message: "Can not edit data [ " + routecodeerror.join(",") + " ]",
+                                        toolbarItems: [
+                                            { text: "Close", onClick: function () { return "Ok" } },
+                                        ],
+                                        width: "500px"
+                                    });
+                                    customDialog.show().done(function (dialogResult) {
+                                        grid.option("editing.allowUpdating", true);
+                                        grid.refresh();
+                                        stagenew = "";
+                                        arrdata = [];
+                                        getdata_on_flag = [];
 
                                     });
-                                    e.element
-                                        .find(".dx-datagrid-addrow-button")
-                                        .dxButton("instance")
-                                        .option("disabled", false);
+                                } else {// ข้อมูลซํ้ากัน ใน case แก้ไข record เดียว
+                                    SqlErrtext = result[0]["SqlErrtext"];
+                                    //DevExpress.ui.dialog.alert(SqlErrtext, 'Edit data error');
+                                    //$(".dx-dialog .dx-popup-title").css("background-color", "#FD0439");
+                                    //$(".dx-dialog .dx-popup-bottom .dx-toolbar-items-container .dx-button").css("background-color", "#FD0439");
+                                    var customDialog = DevExpress.ui.dialog.custom({
+                                        title: 'Edit data Error',
+                                        message: SqlErrtext,
+                                        toolbarItems: [
+                                            { text: "Close", onClick: function () { return "Ok" } },
+                                        ],
+                                        width: "500px"
+                                    });
 
+                                    customDialog.show().done(function (dialogResult) {
+                                        //console.log(dialogResult);
+                                        //grid.option("editing.allowUpdating", true);
+                                        //grid.refresh();
+                                        //stagenew = "";
+                                        //arrdata = [];
+                                        //getdata_on_flag = [];
+
+                                    });
                                 }
-                            });
-                            //setTimeout(function () { location.reload(); },1000);
+
+                            } else {
+                                grid.option('editing.allowUpdating', true);
+                                DevExpress.ui.notify("Edit data success.", "success", 1500);
+                                grid.refresh();
+                                stagenew = "";
+                                arrdata = [];
+                                getdata_on_flag = [];
+                                //console.log(grid._options);
+                                $("#gridInspectionMaintenance").dxDataGrid({
+                                    onToolbarPreparing: function (e) {
+                                        var toolbarItems = e.toolbarOptions.items;
+                                        $.each(toolbarItems, function (_, item) {
+                                            //|| item.name == "revertButton"
+                                            if (item.name == "saveButton") {
+                                                item.visible = false;
+                                            }
+                                            if (item.name == 'revertButton') {
+                                                item.options.onClick = function (arg) {
+                                                    e.component.cancelEditData();
+                                                    e.component.option('editing.allowUpdating', true);
+                                                    var gridInstance = $('#gridInspectionMaintenance').dxDataGrid('instance');
+                                                    gridInstance.option("allowColumnReordering", true);
+                                                    //gridInstance.option("headerFilter", true);
+                                                    e.component.refresh();
+                                                    stagenew = "";
+                                                    arrdata = [];
+                                                    arr_add = [];
+
+                                                    e.element
+                                                        .find(".dx-datagrid-addrow-button")
+                                                        .dxButton("instance")
+                                                        .option("disabled", false);
+
+                                                }
+                                            }
+
+                                        });
+                                        e.element
+                                            .find(".dx-datagrid-addrow-button")
+                                            .dxButton("instance")
+                                            .option("disabled", false);
+
+                                    }
+                                });
+                                //setTimeout(function () { location.reload(); },1000);
+                            }
+
                         }
+                        
                     }
                 });
             } else {//ข้อมูลที่ edit มามันซํ้า
                 var customDialog = DevExpress.ui.dialog.custom({
                     title: 'Edit data error',
-                    message: "This data set already exists.",
+                    message: "This entry already exists.",
                     toolbarItems: [
                         { text: "Close", onClick: function () { return "Ok" } },
                     ],
@@ -1345,8 +1507,25 @@
             });
     }
 
+    function OnInitialized(e) {
+        var gridsort = $('#gridInspectionMaintenance').dxDataGrid('instance');
+        //if (!e.component.isNotFirstLoad) {
+
+            gridsort.columnOption('U_RouteCode', 'sortOrder', 'asc');
+            gridsort.columnOption('U_RptOrder', 'sortOrder', 'asc');
+            gridsort.columnOption('U_MethodDesc', 'sortOrder', 'asc');
+        //}
+    }
+
     function onContentReady(e) {
         e.component.option("loadPanel.enabled", false);
+        //var gridsort = $('#gridInspectionMaintenance').dxDataGrid('instance');
+        //if (!e.component.isNotFirstLoad) {           
+
+        //    gridsort.columnOption('U_RouteCode', 'sortOrder', 'asc');
+        //    gridsort.columnOption('U_RptOrder', 'sortOrder', 'asc');
+        //    gridsort.columnOption('U_MethodDesc', 'sortOrder', 'asc');
+        //}
         //e.element
         //    .find(".dx-datagrid-addrow-button") //find the "+" button container
         //    .dxButton("instance") //get the button instance
@@ -1389,6 +1568,12 @@
         }
 
         if (e.rowType === 'data' && e.rowIndex != undefined) {
+            if (stagenew != "new") {
+                if (e.column.dataField == "U_RouteCode" || e.column.dataField == "Desc" || e.column.dataField == "U_Lastupdateby" || e.column.dataField == "U_Lastupdatedate") {
+                
+                    e.cellElement.css("background-color", "#E5E4E4");
+                }
+            }
             //console.log(e.data);
             //e.cellElement.css("background-color", "lightblue");
            
@@ -1497,7 +1682,7 @@
     //});
 
 
-    
+    //console.log(document);
     window.onbeforeunload = function (e) {
         console.log(e);
         //alert("xx");

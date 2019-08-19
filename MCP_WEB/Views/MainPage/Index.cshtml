@@ -1,0 +1,43 @@
+﻿@*@{
+        ViewData["Title"] = "Index";
+    }*@
+@*<style>
+        body {
+            margin: 0;
+            color: #edf3ff;
+            /*background: #c8c8c8;*/
+            background: url("~/images/BG_login.jpeg") fixed;
+            background-size: cover;
+            font-family: 'THSarabun', Fallback, sans-serif;
+        }
+    </style>*@
+@*<h2>Home</h2>*@
+@*@using System.Security.Claims;*@
+<div class="container">
+    <div class="row">
+        <div class="col-lg-12 col-xs-12">
+
+            <div style="text-align:center; "><img style="width:40%;" src="~/images/meticuly-screen-square.png" /></div>
+
+        </div>
+    </div>
+</div>
+@*@{
+
+    var identity = (ClaimsIdentity)User.Identity;
+    var flag = false;
+
+    string lastChanged;
+    lastChanged = (from c in identity.Claims
+                   where c.Type == "ContactName"
+                   select c.Value).FirstOrDefault();
+    if (string.IsNullOrEmpty(lastChanged))
+    {
+        flag = true;
+    }
+
+}
+<script>
+    var check = "@flag";
+    console.log(check);
+</script>*@
